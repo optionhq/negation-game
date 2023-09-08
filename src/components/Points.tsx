@@ -1,0 +1,45 @@
+"use client";
+import { FiHeart, FiLink2, FiXCircle } from "react-icons/fi";
+
+export default function Points({ points, onNegate }: { points: number; onNegate: (e:React.MouseEvent) => void }) {
+  
+  function onNegateClick(e: React.MouseEvent) {
+    onNegate(e);
+  }
+
+  function onLike(e: React.MouseEvent) {
+    e.stopPropagation();
+    e.nativeEvent.stopPropagation();
+    console.log("onLike clicked");
+    console.log(e.isPropagationStopped());
+  }
+
+  function onWrapperClick(e: React.MouseEvent){
+    e.stopPropagation()
+  }
+  return (
+    <div className=" group/points flex flex-col items-center justify-center p-2 rounded-md w-20 hover:bg-slate-300 -my-2 h-12" onClick={onWrapperClick}>
+      {points}
+      <div className="flex-row gap-2 transition-all hidden group-hover/points:flex">
+        <span className="hover:text-green-500 text-xl" onPointerDown={onLike}>
+          <FiHeart />
+        </span>
+        <span className="hover:text-red-500 text-xl" onPointerDown={onNegate}>
+          <FiXCircle />
+        </span>
+      </div>
+    </div>
+  );
+}
+
+
+function Linkage({ points = 0 }: { points?: number }) {
+  return (
+    <div className="w-fit border border-slate-500 rounded-md px-4 py-2 flex flex-col bg-white items-center justify-center ">
+      <div className="flex flex-row gap-2 items-center justify-center">
+        <FiLink2 />
+        <p>{points}</p>
+      </div>
+    </div>
+  );
+}
