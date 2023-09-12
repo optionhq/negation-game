@@ -30,3 +30,7 @@ body {
 textarea {
   @apply bg-gray-50 border-0 text-gray-900 text-sm rounded-lg focus:ring-inset focus:border-0 block w-full p-4 py-3 resize-none;
 }
+
+.claim{
+  @apply relative flex flex-row items-start gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md;
+}

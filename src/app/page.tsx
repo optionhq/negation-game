@@ -39,7 +39,7 @@ export default function Home({ searchParams }: { searchParams: { id: string | nu
   }, [searchParams.id]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-12">
+    <main className="flex min-h-screen flex-col items-center justify-start p-12 px-48">
       {historicalItems && historicalItems?.length !== 0 && <HistoricalClaims claimsIds={historicalItems.reverse()} />}
       <Accordion data={filteredItems} level={0} setHistoricalItems={setHistoricalItems} />
     </main>
