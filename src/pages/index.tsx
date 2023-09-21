@@ -1,12 +1,14 @@
-"use client";
-
-import "./globals.css";
 import { useEffect, useState } from "react";
-import items from "./data";
+import items from "../data";
 import Accordion from "@/components/Accordion";
 import HistoricalClaims from "@/components/HistoricalClaims";
+import Login from "@/components/Login";
+import { useRouter } from 'next/router';
 
 export default function Home({ searchParams }: { searchParams: { id: string | null } }) {
+  const router = useRouter();
+  const { id } = router.query;
+
   const [filteredItems, setFilteredItems] = useState<any []>();
   const [historicalItems, setHistoricalItems] = useState<string[]>();
 
@@ -32,16 +34,19 @@ export default function Home({ searchParams }: { searchParams: { id: string | nu
   }
 
   useEffect(() => {
-    const param = findRoot(searchParams.id?.split(",")[0])
-    const hist = searchParams.id?.split(",").slice(1)
+    const param = findRoot(id?.toString().split(",")[0]);
+    const hist = id?.toString().split(",").slice(1);
     setFilteredItems(param);
     setHistoricalItems(hist);
-  }, [searchParams.id]);
+  }, [id]);
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-start p-12 px-48">
-      {historicalItems && historicalItems?.length !== 0 && <HistoricalClaims claimsIds={historicalItems.reverse()} />}
-      <Accordion data={filteredItems} level={0} setHistoricalItems={setHistoricalItems} />
-    </main>
+    <div>
+      <header className="flex justify-end m-4"><Login/></header>
+      <main className="flex min-h-screen flex-col items-center justify-start p-12 px-48">
+        {historicalItems && historicalItems?.length !== 0 && <HistoricalClaims claimsIds={historicalItems.reverse()} />}
+        <Accordion data={filteredItems} level={0} setHistoricalItems={setHistoricalItems} />
+      </main>
+    </div>
   );
 }

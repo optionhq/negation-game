@@ -1,3 +1,4 @@
+export {default as Login} from "./Login";
 export { default as Accordion } from "./Accordion";
 export { default as AccordionComponent } from "./AccordionComponent";
 export { default as Arrow } from "./Arrow";

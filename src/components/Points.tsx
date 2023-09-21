@@ -1,4 +1,3 @@
-"use client";
 import { FiHeart, FiLink2, FiXCircle } from "react-icons/fi";
 import ReactButtonWrapper from "./ReactButtonWrapper";
 

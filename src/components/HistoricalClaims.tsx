@@ -1,4 +1,4 @@
-import items from "../app/data";
+import items from "../data";
 
 
 export default function HistoricalClaims({ claimsIds }: { claimsIds: string[] }) {
