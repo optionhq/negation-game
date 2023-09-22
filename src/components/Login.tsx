@@ -3,6 +3,7 @@ import Image from 'next/image';
 import axios from 'axios';
 import { useRouter } from 'next/router';
 import { LOCAL_STORAGE_KEYS } from './constants';
+import Link from 'next/link';
 
 interface FarcasterUser {
   signer_uuid: string;

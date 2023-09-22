@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import QRCode from 'qrcode.react';
 import { LOCAL_STORAGE_KEYS } from './constants';
-import { useNavigate } from 'react-router-dom';
+import { useRouter } from 'next/router';
 
 interface FarcasterUser {
   signer_uuid: string;
@@ -16,7 +16,7 @@ interface FarcasterUser {
 
 function QRCodePage() {
   const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);
-  const navigate = useNavigate();
+  const router = useRouter();
 
   useEffect(() => {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEYS.FARCASTER_USER);
@@ -27,6 +27,11 @@ function QRCodePage() {
   }, []);
 
   useEffect(() => {
+    if (!farcasterUser) {
+      // If farcasterUser is not set, don't start polling
+      return;
+    }
+
     let intervalId: NodeJS.Timeout;
 
     const startPolling = () => {
@@ -39,7 +44,7 @@ function QRCodePage() {
             localStorage.setItem(LOCAL_STORAGE_KEYS.FARCASTER_USER, JSON.stringify(user));
             setFarcasterUser(user);
             clearInterval(intervalId);
-            navigate('/');
+            router.push('/');
           }
         } catch (error) {
           console.error('Error during polling', error);
@@ -52,15 +57,22 @@ function QRCodePage() {
     return () => {
       clearInterval(intervalId);
     };
-  }, [farcasterUser, navigate]);
+  }, [farcasterUser, router]);
 
   return farcasterUser?.signer_approval_url ? (
-    <div className="signer-approval-container">
-      <QRCode value={farcasterUser.signer_approval_url} />
-      <div className="or-divider">OR</div>
-      <a href={farcasterUser.signer_approval_url} target="_blank" rel="noopener noreferrer">
-        Click here to view the signer URL
-      </a>
+    <div className="flex items-center justify-center min-h-screen bg-white">
+      <div className="text-center">
+        <QRCode value={farcasterUser.signer_approval_url} className="mx-auto" />
+        <p className="mt-4 mb-2">OR</p>
+        <a 
+          href={farcasterUser.signer_approval_url} 
+          target="_blank" 
+          rel="noopener noreferrer" 
+          className="text-blue-500 hover:underline"
+        >
+          Click there to view the signer URL
+        </a>
+      </div>
     </div>
   ) : null;
 }
