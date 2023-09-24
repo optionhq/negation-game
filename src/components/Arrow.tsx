@@ -9,7 +9,8 @@ export default function Arrow() {
       strokeLinejoin="round"
       strokeWidth="1.5"
       viewBox="0 0 24 24"
-      width="24">
+      width="24"
+      transform="rotate(270)">
       <path d="M6 9l6 6 6-6"></path>
     </svg>
   );

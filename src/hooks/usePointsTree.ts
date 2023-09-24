@@ -5,6 +5,7 @@ export type PointsTree = {
   title: string;
   id: string;
   points: number;
+  replyCount: number;
   children?: PointsTree[];
 };
 
@@ -47,7 +48,8 @@ export async function fetchPointsTree(id: string | null) {
   const pointsTree: PointsTree[] = response.data.casts.map((cast: any) => ({
     title: cast.text,
     id: cast.hash,
-    points: cast.reactions.likes.length, // replace with the correct property for points
+    points: cast.reactions.likes.length, // using likes as the proxy for points for now
+    replyCount: cast.replies.count,
   }));
 
   const param = findRoot(id?.toString().split(",")[0], pointsTree);

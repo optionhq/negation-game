@@ -1,11 +1,11 @@
 export default function InputComponent({
   paddingLeft,
-  claimBg,
+  pointBg: claimBg,
   parent,
   removeInput
 }: {
   paddingLeft: string;
-  claimBg: string;
+  pointBg: string;
   parent: string;
   removeInput: () => void
 }) {

@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
@@ -27,16 +28,27 @@ export default function AccordionComponent({
     setChildren(e.children);
   }, [e]);
 
+  const fetchThread = async () => {
+    const response = await axios.get('https://api.neynar.com/v1/farcaster/all-casts-in-thread', {
+      params: {
+        api_key: process.env.NEYNAR_API_KEY,
+        threadHash: e.id,
+      },
+      headers: {accept: 'text/plain'}
+    });
+    setChildren(response.data.cast);
+  };
+
   function expandDetails() {
     if (!detailsRef.current) return;
     detailsRef.current.open = !detailsRef.current.open;
     setDetailsOpened(detailsRef.current.open);
+    if (!detailsRef.current.open) {
+      fetchThread();
+    }
   }
+
   const onNegate = (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
-    // e.stopPropagation();
-    // e.preventDefault();
-    // e.nativeEvent.stopImmediatePropagation();
-    // e.nativeEvent.stopPropagation();
     if (!detailsRef.current) return;
     detailsRef.current.open = true;
     setDetailsOpened(detailsRef.current.open);
@@ -51,20 +63,13 @@ export default function AccordionComponent({
     if (!parent) return;
 
     setParentChildren((element: any) => {
-      console.log(element);
       let filtered = element.filter((child: any) => child.type !== "input");
-      console.log(filtered);
       return filtered.length ? filtered : null;
     });
-    // const filteredChildren = children.filter((child: any) => child.type !== "input");
-
-    // setParentChildren((element:any) => element.filter((child: any) => child.type === "input"));
-    // const filteredChildren = children.filter((child: any) => child.type === "input");
-    // setChildren(filteredChildren);
   }
 
   const paddingLeft = `${INDENTATION_PX * level + 6}px`;
-  const claimBg = `${level % 2 ? "bg-slate-200" : " bg-slate-100"}`;
+  const pointBg = `${level % 2 ? "bg-slate-200" : " bg-slate-100"}`;
 
   function newRoute() {
     const current = searchParams.get("id");
@@ -74,15 +79,9 @@ export default function AccordionComponent({
   }
 
   function handleClick(e: React.MouseEvent) {
-    console.log("aaa");
-
-    //stop propagation to not toggle
     e.stopPropagation();
-
-    //dont fire if the user is selecting a text
     const selection = window.getSelection()?.toString();
     if (selection) return;
-
     expandDetails();
   }
 
@@ -94,10 +93,11 @@ export default function AccordionComponent({
 
   function toggle(e: any) {
     e.preventDefault();
-    console.log("ééé");
   }
+
   if (e.type === "input")
-    return <InputComponent claimBg={claimBg} paddingLeft={paddingLeft} parent={parent!} removeInput={removeInput} />;
+    return <InputComponent pointBg={pointBg} paddingLeft={paddingLeft} parent={parent!} removeInput={removeInput} />;
+
   return (
     <details
       ref={detailsRef}
@@ -110,15 +110,14 @@ export default function AccordionComponent({
         onClick={(e) => {
           e.preventDefault();
         }}
-        className={claimBg + " claim relative"}
+        className={pointBg + " claim relative"}
         style={{ paddingLeft: paddingLeft }}>
         <div className="flex flex-col gap-2">
-          <div className={`p-1 rounded-md ${children && children.length ? "opacity-100" : "opacity-0"}`}>
-            <div className={`transition w-full h-full ${detailsOpened ? "rotate-180" : ""}`}>
+          <div className={`p-1 rounded-md ${e.replyCount > 0 ? "opacity-100" : "opacity-0"}`}>
+            <div className={`transition w-full h-full ${detailsOpened ? "rotate-90" : "rotate-0"}`}>
               <Arrow />
             </div>
           </div>
-          {/* {detailsOpened && <div className="w-[1px] bg-black absolute bottom-0 top-12 ml-4"></div>} */}
           {parent && <div className="w-[1px] h-24 bg-black absolute -top-14 left-0 z-40" style={{marginLeft: `${22 + (INDENTATION_PX * (level -1))}px`}}></div>}
         </div>
         <div className="flex flex-col gap-1 items-start justify-center">
