@@ -5,6 +5,7 @@ import Accordion from "@/components/Accordion";
 import HistoricalClaims from "@/components/HistoricalClaims";
 import Login from "@/components/Login";
 import { PointsTree, fetchPointsTree } from "@/hooks/usePointsTree";
+import { GetServerSidePropsContext } from 'next';
 
 export default function Home({ pointsTree, historicalItems }: { pointsTree: PointsTree[], historicalItems: string[] }) {
   const router = useRouter();
@@ -25,9 +26,19 @@ export default function Home({ pointsTree, historicalItems }: { pointsTree: Poin
   );
 }
 
-export async function getServerSideProps() {
-  const id = null; // or replace with an appropriate id value
-  const { pointsTree, historicalItems = [] } = await fetchPointsTree(id);
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  let id = context.query.threadId || null; // replace 'threadId' with the actual query parameter for the thread id
+  if (Array.isArray(id)) {
+    id = id[0];
+  }
+
+  let pointsTree = [];
+  let historicalItems: string[] = [];
+
+  // Fetch the points tree if the thread id is not present
+  const data = await fetchPointsTree(null);
+  pointsTree = data.pointsTree;
+  historicalItems = data.historicalItems || [];
 
   return {
     props: {

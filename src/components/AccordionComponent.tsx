@@ -3,6 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
 
+
 const INDENTATION_PX = 25;
 
 export default function AccordionComponent({
@@ -11,40 +12,47 @@ export default function AccordionComponent({
   parent,
   setParentChildren,
   setHistoricalItems,
+  threadData,
 }: {
   level: number;
   e: any;
   parent: string | undefined;
   setParentChildren: any;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
+  threadData: any; 
 }) {
   const [children, setChildren] = useState<any[]>(e.children);
+  const [isDropdownClicked, setIsDropdownClicked] = useState<boolean>(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [detailsOpened, setDetailsOpened] = useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
-    setChildren(e.children);
-  }, [e]);
-
-  const fetchThread = async () => {
-    const response = await axios.get('https://api.neynar.com/v1/farcaster/all-casts-in-thread', {
-      params: {
-        api_key: process.env.NEYNAR_API_KEY,
-        threadHash: e.id,
-      },
-      headers: {accept: 'text/plain'}
-    });
-    setChildren(response.data.cast);
-  };
+    const fetchThreadData = async () => {
+      try {
+        const res = await fetch(`/api/thread?id=${e.id}`);
+        if (!res.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const threadData = await res.json();
+        setChildren(threadData);
+      } catch (error) {
+        console.error('Fetch Error:', error);
+      }
+    };
+  
+    if (isDropdownClicked) {
+      fetchThreadData();
+    }
+  }, [isDropdownClicked]);
 
   function expandDetails() {
     if (!detailsRef.current) return;
     detailsRef.current.open = !detailsRef.current.open;
     setDetailsOpened(detailsRef.current.open);
-    if (!detailsRef.current.open) {
-      fetchThread();
+    if (detailsRef.current.open) {
+      setIsDropdownClicked(true);
     }
   }
 
@@ -139,6 +147,7 @@ export default function AccordionComponent({
               parent={e.title}
               setHistoricalItems={setHistoricalItems}
               setParentChildren={setChildren}
+              threadData={threadData} // add this line
             />
           ))}
         </div>
