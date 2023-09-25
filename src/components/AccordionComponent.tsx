@@ -37,7 +37,7 @@ export default function AccordionComponent({
         id: response.hash,
         parentId: response.parentHash,
         points: response.reactions.length,
-        replyCount: response.replies,
+        replyCount: response.replies.count,
         children: [],
       };
     };
