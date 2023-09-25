@@ -2,7 +2,7 @@ import axios from 'axios';
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
-
+import { PointsTree } from '@/types/PointsTree';
 
 const INDENTATION_PX = 25;
 
@@ -21,27 +21,59 @@ export default function AccordionComponent({
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   threadData: any; 
 }) {
-  const [children, setChildren] = useState<any[]>(e.children);
+  const [children, setChildren] = useState<any[]>(e.children || []);
   const [isDropdownClicked, setIsDropdownClicked] = useState<boolean>(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [detailsOpened, setDetailsOpened] = useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
 
+
+
   useEffect(() => {
+    const responseToPointsTree = (response: any): PointsTree => {
+      return {
+        title: response.text,
+        id: response.hash,
+        parentId: response.parentHash,
+        points: response.reactions.length,
+        replyCount: response.replies,
+        children: [],
+      };
+    };
+
     const fetchThreadData = async () => {
-      try {
-        const res = await fetch(`/api/thread?id=${e.id}`);
-        if (!res.ok) {
-          throw new Error('Network response was not ok');
+      const res = await fetch(`/api/thread?id=${e.id}`);
+      const threadData = await res.json();
+    
+      // Create a map of entries by their hash
+      const entriesByHash: Map<string, PointsTree> = new Map(threadData.map((entry: any) => [entry.hash, responseToPointsTree(entry)]));
+    
+      // Find the replies for each entry
+      threadData.forEach((entry: any) => {
+        if (entry.parentHash && entriesByHash.has(entry.parentHash)) {
+          let parentEntry = entriesByHash.get(entry.parentHash);
+          if (parentEntry) {
+            // Ensure parentEntry.children is defined
+            if (!parentEntry.children) {
+              parentEntry.children = [];
+            }
+            // Exclude duplicates
+            const childEntry = entriesByHash.get(entry.hash);
+            if (childEntry && !parentEntry.children.some(child => child.id === childEntry.id)) {
+              parentEntry.children.push(childEntry);
+            }
+          }
         }
-        const threadData = await res.json();
-        setChildren(threadData);
-      } catch (error) {
-        console.error('Fetch Error:', error);
+      });
+    
+      // Update the children of the current point
+      const currentPoint = entriesByHash.get(e.id);
+      if (currentPoint) {
+        setChildren(currentPoint.children || []);
       }
     };
-  
+    
     if (isDropdownClicked) {
       fetchThreadData();
     }

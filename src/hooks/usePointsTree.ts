@@ -1,13 +1,8 @@
 // src/hooks/usePointsTree.ts
 import axios from 'axios';
+import { PointsTree } from '@/types/PointsTree';
 
-export type PointsTree = {
-  title: string;
-  id: string;
-  points: number;
-  replyCount: number;
-  children?: PointsTree[];
-};
+
 
 function findRoot(id: string | undefined | null, items: any[]) {
   if (!id) return items;
