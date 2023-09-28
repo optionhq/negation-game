@@ -138,37 +138,30 @@ export default function AccordionComponent({
   if (e.type === "input")
     return <InputComponent pointBg={pointBg} paddingLeft={paddingLeft} parent={parent!} removeInput={removeInput} />;
 
-  return (
-    <details
-      ref={detailsRef}
-      open={false}
-      className="flex flex-col gap-1"
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-      onToggle={toggle}>
-      <summary
-        onClick={(e) => {
-          e.preventDefault();
-        }}
-        className={pointBg + " claim relative"}
-        style={{ paddingLeft: paddingLeft }}>
-        <div className="flex flex-col gap-2">
-          <div className={`p-1 rounded-md ${e.replyCount > 0 ? "opacity-100" : "opacity-0"}`}>
-            <div className={`transition w-full h-full ${detailsOpened ? "rotate-90" : "rotate-0"}`}>
-              <Arrow />
+    return (
+      <details
+        ref={detailsRef}
+        open={false}
+        className="flex flex-col gap-1"
+        onClick={handleClick}
+        onDoubleClick={handleDoubleClick}
+        onToggle={toggle}>
+        <summary
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+          className={pointBg + " claim relative"}
+          style={{ paddingLeft: paddingLeft }}>
+          <div className="flex flex-col gap-2 items-start justify-center">
+            <span className="w-full"> {e.title}</span>
+            {e.endPoint && <a href={e.endPoint.id} target="_blank">{e.endPoint.title}</a>} {/* Add this line */}
+            <div className="flex flex-row gap-0 text-gray-500">
+              <Points points={e.points} onNegate={onNegate} type="like" />
+              {parent && <Points points={e.points} onNegate={onNegate} type="relevance" />}
+              <ExternalLink />
             </div>
           </div>
-          {parent && <div className="w-[1px] h-24 bg-black absolute -top-14 left-0 z-40" style={{marginLeft: `${22 + (INDENTATION_PX * (level -1))}px`}}></div>}
-        </div>
-        <div className="flex flex-col gap-1 items-start justify-center">
-          <span className="w-full"> {e.title}</span>
-          <div className="flex flex-row gap-0 text-gray-500">
-            <Points points={e.points} onNegate={onNegate} type="like" />
-            {parent && <Points points={e.points} onNegate={onNegate} type="relevance" />}
-            <ExternalLink />
-          </div>
-        </div>
-      </summary>
+        </summary>
       {children && children.length && (
         <div className="flex flex-col w-full gap-1 ">
           {children?.map((el: any, i: number) => (

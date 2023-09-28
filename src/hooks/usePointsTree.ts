@@ -1,8 +1,7 @@
 // src/hooks/usePointsTree.ts
 import axios from 'axios';
 import { PointsTree } from '@/types/PointsTree';
-
-
+import { getEndPoint } from '@/hooks/useEndPoint';
 
 function findRoot(id: string | undefined | null, items: any[]) {
   if (!id) return items;
@@ -40,11 +39,16 @@ export async function fetchPointsTree(id: string | null) {
 
   const response = await axios.request(options);
 
-  const pointsTree: PointsTree[] = response.data.casts.map((cast: any) => ({
-    title: cast.text,
-    id: cast.hash,
-    points: cast.reactions.likes.length, // using likes as the proxy for points for now
-    replyCount: cast.replies.count,
+  // Use Promise.all to wait for all getEndPoint promises to resolve
+  const pointsTree: PointsTree[] = await Promise.all(response.data.casts.map(async (cast: any) => {
+    const endPoint = await getEndPoint(cast);
+    return {
+      title: cast.text,
+      id: cast.hash,
+      points: cast.reactions.likes.length, // using likes as the proxy for points for now
+      replyCount: cast.replies.count,
+      endPoint: endPoint,
+    };
   }));
 
   const param = findRoot(id?.toString().split(",")[0], pointsTree);
