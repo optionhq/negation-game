@@ -6,5 +6,5 @@ export type PointsTree = {
   points: number;
   replyCount: number;
   children?: PointsTree[];
-  endPoint?: PointsTree;
+  endPoint?: PointsTree | null;
 };

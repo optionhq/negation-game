@@ -51,6 +51,8 @@ export async function fetchPointsTree(id: string | null) {
     };
   }));
 
+  // console.log(pointsTree);
+
   const param = findRoot(id?.toString().split(",")[0], pointsTree);
   const hist = id?.toString().split(",").slice(1);
 

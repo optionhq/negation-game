@@ -2,7 +2,7 @@ import axios from 'axios';
 import { PointsTree } from '@/types/PointsTree';
 
 async function fetchCastByUrl(url: string): Promise<any> {
-
+  console.log(url);
   const options = {
     method: 'GET',
     url: 'https://api.neynar.com/v2/farcaster/cast',
@@ -11,23 +11,39 @@ async function fetchCastByUrl(url: string): Promise<any> {
   };
 
   const response = await axios.request(options);
-
+  console.log(response.data);
   return response.data.cast;
 }
 
+// these are the only URLs that can used to fetch a cast
+const okUrls = [
+  // warpcast.com/usr/0x...
+  /.*warpcast\.com\/[^/]+\/0x[a-fA-F0-9]+$/
+];
+
 /**
  * This function extracts the URL from the first url embed in the cast, if it exists.
- * It only returns URLs from a permissible source (i.e. can be used to fetch a cast)
+ * It only returns URLs from a permissible source (i.e. that can be used to fetch a cast)
  * @param {any} cast - The cast object from which to extract the URL.
- * @param {string[]} permissibleUrls - An array of permissible URLs.
+ * @param {Regex[]} permissibleUrls - An array of permissible URLs.
  * @returns {string|null} - The extracted URL if it exists and is permissible, or null otherwise.
  */
-function extractEndPointUrl(cast: any, permissibleUrls: string[] = ["warpcast.com"]): string | null {
-  return cast.embeds && cast.embeds.find((embed: any) => embed.url && permissibleUrls.some(url => embed.url.includes(url)))?.url || null;
+export function extractEndPointUrl(cast: any, urlCheck: RegExp[] = okUrls): string | null {
+  // console.log("checking cast")
+  // console.log(cast)
+  const url: string = cast.embeds.find((embed: any) => embed.url && urlCheck.some(urlRegex => urlRegex.test(embed.url)))?.url
+  console.log(url)
+  if (url !== '') {
+    // console.log(true);
+    // console.log(url)
+  } else {
+    // console.log(false);
+  }
+  return cast.embeds && cast.embeds.find((embed: any) => embed.url && urlCheck.some(urlRegex => urlRegex.test(embed.url)))?.url || null;
 }
 
-export async function getEndPoint(cast: any) {
-  const endPointUrl = extractEndPointUrl(cast);
+export async function getEndPoint(endPointUrl: string) {
+  console.log(endPointUrl);
   if (!endPointUrl) return null;
   
   try {
@@ -41,6 +57,6 @@ export async function getEndPoint(cast: any) {
     return point;
   } catch (error) {
     console.error('Error fetching endpoint:', error);
-    return null; // or return a fallback value
+    return { title: 'Error fetching endpoint', id: 'error', points: 0, replyCount: 0 };
   }
 }
