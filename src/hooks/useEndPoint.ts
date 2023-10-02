@@ -2,7 +2,6 @@ import axios from 'axios';
 import { PointsTree } from '@/types/PointsTree';
 
 async function fetchCastByUrl(url: string): Promise<any> {
-  console.log(url);
   const options = {
     method: 'GET',
     url: 'https://api.neynar.com/v2/farcaster/cast',
@@ -11,7 +10,6 @@ async function fetchCastByUrl(url: string): Promise<any> {
   };
 
   const response = await axios.request(options);
-  console.log(response.data);
   return response.data.cast;
 }
 
@@ -29,21 +27,10 @@ const okUrls = [
  * @returns {string|null} - The extracted URL if it exists and is permissible, or null otherwise.
  */
 export function extractEndPointUrl(cast: any, urlCheck: RegExp[] = okUrls): string | null {
-  // console.log("checking cast")
-  // console.log(cast)
-  const url: string = cast.embeds.find((embed: any) => embed.url && urlCheck.some(urlRegex => urlRegex.test(embed.url)))?.url
-  console.log(url)
-  if (url !== '') {
-    // console.log(true);
-    // console.log(url)
-  } else {
-    // console.log(false);
-  }
   return cast.embeds && cast.embeds.find((embed: any) => embed.url && urlCheck.some(urlRegex => urlRegex.test(embed.url)))?.url || null;
 }
 
 export async function getEndPoint(endPointUrl: string) {
-  console.log(endPointUrl);
   if (!endPointUrl) return null;
   
   try {

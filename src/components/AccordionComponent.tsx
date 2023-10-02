@@ -22,7 +22,6 @@ export default function AccordionComponent({
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   threadData: any; 
 }) {
-  // console.log(e);
   const [children, setChildren] = useState<any[]>(e.children || []);
   const [isDropdownClicked, setIsDropdownClicked] = useState<boolean>(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
@@ -106,7 +105,6 @@ export default function AccordionComponent({
     var _children = children;
     if (_children) _children.push({ type: "input" });
     else _children = new Array({ type: "input" });
-    _children.map((e: any) => console.log(e));
     setChildren(_children);
   };
 
@@ -184,7 +182,6 @@ export default function AccordionComponent({
       {children && children.length && (
         <div className="flex flex-col w-full gap-1 ">
           {children?.map((el: any, i: number) => (
-            // console.log(el),
             <AccordionComponent
               key={i}
               level={level + 1}

@@ -14,10 +14,6 @@ export default function Points({
     e.nativeEvent.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
     e.stopPropagation();
-
-    // e.nativeEvent.stopPropagation();
-    // console.log("onLike clicked");
-    // console.log(e.isPropagationStopped());
   }
 
   return (

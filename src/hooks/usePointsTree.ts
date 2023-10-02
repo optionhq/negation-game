@@ -8,10 +8,7 @@ function findRoot(id: string | undefined | null, items: any[]) {
   let filteredItems: any[] = [];
   const traverse = (_items: any) => {
     for (const _item of _items) {
-      console.log(_item.hash, id);
       if (_item.hash === id) {
-        console.log("PUSH", _item.hash)
-        filteredItems.push(_item);
         break;
       } else if (_item.replies && _item.replies.count > 0) {
         traverse(_item.replies);
@@ -51,7 +48,6 @@ export async function fetchPointsTree(id: string | null) {
     };
   }));
 
-  // console.log(pointsTree);
 
   const param = findRoot(id?.toString().split(",")[0], pointsTree);
   const hist = id?.toString().split(",").slice(1);

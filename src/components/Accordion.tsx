@@ -20,7 +20,8 @@ export default function Accordion({
           e={e}
           parent={parent}
           setHistoricalItems={setHistoricalItems}
-          setParentChildren={e.children} 
+          setParentChildren={e.children}
+          threadData={{}}
         />
       ))}
     </div>
