@@ -1,15 +1,18 @@
-import axios from 'axios';
+import axios from "axios";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
-import { EndPointsTree, LinkPointsTree } from '@/types/PointsTree';
-import { extractEndPointUrl } from '@/hooks/useEndPoints';
-
+import { EndPointsTree, LinkPointsTree, User } from "@/types/PointsTree";
+import { extractEndPointUrl } from "@/hooks/useEndPoints";
+import { extractLink } from "@/lib/extractLink";
+import RecastedComponent from "./RecastedComponent";
+import ProfilePreview from "./ProfilePreview";
 const INDENTATION_PX = 25;
 
 type ThreadEntry = {
   text: string;
   hash: string;
+  author: User,
   parentHash?: string;
   reactions: { count: number };
   replies: { count: number };
@@ -24,11 +27,11 @@ export default function AccordionComponent({
   threadData,
 }: {
   level: number;
-  e: any;
+  e:  LinkPointsTree;
   parent: string | undefined;
   setParentChildren: any;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
-  threadData: any; 
+  threadData: any;
 }) {
   const [children, setChildren] = useState<any[]>(e.children || []);
   const [isDropdownClicked, setIsDropdownClicked] = useState<boolean>(false);
@@ -37,14 +40,14 @@ export default function AccordionComponent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentEntry, setCurrentEntry] = useState<LinkPointsTree>(e);
-
-
+  const { text, link } = extractLink(e.title);
 
   useEffect(() => {
     const responseToEndPointsTree = (response: ThreadEntry): EndPointsTree => {
       return {
         title: response.text,
         id: response.hash,
+        author: response.author,
         parentId: response.parentHash,
         points: response.reactions.count,
         replyCount: response.replies.count,
@@ -57,6 +60,7 @@ export default function AccordionComponent({
       return {
         title: response.text,
         id: response.hash,
+        author: response.author,
         parentId: response.parentHash,
         points: response.reactions.count,
         replyCount: response.replies.count,
@@ -65,19 +69,15 @@ export default function AccordionComponent({
       };
     };
 
-
     const fetchThreadData = async () => {
       const res = await fetch(`/api/thread?id=${e.id}`);
       const threadData: ThreadEntry[] = await res.json();
-    
+
       // Create a map of entries by their hash
       const entriesByHash: Map<string, LinkPointsTree> = new Map(
-        threadData.map((entry: ThreadEntry) => [
-          entry.hash, 
-          responseToLinkPointsTree(entry)
-        ])
+        threadData.map((entry: ThreadEntry) => [entry.hash, responseToLinkPointsTree(entry)])
       );
-    
+
       // Find the replies for each entry
       threadData.forEach((entry: ThreadEntry) => {
         if (entry.parentHash && entriesByHash.has(entry.parentHash)) {
@@ -89,20 +89,20 @@ export default function AccordionComponent({
             }
             // Exclude duplicates
             const childEntry = entriesByHash.get(entry.hash);
-            if (childEntry && !parentEntry.children.some(child => child.id === childEntry.id)) {
+            if (childEntry && !parentEntry.children.some((child) => child.id === childEntry.id)) {
               parentEntry.children.push(childEntry);
             }
           }
         }
       });
-    
+
       // Update the children of the current point
       const currentPoint = entriesByHash.get(e.id);
       if (currentPoint) {
         setChildren(currentPoint.children || []);
       }
     };
-    
+
     if (isDropdownClicked) {
       fetchThreadData();
     }
@@ -176,10 +176,9 @@ export default function AccordionComponent({
   function toggle(e: any) {
     e.preventDefault();
   }
-
+  //@ts-ignore
   if (e.type === "input")
     return <InputComponent pointBg={pointBg} paddingLeft={paddingLeft} parent={parent!} removeInput={removeInput} />;
-
   return (
     <details
       ref={detailsRef}
@@ -200,13 +199,16 @@ export default function AccordionComponent({
               <Arrow />
             </div>
           </div>
-          {parent && <div className="w-[1px] h-24 bg-black absolute -top-14 left-0 z-40" style={{marginLeft: `${22 + (INDENTATION_PX * (level -1))}px`}}></div>}
+          {parent && (
+            <div
+              className="w-[1px] h-24 bg-black absolute -top-14 left-0 z-40"
+              style={{ marginLeft: `${22 + INDENTATION_PX * (level - 1)}px` }}></div>
+          )}
         </div>
         <div className="flex flex-col gap-1 items-start justify-center">
-          <span className="w-full"> {e.title}</span>
-          {currentEntry.endPoint && (
-            <pre>{JSON.stringify(currentEntry.endPoint, null, 2)}</pre>
-          )}
+          <ProfilePreview user={e.author!}/>
+          <span className="w-full"> {text}</span>
+          {link && <RecastedComponent url={link} />}
           <div className="flex flex-row gap-0 text-gray-500">
             <Points points={e.points} onNegate={onNegate} type="like" />
             {parent && <Points points={e.points} onNegate={onNegate} type="relevance" />}
@@ -214,21 +216,21 @@ export default function AccordionComponent({
           </div>
         </div>
       </summary>
-    {e.replyCount > 0 && (
-      <div className="flex flex-col w-full gap-1 ">
-        {children.map((el: any, i: number) => (
-          <AccordionComponent
-            key={i}
-            level={level + 1}
-            e={el}
-            parent={e.title}
-            setHistoricalItems={setHistoricalItems}
-            setParentChildren={setChildren}
-            threadData={threadData}
-          />
-        ))}
-      </div>
-    )}
-  </details>
+      {e.replyCount > 0 && (
+        <div className="flex flex-col w-full gap-1 ">
+          {children.map((el: any, i: number) => (
+            <AccordionComponent
+              key={i}
+              level={level + 1}
+              e={el}
+              parent={e.title}
+              setHistoricalItems={setHistoricalItems}
+              setParentChildren={setChildren}
+              threadData={threadData}
+            />
+          ))}
+        </div>
+      )}
+    </details>
   );
 }
