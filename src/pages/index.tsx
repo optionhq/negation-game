@@ -4,8 +4,10 @@ import { useRouter } from 'next/router';
 import Accordion from "@/components/Accordion";
 import HistoricalClaims from "@/components/HistoricalClaims";
 import Login from "@/components/Login";
-import { PointsTree, fetchPointsTree } from "@/hooks/usePointsTree";
+import { fetchPointsTree } from "@/hooks/usePointsTree";
+import { PointsTree } from '@/types/PointsTree';
 import { GetServerSidePropsContext } from 'next';
+import SimpleComponent from '@/components/SimpleComponent';
 
 export default function Home({ pointsTree, historicalItems }: { pointsTree: PointsTree[], historicalItems: string[] }) {
   const router = useRouter();
@@ -18,6 +20,7 @@ export default function Home({ pointsTree, historicalItems }: { pointsTree: Poin
   return (
     <div>
       <header className="flex justify-end m-4"><Login/></header>
+      < SimpleComponent />
       <main className="flex min-h-screen flex-col items-center justify-start p-12 px-48">
         {historicalItemsState && historicalItemsState?.length !== 0 && <HistoricalClaims claimsIds={historicalItemsState.reverse()} />}
         <Accordion data={filteredItems} level={0} setHistoricalItems={setHistoricalItems} />
