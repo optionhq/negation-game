@@ -11,7 +11,7 @@ type ThreadEntry = {
   text: string;
   hash: string;
   parentHash?: string;
-  reactions: any[];
+  reactions: { count: number };
   replies: { count: number };
 };
 
@@ -36,31 +36,35 @@ export default function AccordionComponent({
   const [detailsOpened, setDetailsOpened] = useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [currentEntry, setCurrentEntry] = useState<LinkPointsTree>(e);
 
 
 
   useEffect(() => {
-    const responseToLinkPointsTree = (response: ThreadEntry): EndPointsTree | LinkPointsTree => {
-      return {
-        title: response.text,
-        id: response.hash,
-        parentId: response.parentHash,
-        points: response.reactions.length,
-        replyCount: response.replies.count,
-        children: [],
-      };
-    };
-
     const responseToEndPointsTree = (response: ThreadEntry): EndPointsTree => {
       return {
         title: response.text,
         id: response.hash,
         parentId: response.parentHash,
-        points: response.reactions.length,
+        points: response.reactions.count,
         replyCount: response.replies.count,
         children: [],
       };
     };
+
+    const responseToLinkPointsTree = (response: ThreadEntry): LinkPointsTree => {
+      const endPointUrl = extractEndPointUrl(response);
+      return {
+        title: response.text,
+        id: response.hash,
+        parentId: response.parentHash,
+        points: response.reactions.count,
+        replyCount: response.replies.count,
+        children: [],
+        endPointUrl: endPointUrl || undefined,
+      };
+    };
+
 
     const fetchThreadData = async () => {
       const res = await fetch(`/api/thread?id=${e.id}`);
@@ -92,18 +96,6 @@ export default function AccordionComponent({
         }
       });
     
-      // Set the endPoint property for each LinkingPointsTree that has a parent
-      for (const [hash, entry] of entriesByHash) {
-        if (entry.parentId) {
-          const endPointUrl = extractEndPointUrl(entry);
-          if (endPointUrl) {
-            const endPointResponse = await fetch(`/api/endpoint?endPointUrl=${endPointUrl}`);
-            const endPointData: ThreadEntry = await endPointResponse.json();
-            entry.endPoint = responseToEndPointsTree(endPointData);
-          }
-        }
-      }
-    
       // Update the children of the current point
       const currentPoint = entriesByHash.get(e.id);
       if (currentPoint) {
@@ -115,6 +107,19 @@ export default function AccordionComponent({
       fetchThreadData();
     }
   }, [isDropdownClicked]);
+
+  useEffect(() => {
+    fetchEndPoint(e);
+  }, []);
+
+  const fetchEndPoint = async (entry: LinkPointsTree) => {
+    if (entry.endPointUrl && !entry.endPoint) {
+      const endPointResponse = await fetch(`/api/endpoint?endPointUrl=${entry.endPointUrl}`);
+      const endPointData: EndPointsTree = await endPointResponse.json();
+      entry.endPoint = endPointData;
+      setCurrentEntry({ ...entry }); // trigger a re-render
+    }
+  };
 
   function expandDetails() {
     if (!detailsRef.current) return;
@@ -199,6 +204,9 @@ export default function AccordionComponent({
         </div>
         <div className="flex flex-col gap-1 items-start justify-center">
           <span className="w-full"> {e.title}</span>
+          {currentEntry.endPoint && (
+            <pre>{JSON.stringify(currentEntry.endPoint, null, 2)}</pre>
+          )}
           <div className="flex flex-row gap-0 text-gray-500">
             <Points points={e.points} onNegate={onNegate} type="like" />
             {parent && <Points points={e.points} onNegate={onNegate} type="relevance" />}
@@ -206,21 +214,21 @@ export default function AccordionComponent({
           </div>
         </div>
       </summary>
-      {children && children.length && (
-        <div className="flex flex-col w-full gap-1 ">
-          {children?.map((el: any, i: number) => (
-            <AccordionComponent
-              key={i}
-              level={level + 1}
-              e={el}
-              parent={e.title}
-              setHistoricalItems={setHistoricalItems}
-              setParentChildren={setChildren}
-              threadData={threadData} // add this line
-            />
-          ))}
-        </div>
-      )}
-    </details>
+    {children && children.length && (
+      <div className="flex flex-col w-full gap-1 ">
+        {children?.map((el: any, i: number) => (
+          <AccordionComponent
+            key={i}
+            level={level + 1}
+            e={el}
+            parent={e.title}
+            setHistoricalItems={setHistoricalItems}
+            setParentChildren={setChildren}
+            threadData={threadData}
+          />
+        ))}
+      </div>
+    )}
+  </details>
   );
 }

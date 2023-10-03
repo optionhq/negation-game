@@ -10,4 +10,5 @@ export type EndPointsTree = {
 // TODO: once we've switched to the real network, endPoint should be required
 export interface LinkPointsTree extends EndPointsTree {
   endPoint?: EndPointsTree;
+  endPointUrl?: string;
 }
