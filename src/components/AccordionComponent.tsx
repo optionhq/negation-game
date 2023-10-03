@@ -3,6 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
 import { EndPointsTree, LinkPointsTree } from '@/types/PointsTree';
+import { extractEndPointUrl } from '@/hooks/useEndPoints';
 
 const INDENTATION_PX = 25;
 
@@ -39,7 +40,18 @@ export default function AccordionComponent({
 
 
   useEffect(() => {
-    const responseToPointsTree = (response: ThreadEntry): LinkPointsTree => {
+    const responseToLinkPointsTree = (response: ThreadEntry): EndPointsTree | LinkPointsTree => {
+      return {
+        title: response.text,
+        id: response.hash,
+        parentId: response.parentHash,
+        points: response.reactions.length,
+        replyCount: response.replies.count,
+        children: [],
+      };
+    };
+
+    const responseToEndPointsTree = (response: ThreadEntry): EndPointsTree => {
       return {
         title: response.text,
         id: response.hash,
@@ -55,7 +67,12 @@ export default function AccordionComponent({
       const threadData: ThreadEntry[] = await res.json();
     
       // Create a map of entries by their hash
-      const entriesByHash: Map<string, LinkPointsTree> = new Map(threadData.map((entry: ThreadEntry) => [entry.hash, responseToPointsTree(entry)]));
+      const entriesByHash: Map<string, LinkPointsTree> = new Map(
+        threadData.map((entry: ThreadEntry) => [
+          entry.hash, 
+          responseToLinkPointsTree(entry)
+        ])
+      );
     
       // Find the replies for each entry
       threadData.forEach((entry: ThreadEntry) => {
@@ -75,15 +92,17 @@ export default function AccordionComponent({
         }
       });
     
-      // Set the endPoint property for each LinkingPointsTree that is not a top-level entry
-      entriesByHash.forEach((entry, hash) => {
+      // Set the endPoint property for each LinkingPointsTree that has a parent
+      for (const [hash, entry] of entriesByHash) {
         if (entry.parentId) {
-          const parentEntry = entriesByHash.get(entry.parentId);
-          if (parentEntry) {
-            entry.endPoint = parentEntry;
+          const endPointUrl = extractEndPointUrl(entry);
+          if (endPointUrl) {
+            const endPointResponse = await fetch(`/api/endpoint?endPointUrl=${endPointUrl}`);
+            const endPointData: ThreadEntry = await endPointResponse.json();
+            entry.endPoint = responseToEndPointsTree(endPointData);
           }
         }
-      });
+      }
     
       // Update the children of the current point
       const currentPoint = entriesByHash.get(e.id);
