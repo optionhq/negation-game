@@ -214,9 +214,9 @@ export default function AccordionComponent({
           </div>
         </div>
       </summary>
-    {children && children.length && (
+    {e.replyCount > 0 && (
       <div className="flex flex-col w-full gap-1 ">
-        {children?.map((el: any, i: number) => (
+        {children.map((el: any, i: number) => (
           <AccordionComponent
             key={i}
             level={level + 1}
