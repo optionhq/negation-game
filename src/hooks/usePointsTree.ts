@@ -1,6 +1,6 @@
 // src/hooks/usePointsTree.ts
 import axios from 'axios';
-import { PointsTree } from '@/types/PointsTree';
+import { LinkPointsTree } from '@/types/PointsTree';
 
 
 
@@ -40,10 +40,10 @@ export async function fetchPointsTree(id: string | null) {
 
   const response = await axios.request(options);
 
-  const pointsTree: PointsTree[] = response.data.casts.map((cast: any) => ({
+  const pointsTree: LinkPointsTree[] = response.data.casts.map((cast: any) => ({
     title: cast.text,
     id: cast.hash,
-    points: cast.reactions.likes.length, // using likes as the proxy for points for now
+    points: cast.reactions.likes.length,
     replyCount: cast.replies.count,
   }));
 

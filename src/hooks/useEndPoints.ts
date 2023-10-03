@@ -47,7 +47,7 @@ export async function getEndPoint(endPointUrl: string) {
     const point: PointsTree = {
       title: endCast.text,
       id: endCast.hash,
-      points: endCast.reactions.likes.length, // using likes as the proxy for points for now
+      points: endCast.reactions.likes.length,
       replyCount: endCast.replies.count,
     }
     return point;

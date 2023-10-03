@@ -5,11 +5,11 @@ import Accordion from "@/components/Accordion";
 import HistoricalClaims from "@/components/HistoricalClaims";
 import Login from "@/components/Login";
 import { fetchPointsTree } from "@/hooks/usePointsTree";
-import { PointsTree } from '@/types/PointsTree';
+import { LinkPointsTree } from '@/types/PointsTree';
 import { GetServerSidePropsContext } from 'next';
 import SimpleComponent from '@/components/SimpleComponent';
 
-export default function Home({ pointsTree, historicalItems }: { pointsTree: PointsTree[], historicalItems: string[] }) {
+export default function Home({ pointsTree, historicalItems }: { pointsTree: LinkPointsTree[], historicalItems: string[] }) {
   const router = useRouter();
   const id = Array.isArray(router.query.id) ? router.query.id[0] : router.query.id || null;
 

@@ -8,7 +8,8 @@ const SimpleComponent = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const response = await axios.get(`/api/endpoint?endPointUrl=${encodeURIComponent(url)}`);
+        const response = await axios.get(`/api/thread?id=${"0x73b7e784d6fbc6592997735588dc6bb0de2dedac"}`);
+
         setData(response.data);
       } catch (error) {
         console.error('Error fetching data:', error);

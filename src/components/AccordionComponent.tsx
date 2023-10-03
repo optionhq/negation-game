@@ -2,9 +2,17 @@ import axios from 'axios';
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
-import { PointsTree } from '@/types/PointsTree';
+import { EndPointsTree, LinkPointsTree } from '@/types/PointsTree';
 
 const INDENTATION_PX = 25;
+
+type ThreadEntry = {
+  text: string;
+  hash: string;
+  parentHash?: string;
+  reactions: any[];
+  replies: { count: number };
+};
 
 export default function AccordionComponent({
   level,
@@ -31,7 +39,7 @@ export default function AccordionComponent({
 
 
   useEffect(() => {
-    const responseToPointsTree = (response: any): PointsTree => {
+    const responseToPointsTree = (response: ThreadEntry): LinkPointsTree => {
       return {
         title: response.text,
         id: response.hash,
@@ -44,13 +52,13 @@ export default function AccordionComponent({
 
     const fetchThreadData = async () => {
       const res = await fetch(`/api/thread?id=${e.id}`);
-      const threadData = await res.json();
+      const threadData: ThreadEntry[] = await res.json();
     
       // Create a map of entries by their hash
-      const entriesByHash: Map<string, PointsTree> = new Map(threadData.map((entry: any) => [entry.hash, responseToPointsTree(entry)]));
+      const entriesByHash: Map<string, LinkPointsTree> = new Map(threadData.map((entry: ThreadEntry) => [entry.hash, responseToPointsTree(entry)]));
     
       // Find the replies for each entry
-      threadData.forEach((entry: any) => {
+      threadData.forEach((entry: ThreadEntry) => {
         if (entry.parentHash && entriesByHash.has(entry.parentHash)) {
           let parentEntry = entriesByHash.get(entry.parentHash);
           if (parentEntry) {
@@ -63,6 +71,16 @@ export default function AccordionComponent({
             if (childEntry && !parentEntry.children.some(child => child.id === childEntry.id)) {
               parentEntry.children.push(childEntry);
             }
+          }
+        }
+      });
+    
+      // Set the endPoint property for each LinkingPointsTree that is not a top-level entry
+      entriesByHash.forEach((entry, hash) => {
+        if (entry.parentId) {
+          const parentEntry = entriesByHash.get(entry.parentId);
+          if (parentEntry) {
+            entry.endPoint = parentEntry;
           }
         }
       });
