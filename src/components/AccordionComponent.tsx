@@ -3,7 +3,7 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
 import { EndPointsTree, LinkPointsTree } from '@/types/PointsTree';
-import { extractEndPointUrl } from '@/hooks/useEndPoints';
+import { extractEndPointUrl } from '@/lib/useEndPoints';
 
 const INDENTATION_PX = 25;
 
