@@ -1,7 +1,7 @@
 // src/hooks/usePointsTree.ts
 import axios from 'axios';
 import { LinkPointsTree } from '@/types/PointsTree';
-
+import config from '@/config';
 
 
 function findRoot(id: string | undefined | null, items: any[]) {
@@ -33,7 +33,7 @@ export async function fetchPointsTree(id: string | null) {
       api_key: process.env.NEYNAR_API_KEY,
       feed_type: 'filter',
       filter_type: 'parent_url',
-      parent_url: 'chain://eip155:1/erc721:0xd4498134211baad5846ce70ce04e7c4da78931cc'
+      parent_url: config.parentUrl,
     },
     headers: {accept: 'application/json', api_key: process.env.NEYNAR_API_KEY}
   };

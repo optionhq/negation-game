@@ -3,16 +3,7 @@ import axios from 'axios';
 import QRCode from 'qrcode.react';
 import { LOCAL_STORAGE_KEYS } from './constants';
 import { useRouter } from 'next/router';
-
-interface FarcasterUser {
-  signer_uuid: string;
-  public_key: string;
-  status: string;
-  signer_approval_url?: string;
-  fid?: number;
-  username?: string;
-  profile_picture?: string;
-}
+import { FarcasterUser } from '@/types/FarcasterUser';
 
 function QRCodePage() {
   const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);

@@ -7,6 +7,7 @@ export async function fetchThread(id: string) {
     const response = await axios.get('https://api.neynar.com/v1/farcaster/all-casts-in-thread', {
       params: {
         api_key: process.env.NEYNAR_API_KEY,
+        // Hash of the first cast in thread
         threadHash: id,
       },
       headers: {accept: 'text/plain'}
