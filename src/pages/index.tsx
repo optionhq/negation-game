@@ -4,22 +4,32 @@ import { useRouter } from 'next/router';
 import Accordion from "@/components/Accordion";
 import HistoricalClaims from "@/components/HistoricalClaims";
 import Login from "@/components/Login";
-import { fetchPointsTree } from "@/hooks/usePointsTree";
 import { LinkPointsTree } from '@/types/PointsTree';
-import { GetServerSidePropsContext } from 'next';
 import Cast from '@/components/Cast';
 import { LOCAL_STORAGE_KEYS } from '@/components/constants';
 import { FarcasterUser } from '@/types/FarcasterUser';
+import axios from 'axios';
+import { NextPageContext } from 'next';
+import { fetchFeed } from '@/pages/api/feed';
 
-export default function Home({ pointsTree, historicalItems }: { pointsTree: LinkPointsTree[], historicalItems: string[] }) {
+export default function Home({ initialPointsTree, initialHistoricalItems }: { initialPointsTree: LinkPointsTree[], initialHistoricalItems: string[] }) {
   const router = useRouter();
   const id = Array.isArray(router.query.id) ? router.query.id[0] : router.query.id || null;
 
-  // Use the fetched data directly
-  const filteredItems = pointsTree;
-  const [historicalItemsState, setHistoricalItems] = useState<string[] | undefined>(historicalItems);
+  const [filteredItems, setFilteredItems] = useState(initialPointsTree);
+  const [historicalItemsState, setHistoricalItems] = useState<string[] | undefined>(initialHistoricalItems);
   
   const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);
+
+  const reloadThreads = async () => {
+    try {
+      const response = await axios.get(`/api/feed?id=${router.query.id}`);
+      console.log('reload response', response.data)
+      setFilteredItems(response.data.pointsTree);
+    } catch (error) {
+      console.error('Could not reload threads', error);
+    }
+  };
 
   useEffect(() => {
     const storedData = localStorage.getItem(LOCAL_STORAGE_KEYS.FARCASTER_USER);
@@ -33,7 +43,7 @@ export default function Home({ pointsTree, historicalItems }: { pointsTree: Link
     <div>
       <header className="flex justify-end m-4"><Login/></header>
       <main className="flex min-h-screen flex-col items-center justify-start p-12 px-48">
-        {farcasterUser && <Cast farcasterUser={farcasterUser} />}
+        {farcasterUser?.status == 'approved' && <Cast farcasterUser={farcasterUser} reloadThreads={reloadThreads}/>}
         {historicalItemsState && historicalItemsState?.length !== 0 && <HistoricalClaims claimsIds={historicalItemsState.reverse()} />}
         <Accordion data={filteredItems} level={0} setHistoricalItems={setHistoricalItems} />
       </main>
@@ -41,24 +51,13 @@ export default function Home({ pointsTree, historicalItems }: { pointsTree: Link
   );
 }
 
-export async function getServerSideProps(context: GetServerSidePropsContext) {
-  let id = context.query.threadId || null; // replace 'threadId' with the actual query parameter for the thread id
-  if (Array.isArray(id)) {
-    id = id[0];
-  }
+Home.getInitialProps = async (context: NextPageContext) => {
+  let id = context.query.threadId || null;
 
-  let pointsTree = [];
-  let historicalItems: string[] = [];
-
-  // Fetch the points tree if the thread id is not present
-  const data = await fetchPointsTree(null);
-  pointsTree = data.pointsTree;
-  historicalItems = data.historicalItems || [];
+  const { pointsTree, historicalItems } = await fetchFeed(id as string)
 
   return {
-    props: {
-      pointsTree,
-      historicalItems,
-    },
+    initialPointsTree: pointsTree,
+    initialHistoricalItems: historicalItems,
   };
-}
+};

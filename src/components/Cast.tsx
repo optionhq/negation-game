@@ -3,7 +3,7 @@ import axios from 'axios';
 import { FarcasterUser } from '@/types/FarcasterUser';
 import config from '@/config';
 
-function Cast({ farcasterUser }: {farcasterUser?: FarcasterUser }) {
+function Cast({ farcasterUser, reloadThreads }: {farcasterUser?: FarcasterUser, reloadThreads: () => void }) {
   const [castText, setCastText] = useState('');
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
@@ -18,6 +18,7 @@ function Cast({ farcasterUser }: {farcasterUser?: FarcasterUser }) {
         setCastText('');
         setShowSuccessMessage(true);
         setTimeout(() => setShowSuccessMessage(false), 3000);
+        reloadThreads();
       }
     } catch (error) {
       console.error('Could not send the cast', error);

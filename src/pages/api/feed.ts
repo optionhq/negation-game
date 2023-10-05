@@ -1,10 +1,13 @@
-// src/hooks/usePointsTree.ts
+// pages/api/feed.ts
 import axios from 'axios';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { LinkPointsTree } from '@/types/PointsTree';
 import config from '@/config';
 
 
 function findRoot(id: string | undefined | null, items: any[]) {
+  // for now just return all items
+  return items;
   if (!id) return items;
   let filteredItems: any[] = [];
   const traverse = (_items: any) => {
@@ -25,7 +28,7 @@ function findRoot(id: string | undefined | null, items: any[]) {
   return filteredItems;
 }
 
-export async function fetchPointsTree(id: string | null) {
+export async function fetchFeed(id: string | null) {
   const options = {
     method: 'GET',
     url: 'https://api.neynar.com/v2/farcaster/feed',
@@ -51,4 +54,14 @@ export async function fetchPointsTree(id: string | null) {
   const hist = id?.toString().split(",").slice(1);
 
   return { pointsTree: param, historicalItems: hist };
+}
+
+export default async function handler(req: NextApiRequest, res: NextApiResponse) {
+  const { id } = req.query;
+  if (!id || Array.isArray(id)) {
+    return res.status(400).json({ error: 'Invalid thread id' });
+  }
+
+  const pointsTree = await fetchFeed(id as string || null);
+  res.status(200).json(pointsTree);
 }
