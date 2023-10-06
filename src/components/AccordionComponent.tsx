@@ -3,10 +3,11 @@ import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
 import { EndPointsTree, LinkPointsTree, User } from "@/types/PointsTree";
-import { extractEndPointUrl } from "@/hooks/useEndPoints";
-import { extractLink } from "@/lib/extractLink";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
+import { extractLink } from "@/lib/extractLink";
+import { extractEndPointUrl } from '@/lib/useEndPoints';
+
 const INDENTATION_PX = 25;
 
 type ThreadEntry = {

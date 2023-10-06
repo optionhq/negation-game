@@ -4,16 +4,7 @@ import axios from 'axios';
 import { useRouter } from 'next/router';
 import { LOCAL_STORAGE_KEYS } from './constants';
 import Link from 'next/link';
-
-interface FarcasterUser {
-  signer_uuid: string;
-  public_key: string;
-  status: string;
-  signer_approval_url?: string;
-  fid?: number;
-  username?: string;
-  profile_picture?: string;
-}
+import { FarcasterUser } from '@/types/FarcasterUser';
 
 function Login() {
   const [loading, setLoading] = useState(false);
