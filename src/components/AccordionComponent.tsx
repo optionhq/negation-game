@@ -5,8 +5,8 @@ import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/compon
 import { EndPointsTree, LinkPointsTree, User } from "@/types/PointsTree";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
-import { extractLink } from "@/lib/extractLink";
 import { extractEndPointUrl } from '@/lib/useEndPoints';
+import { extractLink } from "@/lib/extractLink";
 
 const INDENTATION_PX = 25;
 
@@ -135,11 +135,12 @@ export default function AccordionComponent({
     if (!detailsRef.current) return;
     detailsRef.current.open = true;
     setDetailsOpened(detailsRef.current.open);
-    var _children = children;
-    if (_children) _children.push({ type: "input" });
-    else _children = new Array({ type: "input" });
-    _children.map((e: any) => console.log(e));
-    setChildren(_children);
+    
+    // Check if children already contains an object with type: "input"
+    if (!children.some(child => child.type === "input")) {
+      var _children = [...children, { type: "input" }];
+      setChildren(_children);
+    }
   };
 
   function removeInput() {
@@ -217,7 +218,7 @@ export default function AccordionComponent({
           </div>
         </div>
       </summary>
-      {e.replyCount > 0 && (
+      {children.length > 0 && (
         <div className="flex flex-col w-full gap-1 ">
           {children.map((el: any, i: number) => (
             <AccordionComponent

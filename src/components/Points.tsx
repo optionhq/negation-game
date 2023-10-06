@@ -32,7 +32,7 @@ function NegateLikeButtons({
             <HiOutlineCheckCircle size={24} />
           </span>
         </Tooltip>
-        <Tooltip text={type == "like" ? "Not true" : "Does not Apply"} orientation="right">
+        <Tooltip text={type == "like" ? "Not true" : "Does not apply"} orientation="right">
           <span className="hover:text-purple-600 text-xl" onPointerDown={onNegate}>
             <HiOutlineXCircle size={24} />
           </span>
