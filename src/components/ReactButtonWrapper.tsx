@@ -1,6 +1,6 @@
 export default function ReactButtonWrapper({ children }: { children: React.ReactNode }) {
   return (
-    <div className="group/points flex flex-row items-center justify-center gap-2 p-1 rounded-md w-20 hover:bg-slate-300 -my-2 h-12">
+    <div className="group/points flex flex-row items-center justify-center gap-2 px-2 py-1 rounded-md transition-all border-[1px] border-slate-300  hover:border-slate-400 hover: bg-blend-color-dodge hover:bg-slate-200">
         {children}
     </div>
   );

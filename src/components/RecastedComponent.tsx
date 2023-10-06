@@ -14,6 +14,6 @@ export default function RecastedComponent({ url }: { url: string }) {
     };
     fetchPointData();
   }, []);
-  
-  return <div className="m-2 p-2 border border-gray rounded-md">{data?.title}</div>;
+
+  return <div className="m-2 p-2 border border-slate-300 rounded-md w-full max-h-36">{data?.title}</div>;
 }

@@ -151,7 +151,7 @@ export default function AccordionComponent({
   }
 
   const paddingLeft = `${INDENTATION_PX * level + 6}px`;
-  const pointBg = `${level % 2 ? "bg-slate-200" : " bg-slate-100"}`;
+  const pointBg = `${level % 2 ? "bg-indigo-700 bg-opacity-10" : " bg-slate-50"}`;
 
   function newRoute() {
     const current = searchParams.get("id");
@@ -191,7 +191,7 @@ export default function AccordionComponent({
         onClick={(e) => {
           e.preventDefault();
         }}
-        className={pointBg + " claim relative"}
+        className={pointBg + " claim relative border bg- "}
         style={{ paddingLeft: paddingLeft }}>
         <div className="flex flex-col gap-2">
           <div className={`p-1 rounded-md ${e.replyCount > 0 ? "opacity-100" : "opacity-0"}`}>
@@ -199,20 +199,20 @@ export default function AccordionComponent({
               <Arrow />
             </div>
           </div>
-          {parent && (
+          {/* {parent && (
             <div
               className="w-[1px] h-24 bg-black absolute -top-14 left-0 z-40"
               style={{ marginLeft: `${22 + INDENTATION_PX * (level - 1)}px` }}></div>
-          )}
+          )} */}
         </div>
-        <div className="flex flex-col gap-1 items-start justify-center">
-          <ProfilePreview user={e.author!}/>
+        <div className="flex flex-col gap-3 items-start justify-center w-full">
+          {/* <ProfilePreview user={e.author!}/> */}
           <span className="w-full"> {text}</span>
           {link && <RecastedComponent url={link} />}
-          <div className="flex flex-row gap-0 text-gray-500">
+          {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
+          <div className="flex flex-row gap-2 text-gray-500">
             <Points points={e.points} onNegate={onNegate} type="like" />
             {parent && <Points points={e.points} onNegate={onNegate} type="relevance" />}
-            <ExternalLink />
           </div>
         </div>
       </summary>
