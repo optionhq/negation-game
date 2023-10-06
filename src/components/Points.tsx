@@ -3,7 +3,13 @@ import ReactButtonWrapper from "./ReactButtonWrapper";
 import { AiOutlineCheckCircle, AiOutlineCiCircle } from "react-icons/ai";
 import { HiOutlineCheckCircle, HiOutlineXCircle } from "react-icons/hi";
 
-function NegateLikeButtons({ points }: { points: number }) {
+function NegateLikeButtons({
+  points,
+  onNegate,
+}: {
+  points: number;
+  onNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => void;
+}) {
   function onLike(e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) {
     e.nativeEvent.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
@@ -14,17 +20,15 @@ function NegateLikeButtons({ points }: { points: number }) {
     // console.log(e.isPropagationStopped());
   }
 
-  function onNegate() {}
-
   return (
     <div className="group/points w-16 flex flex-col items-center">
       <p className="group-hover/points:hidden h-6">{points}</p>
       <div className="flex-row gap-1 transition-opacity hidden opacity-0 group-hover/points:flex group-hover/points:opacity-100 h-6">
         <span className="hover:text-green-500 text-xl" onPointerDown={onLike}>
-          <HiOutlineCheckCircle size={24}/>
+          <HiOutlineCheckCircle size={24} />
         </span>
         <span className="hover:text-purple-600 text-xl" onPointerDown={onNegate}>
-          <HiOutlineXCircle size={24}/>
+          <HiOutlineXCircle size={24} />
         </span>
       </div>
     </div>
@@ -52,8 +56,8 @@ export default function Points({
           <div className="flex flex-row items-center gap-1 text-sm font-thin">
             {type == "relevance" ? <p>Relevance</p> : <p>Veracity</p>}
           </div>
-          <hr  className="w-full h-[1.5px] bg-slate-300"/>
-          <NegateLikeButtons points={points} />
+          <hr className="w-full h-[1.5px] bg-slate-300" />
+          <NegateLikeButtons points={points} onNegate={onNegate} />
         </div>
 
         {/* {type == "like" ? <FiHeart /> : <FiLink2 />} */}
