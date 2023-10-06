@@ -2,13 +2,16 @@ import { FiCheck, FiHeart, FiLink2, FiXCircle } from "react-icons/fi";
 import ReactButtonWrapper from "./ReactButtonWrapper";
 import { AiOutlineCheckCircle, AiOutlineCiCircle } from "react-icons/ai";
 import { HiOutlineCheckCircle, HiOutlineXCircle } from "react-icons/hi";
+import Tooltip from "./Tooltip";
 
 function NegateLikeButtons({
   points,
   onNegate,
+  type,
 }: {
   points: number;
   onNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => void;
+  type: "relevance" | "like";
 }) {
   function onLike(e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) {
     e.nativeEvent.stopPropagation();
@@ -24,12 +27,16 @@ function NegateLikeButtons({
     <div className="group/points w-16 flex flex-col items-center">
       <p className="group-hover/points:hidden h-6">{points}</p>
       <div className="flex-row gap-1 transition-opacity hidden opacity-0 group-hover/points:flex group-hover/points:opacity-100 h-6">
-        <span className="hover:text-green-500 text-xl" onPointerDown={onLike}>
-          <HiOutlineCheckCircle size={24} />
-        </span>
-        <span className="hover:text-purple-600 text-xl" onPointerDown={onNegate}>
-          <HiOutlineXCircle size={24} />
-        </span>
+        <Tooltip text={type == "like" ? "True" : "Applies"} orientation="left">
+          <span className="hover:text-green-500 text-xl" onPointerDown={onLike}>
+            <HiOutlineCheckCircle size={24} />
+          </span>
+        </Tooltip>
+        <Tooltip text={type == "like" ? "Not true" : "Does not Apply"} orientation="right">
+          <span className="hover:text-purple-600 text-xl" onPointerDown={onNegate}>
+            <HiOutlineXCircle size={24} />
+          </span>
+        </Tooltip>
       </div>
     </div>
   );
@@ -57,7 +64,7 @@ export default function Points({
             {type == "relevance" ? <p>Relevance</p> : <p>Veracity</p>}
           </div>
           <hr className="w-full h-[1.5px] bg-slate-300" />
-          <NegateLikeButtons points={points} onNegate={onNegate} />
+          <NegateLikeButtons points={points} onNegate={onNegate} type={type}/>
         </div>
 
         {/* {type == "like" ? <FiHeart /> : <FiLink2 />} */}
