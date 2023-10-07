@@ -48,8 +48,8 @@ export default function Points({
   type = "like",
 }: {
   points: number;
-  type: "relevance" | "like";
   onNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => void;
+  type: "relevance" | "like";
 }) {
   return (
     <div

@@ -1,7 +1,7 @@
 export function extractLink(text: string): { text: string; link: string | null } {
   if (!text) return { text: "", link: null };
   // Regular expression to match links starting with "https://warpcast.com/"
-  const linkRegex = /(https:\/\/warpcast\.com\/[^\s]+)/;
+  const linkRegex = /.*warpcast\.com\/[^/]+\/0x[a-fA-F0-9]+$/;
 
   // Search for the link in the text
   const match = text.match(linkRegex);
