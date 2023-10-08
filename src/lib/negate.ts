@@ -21,12 +21,15 @@ export const createNegation = async ({text, parentId, farcasterUser}: {text: str
 
     const newCast: PostCastResponse = castResponse.data.cast;
 
-    const warpcastUrl = 'https://warpcast.com/' + newCast.author.username + '/' + newCast.hash.slice(0, 8).toString()
+    const warpcastUrl = 'https://warpcast.com/' + newCast.author.username + '/' + newCast.hash.slice(0, 8).toString();
 
     const replyResponse = await axios.post(`/api/cast`, {
       signer_uuid: farcasterUser.signer_uuid,
       text: config.negationSymbol + "\n" + warpcastUrl,
       parent: parentId,
+      embeds: [
+        { "url": warpcastUrl }
+      ]
     });
 
     return replyResponse.data.cast as PostCastResponse;

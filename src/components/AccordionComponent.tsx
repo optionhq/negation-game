@@ -9,6 +9,7 @@ import { extractEndPointUrl } from "@/lib/useEndPoints";
 import { extractLink } from "@/lib/extractLink";
 import { useFarcasterUser } from '@/contexts/UserContext';
 import { createNegation } from "@/lib/negate";
+import isNegation from "@/lib/isNegation";
 
 const INDENTATION_PX = 25;
 
@@ -43,7 +44,7 @@ export default function AccordionComponent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentEntry, setCurrentEntry] = useState<LinkPointsTree>(e);
-  const { text, link } = extractLink(e.title);
+  const { text, link } = extractLink(e.title); // can remove
   const { farcasterUser, setFarcasterUser } = useFarcasterUser();
 
   useEffect(() => {
@@ -59,58 +60,58 @@ export default function AccordionComponent({
       };
     };
 
-    const responseToLinkPointsTree = (response: ThreadEntry): LinkPointsTree => {
-      const endPointUrl = extractEndPointUrl(response);
-      return {
-        title: response.text,
-        id: response.hash,
-        author: response.author,
-        parentId: response.parentHash,
-        points: response.reactions.count,
-        replyCount: response.replies.count,
-        children: [],
-        endPointUrl: endPointUrl || undefined,
-      };
-    };
-
-    const fetchThreadData = async () => {
-      const res = await fetch(`/api/thread?id=${e.id}`);
-      const threadData: ThreadEntry[] = await res.json();
-
-      // Create a map of entries by their hash
-      const entriesByHash: Map<string, LinkPointsTree> = new Map(
-        threadData.map((entry: ThreadEntry) => [entry.hash, responseToLinkPointsTree(entry)])
-      );
-
-      // Find the replies for each entry
-      threadData.forEach((entry: ThreadEntry) => {
-        if (entry.parentHash && entriesByHash.has(entry.parentHash)) {
-          let parentEntry = entriesByHash.get(entry.parentHash);
-          if (parentEntry) {
-            // Ensure parentEntry.children is defined
-            if (!parentEntry.children) {
-              parentEntry.children = [];
-            }
-            // Exclude duplicates
-            const childEntry = entriesByHash.get(entry.hash);
-            if (childEntry && !parentEntry.children.some((child) => child.id === childEntry.id)) {
-              parentEntry.children.push(childEntry);
-            }
-          }
-        }
-      });
-
-      // Update the children of the current point
-      const currentPoint = entriesByHash.get(e.id);
-      if (currentPoint) {
-        setChildren(currentPoint.children || []);
-      }
-    };
-
     if (isDropdownClicked) {
       fetchThreadData();
     }
   }, [isDropdownClicked]);
+
+  const responseToLinkPointsTree = (response: ThreadEntry): LinkPointsTree => {
+    const endPointUrl = extractEndPointUrl(response);
+    return {
+      title: response.text,
+      id: response.hash,
+      author: response.author,
+      parentId: response.parentHash,
+      points: response.reactions.count,
+      replyCount: response.replies.count,
+      children: [],
+      endPointUrl: endPointUrl || undefined,
+    };
+  };
+
+  const fetchThreadData = async () => {
+    const res = await fetch(`/api/thread?id=${e.id}`);
+    const threadData: ThreadEntry[] = await res.json();
+
+    // Create a map of entries by their hash
+    const entriesByHash: Map<string, LinkPointsTree> = new Map(
+      threadData.map((entry: ThreadEntry) => [entry.hash, responseToLinkPointsTree(entry)])
+    );
+
+    // Find the replies for each entry
+    threadData.forEach((entry: ThreadEntry) => {
+      if (entry.parentHash && entriesByHash.has(entry.parentHash)) {
+        let parentEntry = entriesByHash.get(entry.parentHash);
+        if (parentEntry) {
+          // Ensure parentEntry.children is defined
+          if (!parentEntry.children) {
+            parentEntry.children = [];
+          }
+          // Exclude duplicates
+          const childEntry = entriesByHash.get(entry.hash);
+          if (childEntry && !parentEntry.children.some((child) => child.id === childEntry.id)) {
+            parentEntry.children.push(childEntry);
+          }
+        }
+      }
+    });
+
+    // Update the children of the current point
+    const currentPoint = entriesByHash.get(e.id);
+    if (currentPoint) {
+      setChildren(currentPoint.children || []);
+    }
+  };
 
   useEffect(() => {
     fetchEndPoint(e);
@@ -191,7 +192,7 @@ export default function AccordionComponent({
       throw new Error("Must be logged in to publish. farcasterUser is null")
     }
     const negation = await createNegation({text, parentId, farcasterUser});
-    // fetchThreadData();
+    removeInput();
   };
 
   //@ts-ignore
@@ -227,17 +228,25 @@ export default function AccordionComponent({
         </div>
         <div className="flex flex-col gap-3 items-start justify-center w-full">
           {/* <ProfilePreview user={e.author!}/> */}
-          <span className="w-full"> {text}</span>
-          {link && <RecastedComponent url={link} />}
+          <span className="w-full"> 
+            {(currentEntry.endPoint && isNegation(currentEntry)) &&
+              currentEntry.endPoint.title}
+          </span>
+          {!currentEntry.endPoint && 
+            <> 
+              {currentEntry.title}
+              {link && <RecastedComponent url={link} />}
+            </>
+          }
           {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
           <div className="flex flex-row gap-2 text-gray-500">
             {/* if there is no parent this is an endPoint so veracity negates the id */}
-            {!parent && <Points points={e.points} onNegate={onNegate(e.id)} type="veracity" />}
+            {!parent && <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="veracity" />}
             {/* if there is a parent this is a linkPoint so veracity negates the endPoint.id */}
-            {e.endPointUrl && 
+            {currentEntry.endPoint && 
             <>
-              <Points points={e.points} onNegate={onNegate(e.endPoint!.id)} type="veracity" />
-              <Points points={e.points} onNegate={onNegate(e.id)} type="relevance" />
+              <Points points={e.points} onNegate={onNegate(currentEntry.endPoint!.id)} type="veracity" />
+              <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="relevance" />
             </>
             }
           </div>

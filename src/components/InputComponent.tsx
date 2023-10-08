@@ -16,7 +16,6 @@ export default function InputComponent({
   onPublish: ({text, parentId}: {text: string, parentId: string}) => void
 }) {
   const [text, setText] = useState('');
-  console.log("InputComponent", text, parentId)
 
   return (
     <div

@@ -1,5 +1,5 @@
 // these are the only URLs that can used to fetch a cast
-const okUrls = [
+export const okUrls = [
   // warpcast.com/usr/0x...
   /.*warpcast\.com\/[^/]+\/0x[a-fA-F0-9]+$/
 ];
