@@ -13,15 +13,15 @@ export default function InputComponent({
 
   return (
     <div
-      className={claimBg + " claim flex flex-col order-first border-2 border-black"}
+      className={claimBg + "flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border border-black"}
       onClick={(e) => e.stopPropagation()}
       style={{ paddingLeft: paddingLeft }}>
       <textarea placeholder={"The claim `" + parent + "` is not true because ..."} className="w-full h-36" />
       <div className="w-full flex gap-2 justify-end">
-        <button className="border border-slate-600 px-3 py-2 rounded-md" onClick={removeInput}>
+        <button className="secondary-button" onClick={removeInput}>
           Cancel
         </button>
-        <button className=" bg-slate-600 px-3 py-2 text-white rounded-md">Publish</button>
+        <button className="button">Publish</button>
       </div>
     </div>
   );
