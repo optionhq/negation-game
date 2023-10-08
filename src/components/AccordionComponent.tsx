@@ -7,6 +7,8 @@ import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
 import { extractEndPointUrl } from "@/lib/useEndPoints";
 import { extractLink } from "@/lib/extractLink";
+import { useFarcasterUser } from '@/contexts/UserContext';
+import { createNegation } from "@/lib/negate";
 
 const INDENTATION_PX = 25;
 
@@ -42,6 +44,7 @@ export default function AccordionComponent({
   const searchParams = useSearchParams();
   const [currentEntry, setCurrentEntry] = useState<LinkPointsTree>(e);
   const { text, link } = extractLink(e.title);
+  const { farcasterUser, setFarcasterUser } = useFarcasterUser();
 
   useEffect(() => {
     const responseToEndPointsTree = (response: ThreadEntry): EndPointsTree => {
@@ -131,7 +134,7 @@ export default function AccordionComponent({
     }
   }
 
-  const onNegate = (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
+  const onNegate = (pointId: string) => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
     if (!detailsRef.current) return;
     detailsRef.current.open = true;
     setDetailsOpened(detailsRef.current.open);
@@ -141,8 +144,8 @@ export default function AccordionComponent({
       return
     }
     // Check if children already contains an object with type: "input"
-    if (!children?.some((child) => child.type === "input")) {
-      var _children = [...children, { type: "input" }];
+    else if (!children.some(child => child.type === "input")) {
+      var _children = [...children, { type: "input", parentId: pointId }];
       setChildren(_children);
     }
   };
@@ -182,9 +185,20 @@ export default function AccordionComponent({
   function toggle(e: any) {
     e.preventDefault();
   }
+
+  const handlePublish = async ({text, parentId}: {text: string, parentId: string}) => {
+    if (!farcasterUser) {
+      throw new Error("Must be logged in to publish. farcasterUser is null")
+    }
+    const negation = await createNegation({text, parentId, farcasterUser});
+    // fetchThreadData();
+  };
+
   //@ts-ignore
   if (e.type === "input")
-    return <InputComponent pointBg={pointBg} paddingLeft={paddingLeft} parent={parent!} removeInput={removeInput} />;
+    return <InputComponent pointBg={pointBg} paddingLeft={paddingLeft} 
+            parentText={parent!} parentId={e.parentId!} 
+            removeInput={removeInput} onPublish={handlePublish} />;
   return (
     <details
       ref={detailsRef}
@@ -217,8 +231,8 @@ export default function AccordionComponent({
           {link && <RecastedComponent url={link} />}
           {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
           <div className="flex flex-row gap-2 text-gray-500">
-            <Points points={e.points} onNegate={onNegate} type="like" />
-            {parent && <Points points={e.points} onNegate={onNegate} type="relevance" />}
+            <Points points={e.points} onNegate={onNegate(e.id)} type="like" />
+            {parent && <Points points={e.points} onNegate={onNegate(e.id)} type="relevance" />}
           </div>
         </div>
       </summary>

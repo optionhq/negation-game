@@ -11,6 +11,7 @@ import { FarcasterUser } from '@/types/FarcasterUser';
 import axios from 'axios';
 import { NextPageContext } from 'next';
 import { fetchFeed } from '@/pages/api/feed';
+import { FarcasterUserContext } from '@/contexts/UserContext';
 
 export default function Home({ initialPointsTree, initialHistoricalItems }: { initialPointsTree: LinkPointsTree[], initialHistoricalItems: string[] }) {
   const router = useRouter();
@@ -45,7 +46,9 @@ export default function Home({ initialPointsTree, initialHistoricalItems }: { in
       <main className="flex min-h-screen flex-col items-center justify-start p-12 px-48">
         {farcasterUser?.status == 'approved' && <Cast farcasterUser={farcasterUser} reloadThreads={reloadThreads}/>}
         {historicalItemsState && historicalItemsState?.length !== 0 && <HistoricalClaims claimsIds={historicalItemsState.reverse()} />}
-        <Accordion data={filteredItems} level={0} setHistoricalItems={setHistoricalItems} />
+        <FarcasterUserContext.Provider value={{ farcasterUser, setFarcasterUser }}>
+          <Accordion data={filteredItems} level={0} setHistoricalItems={setHistoricalItems} />
+        </FarcasterUserContext.Provider>
       </main>
     </div>
   );
