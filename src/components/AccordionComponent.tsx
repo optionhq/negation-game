@@ -123,6 +123,19 @@ export default function AccordionComponent({
       const endPointData: EndPointsTree = await endPointResponse.json();
       entry.endPoint = endPointData;
       setCurrentEntry({ ...entry }); // trigger a re-render
+  
+      // Fetch the thread associated with the endpoint
+      const threadResponse = await fetch(`/api/thread?id=${entry.endPoint.id}`);
+      const threadData: ThreadEntry[] = await threadResponse.json();
+  
+      // Convert the thread data to LinkPointsTree and append to children
+      const threadChildren = threadData.map(responseToLinkPointsTree);
+      console.log("")
+      console.log(entry.children)
+      entry.children = [...(entry.children || []), ...threadChildren];
+      console.log(entry.children)
+  
+      setCurrentEntry({ ...entry }); // trigger a re-render again with updated children
     }
   };
 
