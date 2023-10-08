@@ -5,7 +5,7 @@ import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/compon
 import { EndPointsTree, LinkPointsTree, User } from "@/types/PointsTree";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
-import { extractEndPointUrl } from '@/lib/useEndPoints';
+import { extractEndPointUrl } from "@/lib/useEndPoints";
 import { extractLink } from "@/lib/extractLink";
 
 const INDENTATION_PX = 25;
@@ -13,7 +13,7 @@ const INDENTATION_PX = 25;
 type ThreadEntry = {
   text: string;
   hash: string;
-  author: User,
+  author: User;
   parentHash?: string;
   reactions: { count: number };
   replies: { count: number };
@@ -28,7 +28,7 @@ export default function AccordionComponent({
   threadData,
 }: {
   level: number;
-  e:  LinkPointsTree;
+  e: LinkPointsTree;
   parent: string | undefined;
   setParentChildren: any;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
@@ -135,9 +135,13 @@ export default function AccordionComponent({
     if (!detailsRef.current) return;
     detailsRef.current.open = true;
     setDetailsOpened(detailsRef.current.open);
-    
+
+    if (children == null) {
+      setChildren([{ type: "input" }])
+      return
+    }
     // Check if children already contains an object with type: "input"
-    if (!children.some(child => child.type === "input")) {
+    if (!children?.some((child) => child.type === "input")) {
       var _children = [...children, { type: "input" }];
       setChildren(_children);
     }
@@ -153,7 +157,7 @@ export default function AccordionComponent({
   }
 
   const paddingLeft = `${INDENTATION_PX * level + 6}px`;
-  const pointBg = `${level % 2 ? "bg-indigo-700 bg-opacity-10" : " bg-slate-50"}`;
+  const pointBg = `${level % 2 ? " bg-indigo-700 bg-opacity-10 " : " bg-slate-50 "}`;
 
   function newRoute() {
     const current = searchParams.get("id");
@@ -218,7 +222,7 @@ export default function AccordionComponent({
           </div>
         </div>
       </summary>
-      {children.length > 0 && (
+      {children && children.length > 0 && (
         <div className="flex flex-col w-full gap-1 ">
           {children.map((el: any, i: number) => (
             <AccordionComponent
