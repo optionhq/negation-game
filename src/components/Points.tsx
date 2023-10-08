@@ -11,7 +11,7 @@ function NegateLikeButtons({
 }: {
   points: number;
   onNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => void;
-  type: "relevance" | "like";
+  type: "relevance" | "veracity";
 }) {
   function onLike(e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) {
     e.nativeEvent.stopPropagation();
@@ -27,12 +27,12 @@ function NegateLikeButtons({
     <div className="group/points w-16 flex flex-col items-center">
       <p className="group-hover/points:hidden h-6">{points}</p>
       <div className="flex-row gap-1 transition-opacity hidden opacity-0 group-hover/points:flex group-hover/points:opacity-100 h-6">
-        <Tooltip text={type == "like" ? "True" : "Applies"} orientation="left">
+        <Tooltip text={type == "veracity" ? "True" : "Matters"} orientation="left">
           <span className="hover:text-green-500 text-xl" onPointerDown={onLike}>
             <HiOutlineCheckCircle size={24} />
           </span>
         </Tooltip>
-        <Tooltip text={type == "like" ? "Not true" : "Does not apply"} orientation="right">
+        <Tooltip text={type == "veracity" ? "Not true" : "Doesn't matter"} orientation="right">
           <span className="hover:text-purple-600 text-xl" onPointerDown={onNegate}>
             <HiOutlineXCircle size={24} />
           </span>
@@ -45,11 +45,11 @@ function NegateLikeButtons({
 export default function Points({
   points,
   onNegate,
-  type = "like",
+  type = "veracity",
 }: {
   points: number;
   onNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => void;
-  type: "relevance" | "like";
+  type: "relevance" | "veracity";
 }) {
   return (
     <div
@@ -67,7 +67,7 @@ export default function Points({
           <NegateLikeButtons points={points} onNegate={onNegate} type={type}/>
         </div>
 
-        {/* {type == "like" ? <FiHeart /> : <FiLink2 />} */}
+        {/* {type == "veracity" ? <FiHeart /> : <FiLink2 />} */}
         {/* {points} */}
       </ReactButtonWrapper>
     </div>

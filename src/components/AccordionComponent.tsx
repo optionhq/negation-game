@@ -231,8 +231,15 @@ export default function AccordionComponent({
           {link && <RecastedComponent url={link} />}
           {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
           <div className="flex flex-row gap-2 text-gray-500">
-            <Points points={e.points} onNegate={onNegate(e.id)} type="like" />
-            {parent && <Points points={e.points} onNegate={onNegate(e.id)} type="relevance" />}
+            {/* if there is no parent this is an endPoint so veracity negates the id */}
+            {!parent && <Points points={e.points} onNegate={onNegate(e.id)} type="veracity" />}
+            {/* if there is a parent this is a linkPoint so veracity negates the endPoint.id */}
+            {e.endPointUrl && 
+            <>
+              <Points points={e.points} onNegate={onNegate(e.endPoint!.id)} type="veracity" />
+              <Points points={e.points} onNegate={onNegate(e.id)} type="relevance" />
+            </>
+            }
           </div>
         </div>
       </summary>
