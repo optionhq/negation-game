@@ -24,13 +24,21 @@ body {
       rgb(var(--background-end-rgb))
     )
     rgb(var(--background-start-rgb)); */
-    background-color: rgb(var(--background-end-rgb))
+  background-color: rgb(var(--background-end-rgb));
 }
 
 textarea {
-  @apply bg-gray-50 border-0 text-gray-900 text-sm rounded-lg focus:ring-inset focus:border-0 block w-full p-4 py-3 resize-none;
+  @apply bg-white text-gray-900 border text-sm rounded-lg focus:ring-inset focus:border-0 block w-full p-4 py-3 resize-none active:border-green-600;
 }
 
-.claim{
+.claim {
   @apply relative flex flex-row items-start gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md;
+}
+
+.button {
+  @apply bg-purple-900 px-3 py-2 text-white rounded-md;
+}
+
+.secondary-button {
+  @apply border border-slate-600 px-3 py-2 rounded-md;
 }
