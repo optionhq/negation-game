@@ -9,7 +9,7 @@ import { extractEndPointUrl } from "@/lib/useEndPoints";
 import { extractLink } from "@/lib/extractLink";
 import { useFarcasterUser } from '@/contexts/UserContext';
 import { createNegation } from "@/lib/negate";
-import isNegation from "@/lib/isNegation";
+import { isCompleteNegation, validNegation } from "@/lib/isNegation";
 
 const INDENTATION_PX = 25;
 
@@ -48,17 +48,6 @@ export default function AccordionComponent({
   const { farcasterUser, setFarcasterUser } = useFarcasterUser();
 
   useEffect(() => {
-    const responseToEndPointsTree = (response: ThreadEntry): EndPointsTree => {
-      return {
-        title: response.text,
-        id: response.hash,
-        author: response.author,
-        parentId: response.parentHash,
-        points: response.reactions.count,
-        replyCount: response.replies.count,
-        children: [],
-      };
-    };
 
     if (isDropdownClicked) {
       fetchThreadData();
@@ -76,6 +65,18 @@ export default function AccordionComponent({
       replyCount: response.replies.count,
       children: [],
       endPointUrl: endPointUrl || undefined,
+    };
+  };
+
+  const responseToEndPointsTree = (response: ThreadEntry): EndPointsTree => {
+    return {
+      title: response.text,
+      id: response.hash,
+      author: response.author,
+      parentId: response.parentHash,
+      points: response.reactions.count,
+      replyCount: response.replies.count,
+      children: [],
     };
   };
 
@@ -111,18 +112,41 @@ export default function AccordionComponent({
     if (currentPoint) {
       setChildren(currentPoint.children || []);
     }
+
+    fetchEndPoint(e)
   };
 
-  useEffect(() => {
-    fetchEndPoint(e);
-  }, []);
+  // useEffect(() => {
+  //   fetchEndPoint(e);
+  // }, []);
 
   const fetchEndPoint = async (entry: LinkPointsTree) => {
+    // if it's a linkPoint, fetch the endPoint
     if (entry.endPointUrl && !entry.endPoint) {
       const endPointResponse = await fetch(`/api/endpoint?endPointUrl=${entry.endPointUrl}`);
       const endPointData: EndPointsTree = await endPointResponse.json();
       entry.endPoint = endPointData;
       setCurrentEntry({ ...entry }); // trigger a re-render
+
+      // if the endPoint has children, fetch them
+      const endPointNegationsResponse = await fetch(`/api/thread?id=${entry.endPoint.id}`);
+      const endPointNegations: ThreadEntry[] = await endPointNegationsResponse.json();
+
+      console.log("endPointNegations", endPointNegations);
+      let negations: LinkPointsTree[] = [];
+      for (const cast of endPointNegations.filter(e => e.hash !== entry.id)) {
+        // maybbe try with this && cast.parentHash == entry.id ?
+        if (validNegation(cast.text) && cast.parentHash == entry.endPoint.id ) {
+          const negation = responseToLinkPointsTree(cast);
+
+          negations.push(negation);
+          
+        }
+      }
+      console.log("adding negations", negations)
+      console.log("on current entry", currentEntry.endPoint?.title)
+      console.log(currentEntry.endPoint.id)
+      setChildren([...children, ...negations])
     }
   };
 
@@ -229,7 +253,7 @@ export default function AccordionComponent({
         <div className="flex flex-col gap-3 items-start justify-center w-full">
           {/* <ProfilePreview user={e.author!}/> */}
           <span className="w-full"> 
-            {(currentEntry.endPoint && isNegation(currentEntry)) &&
+            {(currentEntry.endPoint && isCompleteNegation(currentEntry)) &&
               currentEntry.endPoint.title}
           </span>
           {!currentEntry.endPoint && 

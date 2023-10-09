@@ -3,7 +3,7 @@ import config from "@/config";
 import { okUrls } from "@/lib/useEndPoints";
 import { LinkPointsTree } from "@/types/PointsTree";
 
-const validNegation = (title: string): boolean => {
+export const validNegation = (title: string): boolean => {
   // a title is a valid negation if it starts with config.negationSymbol 
   // and is then followed by any number of whitespace or newline characters
   // and finally followed by an okUrl
@@ -16,12 +16,10 @@ const validNegation = (title: string): boolean => {
   return false;
 }
 
-const isNegation = (entry: LinkPointsTree): boolean => {
+export const isCompleteNegation = (entry: LinkPointsTree): boolean => {
   if (entry.endPoint && validNegation(entry.title)) {
     return true;
   } else {
     return false;
   }
 }
-
-export default isNegation;
