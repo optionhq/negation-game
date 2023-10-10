@@ -27,12 +27,12 @@ function NegateLikeButtons({
     <div className="group/points w-16 flex flex-col items-center">
       <p className="group-hover/points:hidden h-6">{points}</p>
       <div className="flex-row gap-1 transition-opacity hidden opacity-0 group-hover/points:flex group-hover/points:opacity-100 h-6">
-        <Tooltip text={type == "veracity" ? "True" : "Matters"} orientation="top">
+        <Tooltip text={type == "veracity" ? "True" : "Matters"} orientation="bottom">
           <span className="hover:text-green-500 text-xl" onPointerDown={onLike}>
             <HiOutlineCheckCircle size={24} />
           </span>
         </Tooltip>
-        <Tooltip text={type == "veracity" ? "Not true" : "Doesn't matter"} orientation="top">
+        <Tooltip text={type == "veracity" ? "Not true" : "Doesn't matter"} orientation="bottom">
           <span className="hover:text-purple-600 text-xl" onPointerDown={onNegate}>
             <HiOutlineXCircle size={24} />
           </span>
