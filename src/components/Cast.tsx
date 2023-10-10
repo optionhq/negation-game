@@ -1,40 +1,40 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { FarcasterUser } from '@/types/FarcasterUser';
-import config from '@/config';
+import React, { useState } from "react";
+import axios from "axios";
+import { FarcasterUser } from "@/types/FarcasterUser";
+import config from "@/config";
+import { BiSolidPencil } from "react-icons/bi";
+import Modal from "./Modal";
+import { InputComponent } from ".";
+import publish from "@/lib/publish";
 
-function Cast({ farcasterUser, reloadThreads }: {farcasterUser?: FarcasterUser, reloadThreads: () => void }) {
-  const [castText, setCastText] = useState('');
-  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+function Cast({ farcasterUser, reloadThreads }: { farcasterUser?: FarcasterUser; reloadThreads: () => void }) {
+  const [castModal, setCastModal] = useState(false);
 
-  const handleCast = async () => {
+  const onPublish = async (text: string) => {
     try {
-      const response = await axios.post('/api/cast', {
-        text: castText,
-        signer_uuid: farcasterUser?.signer_uuid,
-        parent: config.parentUrl,
-      });
-      if (response.status === 200) {
-        setCastText('');
-        setShowSuccessMessage(true);
-        setTimeout(() => setShowSuccessMessage(false), 3000);
+      const resp = await publish({ text: text, farcasterUser: farcasterUser! });
+      if (!resp) throw Error;
+
+      if (resp.status === 200) {
         reloadThreads();
+        setCastModal(false);
       }
     } catch (error) {
-      console.error('Could not send the cast', error);
+      console.error("Could not send the cast", error);
     }
   };
 
   return (
     <div>
-      <input 
-        type="text" 
-        value={castText} 
-        onChange={(e) => setCastText(e.target.value)} 
-        style={{ width: '200px', height: '30px', margin: '10px' }}
-      />
-      <button onClick={handleCast}>Make point</button>
-      {showSuccessMessage && <p>Point created</p>}
+      <button className="fixed bottom-3 left-3 button" onClick={() => setCastModal(true)}>
+        <BiSolidPencil />
+        <p>Make a Point</p>
+      </button>
+      {castModal && (
+        <Modal setSelected={setCastModal}>
+          <InputComponent onPublish={onPublish} placeHolder="Enter a new point!" onCancel={() => setCastModal(false)} />
+        </Modal>
+      )}
     </div>
   );
 }

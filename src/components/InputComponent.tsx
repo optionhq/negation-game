@@ -1,40 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 export default function InputComponent({
-  paddingLeft,
-  pointBg: claimBg,
-  parentText,
-  parentId,
-  removeInput,
-  onPublish
+  paddingLeft = "20px",
+  pointBg = "bg-white ",
+  placeHolder,
+  onCancel,
+  onPublish,
 }: {
-  paddingLeft: string;
-  pointBg: string;
-  parentText: string;
-  parentId: string;
-  removeInput: () => void
-  onPublish: ({text, parentId}: {text: string, parentId: string}) => void
+  paddingLeft?: string;
+  pointBg?: string;
+  placeHolder: string;
+  onCancel: () => void;
+  onPublish: (text: string) => Promise<void>;
 }) {
-  const [text, setText] = useState('');
+  const [text, setText] = useState("");
 
   return (
     <div
-      className={claimBg + "flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border border-black"}
+      className={
+        pointBg +
+        "w-full flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border"
+      }
       onClick={(e) => e.stopPropagation()}
       style={{ paddingLeft: paddingLeft }}>
-      <textarea 
-        placeholder={"The claim `" + parentText + "` is not true because ..."} 
-        className="w-full h-36" 
-        value={text} 
+      <textarea
+        placeholder={placeHolder}
+        className="w-full h-36 bg-teal-500/10 caret-teal-500"
+        value={text}
         onChange={(e) => setText(e.target.value)}
       />
       <div className="w-full flex gap-2 justify-end">
-        <button className="secondary-button" onClick={removeInput}>
+        <button className="secondary-button" onClick={onCancel}>
           Cancel
         </button>
-        <button className="button" onClick={() => {
-          onPublish({text: text, parentId: parentId});
-        }}>Publish</button>
+        <button
+          className="button"
+          onClick={() => {
+            onPublish(text);
+          }}>
+          Publish
+        </button>
       </div>
     </div>
   );

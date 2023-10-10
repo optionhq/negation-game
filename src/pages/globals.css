@@ -28,17 +28,17 @@ body {
 }
 
 textarea {
-  @apply bg-white text-gray-900 border text-sm rounded-lg focus:ring-inset focus:border-0 block w-full p-4 py-3 resize-none active:border-green-600;
+  @apply bg-white text-gray-900 border text-sm rounded-lg focus:ring-inset focus:border-0 block w-full p-4 py-3 resize-none;
 }
 
 .claim {
-  @apply relative flex flex-row items-start gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md;
+  @apply relative flex flex-row items-start gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md z-0;
 }
 
 .button {
-  @apply bg-purple-900 px-3 py-2 text-white rounded-md;
+  @apply bg-purple-900 px-3 py-2 text-white rounded-md cursor-pointer flex flex-row gap-2 items-center hover:bg-purple-900/70;
 }
 
 .secondary-button {
-  @apply border border-slate-600 px-3 py-2 rounded-md;
+  @apply border text-black/80 px-3 py-2 rounded-md flex items-center justify-center hover:border-black hover:bg-slate-100 hover:text-black;
 }

@@ -7,8 +7,8 @@ import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
 import { extractEndPointUrl } from "@/lib/useEndPoints";
 import { extractLink } from "@/lib/extractLink";
-import { useFarcasterUser } from '@/contexts/UserContext';
-import { createNegation } from "@/lib/negate";
+import { useFarcasterUser } from "@/contexts/UserContext";
+import { negate } from "@/lib/negate";
 import isNegation from "@/lib/isNegation";
 
 const INDENTATION_PX = 25;
@@ -108,6 +108,9 @@ export default function AccordionComponent({
 
     // Update the children of the current point
     const currentPoint = entriesByHash.get(e.id);
+    // const currentCasted = entriesByHash.get(currentEntry.endPoint?.id!)
+
+    console.log("title", e.title, "step", level, currentPoint);
     if (currentPoint) {
       setChildren(currentPoint.children || []);
     }
@@ -123,18 +126,18 @@ export default function AccordionComponent({
       const endPointData: EndPointsTree = await endPointResponse.json();
       entry.endPoint = endPointData;
       setCurrentEntry({ ...entry }); // trigger a re-render
-  
+
       // Fetch the thread associated with the endpoint
       const threadResponse = await fetch(`/api/thread?id=${entry.endPoint.id}`);
       const threadData: ThreadEntry[] = await threadResponse.json();
-  
+
       // Convert the thread data to LinkPointsTree and append to children
       const threadChildren = threadData.map(responseToLinkPointsTree);
-      console.log("")
-      console.log(entry.children)
+      console.log("");
+      console.log(entry.children);
       entry.children = [...(entry.children || []), ...threadChildren];
-      console.log(entry.children)
-  
+      console.log(entry.children);
+
       setCurrentEntry({ ...entry }); // trigger a re-render again with updated children
     }
   };
@@ -149,16 +152,20 @@ export default function AccordionComponent({
   }
 
   const onNegate = (pointId: string) => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
+    if (!farcasterUser) {
+      window.alert("You must be logged in to Negate.")
+      return
+    }
     if (!detailsRef.current) return;
     detailsRef.current.open = true;
     setDetailsOpened(detailsRef.current.open);
 
     if (children == null) {
-      setChildren([{ type: "input" }])
-      return
+      setChildren([{ type: "input" }]);
+      return;
     }
     // Check if children already contains an object with type: "input"
-    else if (!children.some(child => child.type === "input")) {
+    else if (!children.some((child) => child.type === "input")) {
       var _children = [...children, { type: "input", parentId: pointId }];
       setChildren(_children);
     }
@@ -200,19 +207,27 @@ export default function AccordionComponent({
     e.preventDefault();
   }
 
-  const handlePublish = async ({text, parentId}: {text: string, parentId: string}) => {
+  const onPublishNegation = async (text: string) => {
     if (!farcasterUser) {
-      throw new Error("Must be logged in to publish. farcasterUser is null")
+      window.alert("Must be logged in to publish. farcasterUser is null")
+      return
     }
-    const negation = await createNegation({text, parentId, farcasterUser});
+    const parentId = e.parentId!;
+    const negation = await negate({ text, parentId, farcasterUser });
     removeInput();
   };
 
   //@ts-ignore
   if (e.type === "input")
-    return <InputComponent pointBg={pointBg} paddingLeft={paddingLeft} 
-            parentText={parent!} parentId={e.parentId!} 
-            removeInput={removeInput} onPublish={handlePublish} />;
+    return (
+      <InputComponent
+        pointBg={pointBg}
+        paddingLeft={paddingLeft}
+        placeHolder={"The claim `" + parent + "` is not true because ..."}
+        onCancel={removeInput}
+        onPublish={onPublishNegation}
+      />
+    );
   return (
     <details
       ref={detailsRef}
@@ -225,7 +240,7 @@ export default function AccordionComponent({
         onClick={(e) => {
           e.preventDefault();
         }}
-        className={pointBg + " claim relative border bg- "}
+        className={pointBg + " claim relative border "}
         style={{ paddingLeft: paddingLeft }}>
         <div className="flex flex-col gap-2">
           <div className={`p-1 rounded-md ${e.replyCount > 0 ? "opacity-100" : "opacity-0"}`}>
@@ -241,27 +256,26 @@ export default function AccordionComponent({
         </div>
         <div className="flex flex-col gap-3 items-start justify-center w-full">
           {/* <ProfilePreview user={e.author!}/> */}
-          <span className="w-full"> 
-            {(currentEntry.endPoint && isNegation(currentEntry)) &&
-              currentEntry.endPoint.title}
+          <span className="w-full">
+            {currentEntry.endPoint && isNegation(currentEntry) && currentEntry.endPoint.title}
           </span>
-          {!currentEntry.endPoint && 
-            <> 
+          {!currentEntry.endPoint && (
+            <>
               {currentEntry.title}
               {link && <RecastedComponent url={link} />}
             </>
-          }
+          )}
           {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
           <div className="flex flex-row gap-2 text-gray-500">
             {/* if there is no parent this is an endPoint so veracity negates the id */}
             {!parent && <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="veracity" />}
             {/* if there is a parent this is a linkPoint so veracity negates the endPoint.id */}
-            {currentEntry.endPoint && 
-            <>
-              <Points points={e.points} onNegate={onNegate(currentEntry.endPoint!.id)} type="veracity" />
-              <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="relevance" />
-            </>
-            }
+            {currentEntry.endPoint && (
+              <>
+                <Points points={e.points} onNegate={onNegate(currentEntry.endPoint!.id)} type="veracity" />
+                <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="relevance" />
+              </>
+            )}
           </div>
         </div>
       </summary>
