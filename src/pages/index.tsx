@@ -49,7 +49,7 @@ export default function Home({
 
   return (
     <div>
-      <header className="flex justify-end px-4 py-2 gap-2 bg-white border fixed top-0 w-screen z-40">
+      <header className="flex justify-end px-6 py-2 gap-6 bg-white border fixed top-0 w-screen z-40">
         <Notifications/>
         <Login />
       </header>
