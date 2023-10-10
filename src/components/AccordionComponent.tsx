@@ -113,39 +113,44 @@ export default function AccordionComponent({
       setChildren(currentPoint.children || []);
     }
 
-    fetchEndPoint(e)
+    fetchEndPointAttributes(e)
   };
 
   // useEffect(() => {
   //   fetchEndPoint(e);
   // }, []);
 
-  const fetchEndPoint = async (entry: LinkPointsTree) => {
-    // if it's a linkPoint, fetch the endPoint
+  const fetchEndPoint = async (entry: LinkPointsTree): Promise<LinkPointsTree> => {
     if (entry.endPointUrl && !entry.endPoint) {
       const endPointResponse = await fetch(`/api/endpoint?endPointUrl=${entry.endPointUrl}`);
       const endPointData: EndPointsTree = await endPointResponse.json();
       entry.endPoint = endPointData;
       setCurrentEntry({ ...entry }); // trigger a re-render
+    }
+    return entry;
+  }
+
+  const fetchEndPointAttributes = async (entry: LinkPointsTree) => {
+    // if it's a linkPoint, fetch the endPoint
+    if (entry.endPointUrl && !entry.endPoint) {
+      const entryWithEndPoint = await fetchEndPoint(entry);
 
       // if the endPoint has children, fetch them
-      const endPointNegationsResponse = await fetch(`/api/thread?id=${entry.endPoint.id}`);
+      const endPointNegationsResponse = await fetch(`/api/thread?id=${entryWithEndPoint.endPoint!.id}`);
       const endPointNegations: ThreadEntry[] = await endPointNegationsResponse.json();
 
       console.log("endPointNegations", endPointNegations);
       let negations: LinkPointsTree[] = [];
-      for (const cast of endPointNegations.filter(e => e.hash !== entry.id)) {
-        // maybbe try with this && cast.parentHash == entry.id ?
-        if (validNegation(cast.text) && cast.parentHash == entry.endPoint.id ) {
+      for (const cast of endPointNegations.filter(e => e.hash !== entryWithEndPoint.id)) {
+        if (validNegation(cast.text) && cast.parentHash == entryWithEndPoint.endPoint!.id ) {
           const negation = responseToLinkPointsTree(cast);
-
+          console.log(negation.endPoint?.title)
           negations.push(negation);
           
         }
       }
-      console.log("adding negations", negations)
       console.log("on current entry", currentEntry.endPoint?.title)
-      console.log(currentEntry.endPoint.id)
+      console.log(currentEntry.id)
       setChildren([...children, ...negations])
     }
   };
