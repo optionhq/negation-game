@@ -32,7 +32,7 @@ textarea {
 }
 
 .claim {
-  @apply relative flex flex-row items-start gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md z-0;
+  @apply relative flex flex-row items-start gap-3 font-medium list-none px-5 py-3 rounded-md z-0;
 }
 
 .button {

@@ -240,7 +240,7 @@ export default function AccordionComponent({
         onClick={(e) => {
           e.preventDefault();
         }}
-        className={pointBg + " claim relative border "}
+        className={pointBg + `claim relative border ${e.replyCount ? "cursor-pointer": ""}`}
         style={{ paddingLeft: paddingLeft }}>
         <div className="flex flex-col gap-2">
           <div className={`p-1 rounded-md ${e.replyCount > 0 ? "opacity-100" : "opacity-0"}`}>
