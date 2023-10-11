@@ -12,7 +12,7 @@ import axios from "axios";
 import { NextPageContext } from "next";
 import { fetchFeed } from "@/pages/api/feed";
 import { FarcasterUserContext } from "@/contexts/UserContext";
-import Notifications from "@/components/Notifications";
+import NotificationButton from "@/components/notifications/NotificationButton";
 
 export default function Home({
   initialPointsTree,
@@ -28,7 +28,6 @@ export default function Home({
   const [historicalItemsState, setHistoricalItems] = useState<string[] | undefined>(initialHistoricalItems);
 
   const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);
-
   const reloadThreads = async () => {
     try {
       const response = await axios.get(`/api/feed?id=${router.query.id}`);
@@ -49,8 +48,8 @@ export default function Home({
 
   return (
     <div>
-      <header className="flex justify-end px-6 py-2 gap-6 bg-white border fixed top-0 w-screen z-40">
-        <Notifications/>
+      <header className="flex justify-end px-6 py-2 gap-6 bg-slate-50 border fixed top-0 w-screen z-40">
+        {farcasterUser?.status == "approved" && <NotificationButton/>}
         <Login />
       </header>
       <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-48">

@@ -10,7 +10,7 @@ export default function Tooltip({
   orientation: "left" | "right" | "top" | "bottom";
 }) {
   return (
-    <div className="group/tooltip inline-block relative">
+    <div className="group/tooltip inline-block relative h-full">
       {children}
       <div
         className={`opacity-0 invisible group-hover/tooltip:opacity-100 group-hover/tooltip:visible absolute z-30 bg-gray-600 text-white text-sm leading-tight py-2 px-3 rounded-lg transition-opacity duration-200 ease-in-out transform flex items-center justify-center w-fit h-fit ${
