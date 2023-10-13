@@ -1,27 +1,25 @@
 // src/components/Login.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useSigner } from 'neynar-next';
-import { type User } from 'neynar-next/server';
+import { type User } from 'neynar-next/server'
+import useSWR from 'swr';
 import axios from 'axios';
+
+// Define the fetcher function
+const fetcher = ( url: string ) => axios.get(url).then(res => res.data);
 
 function Login() {
   const { signer, isLoading, signIn } = useSigner();
   const router = useRouter();
-  const [user, setUser] = useState<User | null>(null);
 
-  useEffect(() => {
-    if (signer?.status === 'approved') {
-      axios.get<User>(`/api/users/${signer.fid}`)
-        .then(response => {
-          setUser(response.data);
-        })
-        .catch(error => {
-          console.error(error);
-        });
-    }
-  }, [signer]);
+  // Use the useSWR hook to fetch the user data
+  const { data: user, error } = useSWR<User>(signer?.status === 'approved' ? `/api/users/${signer.fid}` : null, fetcher);
+
+  // Log the user data and error to the console
+  console.log('user', user);
+  console.log('error', error);
 
   useEffect(() => {
     if (signer && signer.status === "pending_approval") {
