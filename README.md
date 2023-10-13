@@ -12,6 +12,16 @@ yarn dev
 pnpm dev
 ```
 
+You'll have to fill out the content of .env.local with your values:
+```bash
+NODE_ENV=development
+
+NEYNAR_API_KEY="Your Neynar api key (ask Connor)"
+
+FARCASTER_FID=YOUR_FID_AS_NUMBER
+FARCASTER_MNEMONIC="your mneumonic here"
+```
+
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.

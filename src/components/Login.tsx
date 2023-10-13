@@ -1,73 +1,50 @@
-import React, { useEffect, useState } from "react";
+// src/components/Login.tsx
+import React, { useEffect } from "react";
 import Image from "next/image";
-import axios from "axios";
 import { useRouter } from "next/router";
 import { LOCAL_STORAGE_KEYS } from "./constants";
 import Link from "next/link";
-import { FarcasterUser } from "@/types/FarcasterUser";
+import { useSigner } from 'neynar-next';
+import useSWRImmutable from 'swr/immutable';
 
 function Login() {
-  const [loading, setLoading] = useState(false);
-  const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);
+  const { signer, isLoading, signIn } = useSigner();
   const router = useRouter();
 
-  useEffect(() => {
-    const storedData = localStorage.getItem(LOCAL_STORAGE_KEYS.FARCASTER_USER);
-    if (storedData) {
-      const user: FarcasterUser = JSON.parse(storedData);
-      setFarcasterUser(user);
-    }
-  }, []);
+  const { data: user } = useSWRImmutable(signer?.status === 'approved' ? `/api/users/${signer.fid}` : null);
 
   useEffect(() => {
-    if (farcasterUser && farcasterUser.status === "pending_approval") {
+    if (signer && signer.status === "pending_approval") {
+      console.log("signer", signer);
       router.push("/qr-code");
     }
-  }, [farcasterUser, router]);
+  }, [signer, router]);
 
   return (
     <div>
-      {!farcasterUser?.status && (
+      {!signer?.status && (
         <button
           className="button"
-          style={{ cursor: loading ? "not-allowed" : "pointer" }}
-          onClick={handleSignIn}
-          disabled={loading}>
-          {loading ? "Loading..." : "Sign in with farcaster"}
+          style={{ cursor: isLoading ? "not-allowed" : "pointer" }}
+          onClick={signIn}
+          disabled={isLoading}>
+          {isLoading ? "Loading..." : "Sign in with farcaster"}
         </button>
       )}
-      {farcasterUser?.status === "approved" && (
+      {user && (
         <div>
           {/* Display user's profile picture and username here */}
           <Image
-            src={farcasterUser.profile_picture || "/default-avatar.svg"}
+            src={user.profile_picture || "/default-avatar.svg"}
             alt="Description"
             width={50}
             height={50}
           />
-          <span>{farcasterUser.username}</span>
+          <span>{user.username}</span>
         </div>
       )}
     </div>
   );
-
-  async function handleSignIn() {
-    setLoading(true);
-    await createAndStoreSigner();
-    setLoading(false);
-  }
-
-  async function createAndStoreSigner() {
-    try {
-      const response = await axios.post("/api/signer");
-      if (response.status === 200) {
-        localStorage.setItem(LOCAL_STORAGE_KEYS.FARCASTER_USER, JSON.stringify(response.data));
-        setFarcasterUser(response.data);
-      }
-    } catch (error) {
-      console.error("API Call failed", error);
-    }
-  }
 }
 
 export default Login;
