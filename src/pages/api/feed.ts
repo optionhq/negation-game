@@ -35,7 +35,7 @@ export async function fetchFeed(id: string | null) {
       api_key: process.env.NEYNAR_API_KEY,
       feed_type: 'filter',
       filter_type: 'parent_url',
-      parent_url: config.parentUrl,
+      parent_url: config.channelId,
     },
     headers: { accept: "application/json", api_key: process.env.NEYNAR_API_KEY },
   };

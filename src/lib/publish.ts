@@ -17,7 +17,7 @@ export default async function publish({
     const castResponse = await axios.post(`/api/cast`, {
       signer_uuid: farcasterUser.signer_uuid,
       text: text,
-      parent: parentId ? parentId : config.parentUrl ,
+      parent: parentId ? parentId : config.channelId ,
       embeds: embeds
     });
     return castResponse
