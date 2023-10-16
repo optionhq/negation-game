@@ -10,6 +10,7 @@ import { extractLink } from "@/lib/extractLink";
 import { useFarcasterUser } from "@/contexts/UserContext";
 import { negate } from "@/lib/negate";
 import isNegation from "@/lib/isNegation";
+import Negations from "./Negations";
 
 const INDENTATION_PX = 25;
 
@@ -37,7 +38,8 @@ export default function AccordionComponent({
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   threadData: any;
 }) {
-  const [children, setChildren] = useState<any[]>(e.children || []);
+  const [veracityNegations, setVeracityNegations] = useState<any[]>(e.children || []);
+  const [relevanceNegations, setRelevanceNegations] = useState<any[]>(e.children || []);
   const [isDropdownClicked, setIsDropdownClicked] = useState<boolean>(false);
   const detailsRef = useRef<HTMLDetailsElement>(null);
   const [detailsOpened, setDetailsOpened] = useState<boolean>(false);
@@ -61,7 +63,7 @@ export default function AccordionComponent({
     };
 
     if (isDropdownClicked) {
-      fetchThreadData();
+      unfurlDropdown();
     }
   }, [isDropdownClicked]);
 
@@ -79,68 +81,37 @@ export default function AccordionComponent({
     };
   };
 
-  const fetchThreadData = async () => {
-    const res = await fetch(`/api/thread?id=${e.id}`);
+  const getNegations = async (point: LinkPointsTree) => {
+    const res = await fetch(`/api/thread?id=${point.id}`);
     const threadData: ThreadEntry[] = await res.json();
 
-    // Create a map of entries by their hash
-    const entriesByHash: Map<string, LinkPointsTree> = new Map(
-      threadData.map((entry: ThreadEntry) => [entry.hash, responseToLinkPointsTree(entry)])
-    );
-
-    // Find the replies for each entry
-    threadData.forEach((entry: ThreadEntry) => {
-      if (entry.parentHash && entriesByHash.has(entry.parentHash)) {
-        let parentEntry = entriesByHash.get(entry.parentHash);
-        if (parentEntry) {
-          // Ensure parentEntry.children is defined
-          if (!parentEntry.children) {
-            parentEntry.children = [];
-          }
-          // Exclude duplicates
-          const childEntry = entriesByHash.get(entry.hash);
-          if (childEntry && !parentEntry.children.some((child) => child.id === childEntry.id)) {
-            parentEntry.children.push(childEntry);
-          }
-        }
+    const negations: LinkPointsTree[] = [];
+    for (const cast of threadData) {
+      const possibleNegation = responseToLinkPointsTree(cast);
+      if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
+        const res = await fetch(`/api/endpoint?endPointUrl=${possibleNegation.endPointUrl}`);
+        const endPoint: EndPointsTree = await res.json();
+        possibleNegation.endPoint = endPoint;
+        // it's now a negation
+        const negation = possibleNegation;
+        negations.push(negation);
       }
-    });
-
-    // Update the children of the current point
-    const currentPoint = entriesByHash.get(e.id);
-    // const currentCasted = entriesByHash.get(currentEntry.endPoint?.id!)
-
-    console.log("title", e.title, "step", level, currentPoint);
-    if (currentPoint) {
-      setChildren(currentPoint.children || []);
     }
-  };
 
-  useEffect(() => {
-    fetchEndPoint(e);
-  }, []);
+    return negations
+  }
 
-  const fetchEndPoint = async (entry: LinkPointsTree) => {
-    if (entry.endPointUrl && !entry.endPoint) {
-      const endPointResponse = await fetch(`/api/endpoint?endPointUrl=${entry.endPointUrl}`);
-      const endPointData: EndPointsTree = await endPointResponse.json();
-      entry.endPoint = endPointData;
-      setCurrentEntry({ ...entry }); // trigger a re-render
+  const unfurlDropdown = async () => {
+    const relevanceNegations = await getNegations(e);
 
-      // Fetch the thread associated with the endpoint
-      const threadResponse = await fetch(`/api/thread?id=${entry.endPoint.id}`);
-      const threadData: ThreadEntry[] = await threadResponse.json();
+    setRelevanceNegations(relevanceNegations);
 
-      // Convert the thread data to LinkPointsTree and append to children
-      const threadChildren = threadData.map(responseToLinkPointsTree);
-      console.log("");
-      console.log(entry.children);
-      entry.children = [...(entry.children || []), ...threadChildren];
-      console.log(entry.children);
-
-      setCurrentEntry({ ...entry }); // trigger a re-render again with updated children
+    if (e.endPoint) {
+      const veracityNegations = await getNegations(e.endPoint);
+      console.log("fallacies", veracityNegations)
+      setVeracityNegations(veracityNegations);
     }
-  };
+  }
 
   function expandDetails() {
     if (!detailsRef.current) return;
@@ -160,14 +131,14 @@ export default function AccordionComponent({
     detailsRef.current.open = true;
     setDetailsOpened(detailsRef.current.open);
 
-    if (children == null) {
-      setChildren([{ type: "input" }]);
+    if (relevanceNegations == null) {
+      setRelevanceNegations([{ type: "input" }]);
       return;
     }
     // Check if children already contains an object with type: "input"
-    else if (!children.some((child) => child.type === "input")) {
-      var _children = [...children, { type: "input", parentId: pointId }];
-      setChildren(_children);
+    else if (!relevanceNegations.some((child) => child.type === "input")) {
+      var _children = [...relevanceNegations, { type: "input", parentId: pointId }];
+      setRelevanceNegations(_children);
     }
   };
 
@@ -240,10 +211,10 @@ export default function AccordionComponent({
         onClick={(e) => {
           e.preventDefault();
         }}
-        className={pointBg + `claim relative border ${e.replyCount ? "cursor-pointer": ""}`}
+        className={pointBg + `claim relative border ${e.replyCount || (e.endPoint && e.endPoint?.replyCount > 0) ? "cursor-pointer": ""}`}
         style={{ paddingLeft: paddingLeft }}>
         <div className="flex flex-col gap-2">
-          <div className={`p-1 rounded-md ${e.replyCount > 0 ? "opacity-100" : "opacity-0"}`}>
+          <div className={`p-1 rounded-md ${e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"}`}>
             <div className={`transition w-full h-full ${detailsOpened ? "rotate-90" : "rotate-0"}`}>
               <Arrow />
             </div>
@@ -279,20 +250,30 @@ export default function AccordionComponent({
           </div>
         </div>
       </summary>
-      {children && children.length > 0 && (
-        <div className="flex flex-col w-full gap-1 ">
-          {children.map((el: any, i: number) => (
-            <AccordionComponent
-              key={i}
-              level={level + 1}
-              e={el}
-              parent={e.title}
-              setHistoricalItems={setHistoricalItems}
-              setParentChildren={setChildren}
-              threadData={threadData}
-            />
-          ))}
-        </div>
+      {relevanceNegations && relevanceNegations.length > 0 && (
+        <Negations
+          negations={relevanceNegations}
+          level={level}
+          parentTitle={e.title}
+          setHistoricalItems={setHistoricalItems}
+          setParentChildren={setRelevanceNegations}
+          threadData={threadData}
+          negationType="relevance"
+        />
+      )}
+      {veracityNegations && veracityNegations.length > 0 && (
+        <>
+          <div className="h-1 bg-gray-200"/>
+          <Negations
+            negations={veracityNegations}
+            level={level}
+            parentTitle={e.title}
+            setHistoricalItems={setHistoricalItems}
+            setParentChildren={setVeracityNegations}
+            threadData={threadData}
+            negationType="veracity"
+          />
+        </>
       )}
     </details>
   );
