@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Accordion from "@/components/Accordion";
 import HistoricalClaims from "@/components/HistoricalClaims";
 import Login from "@/components/Login";
-import { LinkPointsTree } from "@/types/PointsTree";
+import { Negation } from "@/types/Points";
 import Cast from "@/components/Cast";
 import { LOCAL_STORAGE_KEYS } from "@/components/constants";
 import { FarcasterUser } from "@/types/FarcasterUser";
@@ -18,7 +18,7 @@ export default function Home({
   initialPointsTree,
   initialHistoricalItems,
 }: {
-  initialPointsTree: LinkPointsTree[];
+  initialPointsTree: Negation[];
   initialHistoricalItems: string[];
 }) {
   const router = useRouter();

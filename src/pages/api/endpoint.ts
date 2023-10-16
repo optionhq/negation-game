@@ -1,6 +1,6 @@
 // pages/api/endpoint.ts
 import axios from 'axios';
-import { EndPointsTree } from '@/types/PointsTree';
+import { Node } from '@/types/Points';
 import type { NextApiRequest, NextApiResponse } from 'next'
 
 async function fetchCastByUrl(url: string): Promise<any> {
@@ -20,7 +20,7 @@ async function getEndPoint(endPointUrl: string) {
   
   try {
     const endCast = await fetchCastByUrl(endPointUrl);
-    const point: EndPointsTree = {
+    const point: Node = {
       title: endCast.text,
       id: endCast.hash,
       points: endCast.reactions.likes.length,

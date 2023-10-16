@@ -1,4 +1,4 @@
-import { User } from "@/types/PointsTree";
+import { User } from "@/types/Points";
 import Image from "next/image";
 
 export default function ProfilePreview({user}: {user: User}){

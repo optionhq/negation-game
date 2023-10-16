@@ -17,10 +17,6 @@ function Login() {
   // Use the useSWR hook to fetch the user data
   const { data: user, error } = useSWR<User>(signer?.status === 'approved' ? `/api/users/${signer.fid}` : null, fetcher);
 
-  // Log the user data and error to the console
-  console.log('user', user);
-  console.log('error', error);
-
   useEffect(() => {
     if (signer && signer.status === "pending_approval") {
       router.push("/qr-code");

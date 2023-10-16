@@ -1,7 +1,7 @@
 // pages/api/feed.ts
 import axios from 'axios';
 import { NextApiRequest, NextApiResponse } from 'next';
-import { LinkPointsTree } from '@/types/PointsTree';
+import { Negation } from '@/types/Points';
 import config from '@/config';
 
 function findRoot(id: string | undefined | null, items: any[]) {
@@ -42,7 +42,7 @@ export async function fetchFeed(id: string | null) {
 
   const response = await axios.request(options);
 
-  const pointsTree: LinkPointsTree[] = response.data.casts.map((cast: any) => {
+  const pointsTree: Negation[] = response.data.casts.map((cast: any) => {
     return {
       title: cast.text,
       id: cast.hash,
