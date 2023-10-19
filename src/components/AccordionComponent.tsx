@@ -11,7 +11,7 @@ import { useFarcasterUser } from "@/contexts/UserContext";
 import { negate } from "@/lib/negate";
 import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
-
+import { GoUnlink, GoCircleSlash } from "react-icons/go";
 const INDENTATION_PX = 25;
 
 type ThreadEntry = {
@@ -48,6 +48,7 @@ export default function AccordionComponent({
   const [currentEntry, setCurrentEntry] = useState<LinkPointsTree>(e);
   const { text, link } = extractLink(e.title); // can remove
   const { farcasterUser, setFarcasterUser } = useFarcasterUser();
+  const [childrenLoading, setChildrenLoading] = useState(false);
 
   useEffect(() => {
     const responseToEndPointsTree = (response: ThreadEntry): EndPointsTree => {
@@ -98,20 +99,22 @@ export default function AccordionComponent({
       }
     }
 
-    return negations
-  }
+    return negations;
+  };
 
   const unfurlDropdown = async () => {
+    setChildrenLoading(true);
     const relevanceNegations = await getNegations(e);
 
     setRelevanceNegations(relevanceNegations);
 
     if (e.endPoint) {
       const veracityNegations = await getNegations(e.endPoint);
-      console.log("fallacies", veracityNegations)
+      console.log("fallacies", veracityNegations);
       setVeracityNegations(veracityNegations);
     }
-  }
+    setChildrenLoading(false);
+  };
 
   function expandDetails() {
     if (!detailsRef.current) return;
@@ -151,7 +154,7 @@ export default function AccordionComponent({
     });
   }
 
-  const paddingLeft = `${INDENTATION_PX * level + 6}px`;
+  const paddingLeft = `${0}px`;
   const pointBg = `${level % 2 ? " bg-indigo-700 bg-opacity-10 " : " bg-slate-50 "}`;
 
   function newRoute() {
@@ -180,8 +183,8 @@ export default function AccordionComponent({
 
   const onPublishNegation = async (text: string) => {
     if (!farcasterUser) {
-      window.alert("Must be logged in to publish. farcasterUser is null")
-      return
+      window.alert("Must be logged in to publish. farcasterUser is null");
+      return;
     }
     const parentId = e.parentId!;
     const negation = await negate({ text, parentId, farcasterUser });
@@ -193,7 +196,6 @@ export default function AccordionComponent({
     return (
       <InputComponent
         pointBg={pointBg}
-        paddingLeft={paddingLeft}
         placeHolder={"The claim `" + parent + "` is not true because ..."}
         onCancel={removeInput}
         onPublish={onPublishNegation}
@@ -211,10 +213,17 @@ export default function AccordionComponent({
         onClick={(e) => {
           e.preventDefault();
         }}
-        className={pointBg + `claim relative border ${e.replyCount || (e.endPoint && e.endPoint?.replyCount > 0) ? "cursor-pointer": ""}`}
-        style={{ paddingLeft: paddingLeft }}>
+        className={
+          pointBg +
+          `claim relative border ${e.replyCount || (e.endPoint && e.endPoint?.replyCount > 0) ? "cursor-pointer" : ""}`
+        }
+        // style={{ paddingLeft: paddingLeft }}
+      >
         <div className="flex flex-col gap-2">
-          <div className={`p-1 rounded-md ${e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"}`}>
+          <div
+            className={`p-1 rounded-md ${
+              e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"
+            }`}>
             <div className={`transition w-full h-full ${detailsOpened ? "rotate-90" : "rotate-0"}`}>
               <Arrow />
             </div>
@@ -250,20 +259,31 @@ export default function AccordionComponent({
           </div>
         </div>
       </summary>
+      {childrenLoading && <div className="border w-full p-4 flex items-center justify-center">Loading...</div>}
       {relevanceNegations && relevanceNegations.length > 0 && (
-        <Negations
-          negations={relevanceNegations}
-          level={level}
-          parentTitle={e.title}
-          setHistoricalItems={setHistoricalItems}
-          setParentChildren={setRelevanceNegations}
-          threadData={threadData}
-          negationType="relevance"
-        />
+        <div className=" border-black p-2 border-l  my-3 flex flex-col gap-3" style={{ marginLeft: INDENTATION_PX }}>
+          <div className="flex flex-row gap-2 p-2 items-center font-semibold text-gray-400">
+            <GoUnlink size={20} color="#AAAAAA" />
+            <p>Not relevant</p>
+          </div>
+
+          <Negations
+            negations={relevanceNegations}
+            level={level}
+            parentTitle={e.title}
+            setHistoricalItems={setHistoricalItems}
+            setParentChildren={setRelevanceNegations}
+            threadData={threadData}
+            negationType="relevance"
+          />
+        </div>
       )}
       {veracityNegations && veracityNegations.length > 0 && (
-        <>
-          <div className="h-1 bg-gray-200"/>
+        <div className="border-black p-2 border-l  my-3 flex flex-col gap-3" style={{ marginLeft: INDENTATION_PX }}>
+          <div className="flex flex-row gap-2 p-2 items-center font-semibold text-gray-400">
+            <GoCircleSlash size={20} color="#AAAAAA" />
+            <p>Not true</p>
+          </div>
           <Negations
             negations={veracityNegations}
             level={level}
@@ -273,7 +293,7 @@ export default function AccordionComponent({
             threadData={threadData}
             negationType="veracity"
           />
-        </>
+        </div>
       )}
     </details>
   );
