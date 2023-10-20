@@ -3,7 +3,7 @@ export type User = {
   username: string,
   display_name: string,
   pfp_url: string,
-  profile: { bio: [Object] },
+  profile: { bio: { text: string; } },
   follower_count: number,
   following_count: number,
   verifications: string[],

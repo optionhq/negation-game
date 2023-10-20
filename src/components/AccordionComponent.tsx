@@ -12,6 +12,7 @@ import { negate } from "@/lib/negate";
 import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
 import { GoUnlink, GoCircleSlash } from "react-icons/go";
+import { Cast } from "neynar-next/server";
 const INDENTATION_PX = 25;
 
 type ThreadEntry = {
@@ -46,22 +47,11 @@ export default function AccordionComponent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const [currentEntry, setCurrentEntry] = useState<LinkPointsTree>(e);
-  const { text, link } = extractLink(e.title); // can remove
+  const { text, link } = extractLink(e.title);
   const { farcasterUser, setFarcasterUser } = useFarcasterUser();
   const [childrenLoading, setChildrenLoading] = useState(false);
 
   useEffect(() => {
-    const responseToEndPointsTree = (response: ThreadEntry): EndPointsTree => {
-      return {
-        title: response.text,
-        id: response.hash,
-        author: response.author,
-        parentId: response.parentHash,
-        points: response.reactions.count,
-        replyCount: response.replies.count,
-        children: [],
-      };
-    };
 
     if (isDropdownClicked) {
       unfurlDropdown();
@@ -90,8 +80,18 @@ export default function AccordionComponent({
     for (const cast of threadData) {
       const possibleNegation = responseToLinkPointsTree(cast);
       if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
-        const res = await fetch(`/api/endpoint?endPointUrl=${possibleNegation.endPointUrl}`);
-        const endPoint: EndPointsTree = await res.json();
+        const res = await fetch(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
+        const cast: Cast = await res.json();
+        const endPoint: EndPointsTree = {
+          title: cast.text,
+          id: cast.hash,
+          author: cast.author,
+          parentId: cast.parent_hash as `0x${string}`,
+          points: cast.reactions?.likes.length,
+          replyCount: cast.replies?.count,
+          children: [],
+        }
+        
         possibleNegation.endPoint = endPoint;
         // it's now a negation
         const negation = possibleNegation;
@@ -110,7 +110,6 @@ export default function AccordionComponent({
 
     if (e.endPoint) {
       const veracityNegations = await getNegations(e.endPoint);
-      console.log("fallacies", veracityNegations);
       setVeracityNegations(veracityNegations);
     }
     setChildrenLoading(false);
@@ -127,7 +126,7 @@ export default function AccordionComponent({
 
   const onNegate = (pointId: string) => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
     if (!farcasterUser) {
-      window.alert("You must be logged in to Negate.")
+      window.alert("You must be logged in to publish.")
       return
     }
     if (!detailsRef.current) return;

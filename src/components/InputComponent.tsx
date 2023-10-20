@@ -16,8 +16,7 @@ export default function InputComponent({
   onPublish: (text: string) => Promise<void>;
 }) {
   const [text, setText] = useState("");
-
-  console.log(text.length > 0);
+  
   return (
     <div
       className={
