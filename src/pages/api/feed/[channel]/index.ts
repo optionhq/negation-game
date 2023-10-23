@@ -7,7 +7,7 @@ const schema = Joi.object({
   channel: Joi.string().required(),
 });
 
-export async function GET(req: NextApiRequest, res: NextApiResponse) {
+export default async function GET(req: NextApiRequest, res: NextApiResponse) {
   const { error, value } = schema.validate(req.query);
   if (error) return new Response(error.details[0].message, { status: 400 });
 

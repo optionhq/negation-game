@@ -1,3 +1,5 @@
+// import { User } from "neynar-next/server";
+
 export type User = {
   fid: number,
   username: string,
@@ -7,7 +9,7 @@ export type User = {
   follower_count: number,
   following_count: number,
   verifications: string[],
-  active_status: 'active'
+  active_status: 'active' | 'inactive',
 }
 
 export type PointsTree = {

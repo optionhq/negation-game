@@ -19,8 +19,6 @@ function NegateLikeButtons({
     e.stopPropagation();
 
     // e.nativeEvent.stopPropagation();
-    // console.log("onLike clicked");
-    // console.log(e.isPropagationStopped());
   }
 
   return (

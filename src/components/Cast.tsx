@@ -7,7 +7,7 @@ import Modal from "./Modal";
 import { InputComponent } from ".";
 import publish from "@/lib/publish";
 
-function Cast({ farcasterUser, reloadThreads }: { farcasterUser?: FarcasterUser; reloadThreads: () => void }) {
+function CastComponent({ farcasterUser, reloadThreads }: { farcasterUser?: FarcasterUser; reloadThreads: () => void }) {
   const [castModal, setCastModal] = useState(false);
 
   const onPublish = async (text: string) => {
@@ -39,4 +39,4 @@ function Cast({ farcasterUser, reloadThreads }: { farcasterUser?: FarcasterUser;
   );
 }
 
-export default Cast;
+export default CastComponent;

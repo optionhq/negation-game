@@ -2,17 +2,18 @@ import axios from "axios";
 import { useSearchParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
-import { EndPointsTree, LinkPointsTree, User } from "@/types/PointsTree";
+import { EndPointsTree, LinkPointsTree } from "@/types/PointsTree";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
-import { extractEndPointUrl } from "@/lib/useEndPoints";
 import { extractLink } from "@/lib/extractLink";
 import { useFarcasterUser } from "@/contexts/UserContext";
 import { negate } from "@/lib/negate";
 import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
 import { GoUnlink, GoCircleSlash } from "react-icons/go";
-import { Cast } from "neynar-next/server";
+import { Cast, User } from "neynar-next/server";
+import { castToPointsTree, castToLinkPointsTree} from "@/lib/useCasts";
+
 const INDENTATION_PX = 25;
 
 type ThreadEntry = {
@@ -51,46 +52,17 @@ export default function AccordionComponent({
   const { farcasterUser, setFarcasterUser } = useFarcasterUser();
   const [childrenLoading, setChildrenLoading] = useState(false);
 
-  useEffect(() => {
-
-    if (isDropdownClicked) {
-      unfurlDropdown();
-    }
-  }, [isDropdownClicked]);
-
-  const responseToLinkPointsTree = (response: ThreadEntry): LinkPointsTree => {
-    const endPointUrl = extractEndPointUrl(response);
-    return {
-      title: response.text,
-      id: response.hash,
-      author: response.author,
-      parentId: response.parentHash,
-      points: response.reactions.count,
-      replyCount: response.replies.count,
-      children: [],
-      endPointUrl: endPointUrl || undefined,
-    };
-  };
-
   const getNegations = async (point: LinkPointsTree) => {
-    const res = await fetch(`/api/thread?id=${point.id}`);
-    const threadData: ThreadEntry[] = await res.json();
+    const {data: {result: { casts }}} = await axios.get(`/api/cast/${point.id}/thread`);
+    const thread: Cast[] = casts;
 
     const negations: LinkPointsTree[] = [];
-    for (const cast of threadData) {
-      const possibleNegation = responseToLinkPointsTree(cast);
+    for (const cast of thread) {
+      const possibleNegation = castToLinkPointsTree(cast);
       if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
-        const res = await fetch(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
-        const cast: Cast = await res.json();
-        const endPoint: EndPointsTree = {
-          title: cast.text,
-          id: cast.hash,
-          author: cast.author,
-          parentId: cast.parent_hash as `0x${string}`,
-          points: cast.reactions?.likes.length,
-          replyCount: cast.replies?.count,
-          children: [],
-        }
+        const res = await axios.get(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
+        const cast: Cast = res.data;
+        const endPoint: EndPointsTree = castToPointsTree(cast)
         
         possibleNegation.endPoint = endPoint;
         // it's now a negation
@@ -104,25 +76,30 @@ export default function AccordionComponent({
 
   const unfurlDropdown = async () => {
     setChildrenLoading(true);
-    const relevanceNegations = await getNegations(e);
 
-    setRelevanceNegations(relevanceNegations);
+    const negations = await getNegations(e)
 
-    if (e.endPoint) {
-      const veracityNegations = await getNegations(e.endPoint);
-      setVeracityNegations(veracityNegations);
+    if (isNegation(e)) {;
+      setRelevanceNegations(negations);
+
+      if (e.endPoint) {
+        const veracityNegations = await getNegations(e.endPoint);
+        setVeracityNegations(veracityNegations);
+      }  
+
+    } else {
+      setVeracityNegations(negations);
     }
+
     setChildrenLoading(false);
   };
 
-  function expandDetails() {
-    if (!detailsRef.current) return;
-    detailsRef.current.open = !detailsRef.current.open;
-    setDetailsOpened(detailsRef.current.open);
-    if (detailsRef.current.open) {
-      setIsDropdownClicked(true);
+  useEffect(() => {
+
+    if (isDropdownClicked) {
+      unfurlDropdown();
     }
-  }
+  }, [isDropdownClicked]);
 
   const onNegate = (pointId: string) => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
     if (!farcasterUser) {
@@ -165,19 +142,14 @@ export default function AccordionComponent({
 
   function handleClick(e: React.MouseEvent) {
     e.stopPropagation();
-    const selection = window.getSelection()?.toString();
-    if (selection) return;
-    expandDetails();
-  }
-
-  function handleDoubleClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    e.preventDefault();
     newRoute();
   }
 
-  function toggle(e: any) {
-    e.preventDefault();
+  function handleArrowClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    // expandDetails();
+    setDetailsOpened(prevState => !prevState);
+    setIsDropdownClicked(!detailsOpened);
   }
 
   const onPublishNegation = async (text: string) => {
@@ -205,9 +177,7 @@ export default function AccordionComponent({
       ref={detailsRef}
       open={false}
       className="flex flex-col gap-1"
-      onClick={handleClick}
-      onDoubleClick={handleDoubleClick}
-      onToggle={toggle}>
+      onClick={handleClick}>
       <summary
         onClick={(e) => {
           e.preventDefault();
@@ -222,14 +192,15 @@ export default function AccordionComponent({
           <div
             className={`p-1 rounded-md ${
               e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"
-            }`}>
+            }`}
+            onClick={handleArrowClick}>
             <div className={`transition w-full h-full ${detailsOpened ? "rotate-90" : "rotate-0"}`}>
               <Arrow />
             </div>
           </div>
           {/* {parent && (
             <div
-              className="w-[1px] h-24 bg-black absolute -top-14 left-0 z-40"
+              className="w-[1px] h-242 bg-black absolute -top-14 left-0 z-40"
               style={{ marginLeft: `${22 + INDENTATION_PX * (level - 1)}px` }}></div>
           )} */}
         </div>
@@ -258,12 +229,11 @@ export default function AccordionComponent({
           </div>
         </div>
       </summary>
-      {childrenLoading && <div className="border w-full p-4 flex items-center justify-center">Loading...</div>}
       {relevanceNegations && relevanceNegations.length > 0 && (
         <div className=" border-black p-2 border-l  my-3 flex flex-col gap-3" style={{ marginLeft: INDENTATION_PX }}>
           <div className="flex flex-row gap-2 p-2 items-center font-semibold text-gray-400">
             <GoUnlink size={20} color="#AAAAAA" />
-            <p>Not relevant</p>
+            <p>Doesnt matter</p>
           </div>
 
           <Negations
@@ -294,6 +264,7 @@ export default function AccordionComponent({
           />
         </div>
       )}
+      {childrenLoading && <div className="border w-full p-4 flex items-center justify-center">Loading...</div>}
     </details>
   );
 }

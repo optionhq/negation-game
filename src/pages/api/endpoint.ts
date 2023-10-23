@@ -21,8 +21,8 @@ async function getEndPoint(endPointUrl: string) {
   try {
     const endCast = await fetchCastByUrl(endPointUrl);
     const point: EndPointsTree = {
-      text: endCast.text,
-      hash: endCast.hash,
+      title: endCast.text,
+      id: endCast.hash,
       points: endCast.reactions.likes.length,
       replyCount: endCast.replies.count,
     }
