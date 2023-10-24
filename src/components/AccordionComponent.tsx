@@ -6,7 +6,7 @@ import { EndPointsTree, LinkPointsTree } from "@/types/PointsTree";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
 import { extractLink } from "@/lib/extractLink";
-import { useFarcasterUser } from "@/contexts/UserContext";
+import { useFarcasterSigner } from "@/contexts/UserContext";
 import { negate } from "@/lib/negate";
 import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
@@ -24,13 +24,15 @@ export default function AccordionComponent({
   setParentChildren,
   setHistoricalItems,
   threadData,
+  refreshParentThread,
 }: {
   level: number;
   e: LinkPointsTree;
-  parent: string | undefined;
+  parent: LinkPointsTree | undefined;
   setParentChildren: any;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   threadData: any;
+  refreshParentThread: undefined | (() => Promise<void>)
 }) {
   const [veracityNegations, setVeracityNegations] = useState<any[]>(e.children || []);
   const [relevanceNegations, setRelevanceNegations] = useState<any[]>(e.children || []);
@@ -41,7 +43,7 @@ export default function AccordionComponent({
   const searchParams = useSearchParams();
   const [currentEntry, setCurrentEntry] = useState<LinkPointsTree>(e);
   const { text, link } = extractLink(e.title);
-  const { farcasterUser, setFarcasterUser } = useFarcasterUser();
+  const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
   const [childrenLoading, setChildrenLoading] = useState(false);
 
   const getNegations = async (point: LinkPointsTree) => {
@@ -66,51 +68,64 @@ export default function AccordionComponent({
     return negations;
   };
 
+  const updateNegationsInPlace = async (
+    setNegations: React.Dispatch<React.SetStateAction<LinkPointsTree[]>>,
+    getNegationsFor: () => Promise<LinkPointsTree[]>
+  ) => {
+    const newNegations = await getNegationsFor();
+    setNegations(prevNegations => {
+      const uniqueNegations = newNegations.filter(negation => 
+        !prevNegations.some(prevNegation => prevNegation.id === negation.id)
+      );
+      return [...prevNegations, ...uniqueNegations];
+    });
+  };
+  
   const unfurlDropdown = async () => {
     setChildrenLoading(true);
-
-    const negations = await getNegations(e)
-
-    if (isNegation(e)) {;
-      setRelevanceNegations(negations);
-
+  
+    if (isNegation(e)) {
+      await updateNegationsInPlace(setRelevanceNegations, () => getNegations(e));
       if (e.endPoint) {
-        const veracities = await getNegations(e.endPoint);
-        setVeracityNegations(veracities);
-      }  
-
+        await updateNegationsInPlace(setVeracityNegations, () => getNegations(e.endPoint!));
+      }
     } else {
-      setVeracityNegations(negations);
+      await updateNegationsInPlace(setVeracityNegations, () => getNegations(e));
     }
-
+  
     setChildrenLoading(false);
   };
 
   useEffect(() => {
-
-    if (detailsOpened) {
+    if (detailsOpened && e.type !== "input") {
       unfurlDropdown();
     }
-  }, [detailsOpened]);
+  }, [detailsOpened, e]);
 
-  const onNegate = (pointId: string) => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
-    if (!farcasterUser) {
-      window.alert("You must be logged in to publish.")
-      return
+  const onNegate = (pointId: string, negationType: 'relevance' | 'veracity') => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
+  
+    // Open the details if they're not already open
+    if (!detailsOpened) {
+      setIsDropdownClicked(true)
+      setDetailsOpened(true);
     }
-    if (!detailsRef.current) return;
-    detailsRef.current.open = true;
-    setDetailsOpened(detailsRef.current.open);
+  
+    const setNegations = negationType === 'relevance' ? setRelevanceNegations : setVeracityNegations;
+  
+    // add it if there isn't already one in there
+    setNegations(prevNegations => {
+      // Check if there's already an input element in the array
+      const hasInput = prevNegations.some(negation => negation.type === "input");
+    
+      // If there's already an input element, return the previous state
+      if (hasInput) {
+        return prevNegations;
+      }
+    
+      // If there's no input element, add one
+      return [...prevNegations, { type: "input", parentId: pointId, kind: negationType}];
+    });
 
-    if (relevanceNegations == null) {
-      setRelevanceNegations([{ type: "input" }]);
-      return;
-    }
-    // Check if children already contains an object with type: "input"
-    else if (!relevanceNegations.some((child) => child.type === "input")) {
-      var _children = [...relevanceNegations, { type: "input", parentId: pointId }];
-      setRelevanceNegations(_children);
-    }
   };
 
   function removeInput() {
@@ -157,13 +172,15 @@ export default function AccordionComponent({
   }, [router.query.id, e.id]);
 
   const onPublishNegation = async (text: string) => {
-    if (!farcasterUser) {
+    if (!farcasterSigner) {
       window.alert("Must be logged in to publish. farcasterUser is null");
       return;
     }
     const parentId = e.parentId!;
-    const negation = await negate({ text, parentId, farcasterUser });
+    const negation = await negate({ text, parentId, farcasterSigner });
     removeInput();
+    // @ts-ignore
+    refreshParentThread()
   };
 
   //@ts-ignore
@@ -171,7 +188,7 @@ export default function AccordionComponent({
     return (
       <InputComponent
         pointBg={pointBg}
-        placeHolder={"The claim `" + parent + "` is not true because ..."}
+        placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (e?.kind === "relevance" ? "relevant": "true")+ " because ..."}
         onCancel={removeInput}
         onPublish={onPublishNegation}
       />
@@ -222,11 +239,11 @@ export default function AccordionComponent({
             {/* if there is no parent this is an endPoint so veracity negates the id */}
             {currentEntry.endPoint && (
               <>
-                <Points points={e.points} onNegate={onNegate(currentEntry.endPoint!.id)} type="veracity" />
-                <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="relevance" />
+                <Points points={e.points} onNegate={onNegate(currentEntry.endPoint!.id, 'veracity')} type="veracity" />
+                <Points points={e.points} onNegate={onNegate(currentEntry.id, 'relevance')} type="relevance" />
               </>
             ) ||
-              <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="veracity" />
+              <Points points={e.points} onNegate={onNegate(currentEntry.id, 'veracity')} type="veracity" />
             }
           </div>
         </div>
@@ -235,17 +252,18 @@ export default function AccordionComponent({
         <div className="border-black pl-3 border-l my-2 flex flex-col gap-2" style={{ marginLeft: INDENTATION_PX }}>
           <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
             <GoUnlink size={18} color="#AAAAAA" />
-            <p>Doesnt matter</p>
+            <p>Doesn't matter</p>
           </div>
 
           <Negations
             negations={relevanceNegations}
             level={level}
-            parentTitle={e.title}
+            parent={e}
             setHistoricalItems={setHistoricalItems}
             setParentChildren={setRelevanceNegations}
             threadData={threadData}
             negationType="relevance"
+            refreshParentThread={unfurlDropdown}
           />
         </div>
       )}
@@ -258,11 +276,12 @@ export default function AccordionComponent({
           <Negations
             negations={veracityNegations}
             level={level}
-            parentTitle={e.title}
+            parent={e}
             setHistoricalItems={setHistoricalItems}
             setParentChildren={setVeracityNegations}
             threadData={threadData}
             negationType="veracity"
+            refreshParentThread={unfurlDropdown}
           />
         </div>
       )}

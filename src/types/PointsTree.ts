@@ -8,6 +8,9 @@ export type PointsTree = {
   points: number;
   replyCount: number;
   children?: LinkPointsTree[];
+  // used when it's an input type
+  type?: string
+  kind?: "relevance" | "veracity"
 };
 
 export type EndPointsTree = PointsTree;

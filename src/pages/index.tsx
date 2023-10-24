@@ -6,13 +6,11 @@ import HistoricalPoints from "@/components/HistoricalPoints";
 import Login from "@/components/Login";
 import { LinkPointsTree } from "@/types/PointsTree";
 import CastComponent from "@/components/Cast";
-import { LOCAL_STORAGE_KEYS } from "@/components/constants";
-import { FarcasterUser } from "@/types/FarcasterUser";
 import axios from "axios";
-import { FarcasterUserContext } from "@/contexts/UserContext";
+import { FarcasterSignerContext } from "@/contexts/UserContext";
 import NotificationButton from "@/components/notifications/NotificationButton";
 import config from "@/config";
-import { Cast } from "neynar-next/server";
+import { Cast, Signer } from "neynar-next/server";
 import { getMaybeNegation } from "@/lib/useCasts";
 
 
@@ -52,7 +50,7 @@ export default function Home() {
 
   const [filteredItems, setFilteredItems] = useState<LinkPointsTree[]>([]);
   const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
-  const [farcasterUser, setFarcasterUser] = useState<FarcasterUser | null>(null);
+  const [farcasterSigner, setFarcasterSigner] = useState<Signer | null>(null);
 
   useEffect(() => {
     const fetchItems = async () => {
@@ -82,22 +80,14 @@ export default function Home() {
     }
   };
 
-  useEffect(() => {
-    const storedData = localStorage.getItem(LOCAL_STORAGE_KEYS.FARCASTER_USER);
-    if (storedData) {
-      const user: FarcasterUser = JSON.parse(storedData);
-      setFarcasterUser(user);
-    }
-  }, []);
-
   return (
     <div>
       <header className="flex justify-end px-6 py-2 gap-6 bg-slate-50 border fixed top-0 w-screen z-40">
-        {farcasterUser?.status == "approved" && <NotificationButton/>}
-        <Login />
+        {farcasterSigner && <NotificationButton/>}
+        <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
       <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-48">
-        {farcasterUser?.status == "approved" && <CastComponent farcasterUser={farcasterUser} reloadThreads={reloadPage} />}
+        {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={reloadPage} />}
         {historicalPointIds && historicalPointIds?.length !== 0 && (
           <HistoricalPoints 
           ids={historicalPointIds.reverse()} 
@@ -111,14 +101,14 @@ export default function Home() {
           }}
         />
         )}
-        <FarcasterUserContext.Provider value={{ farcasterUser, setFarcasterUser }}>
+        <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
           <Accordion 
             key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
             data={filteredItems} 
             level={0} 
             setHistoricalItems={setHistoricalPointIds} 
           />
-        </FarcasterUserContext.Provider>
+        </FarcasterSignerContext.Provider>
       </main>
     </div>
   );

@@ -20,15 +20,19 @@ async function GET(req: NextApiRequest, res: NextApiResponse) {
 const postSchema = Joi.object({
   signerUuid: Joi.string().required(),
   text: Joi.string().required(),
-})
+  parent: Joi.string().optional(),
+  embeds: Joi.array().items(Joi.object({
+    url: Joi.string().required()
+  })).optional()
+});
 
 async function POST(req: NextApiRequest, res: NextApiResponse) {
-  const { error, value } = postSchema.validate(req.query)
+  const { error, value } = postSchema.validate(req.body)
   if (error) return res.status(400).json({ error: error.details[0].message })
 
-  await neynarClient.postCast(value.signerUuid, value.text)
+  const result = await neynarClient.postCast(value.signerUuid, value.text, { parent: value.parent, embeds: value.embeds });
 
-  return res.status(201).json(null)
+  return res.status(201).json(result)
 }
 
 const deleteSchema = Joi.object({

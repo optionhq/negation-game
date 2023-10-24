@@ -1,18 +1,16 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { FarcasterUser } from "@/types/FarcasterUser";
-import config from "@/config";
-import { BiSolidPencil } from "react-icons/bi";
-import Modal from "./Modal";
-import { InputComponent } from ".";
-import publish from "@/lib/publish";
+import { BiSolidPencil } from "react-icons/bi"
+import Modal from "./Modal"
+import { InputComponent } from "."
+import { Signer } from "neynar-next/server"
+import publish from "@/lib/publish"
 
-function CastComponent({ farcasterUser, reloadThreads }: { farcasterUser?: FarcasterUser; reloadThreads: () => void }) {
+function CastComponent({ farcasterSigner, reloadThreads }: { farcasterSigner: Signer; reloadThreads: () => void }) {
   const [castModal, setCastModal] = useState(false);
 
   const onPublish = async (text: string) => {
     try {
-      const resp = await publish({ text: text, farcasterUser: farcasterUser! });
+      const resp = await publish({ text: text, farcasterSigner: farcasterSigner });
       if (!resp) throw Error;
 
       if (resp.status === 200) {

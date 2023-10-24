@@ -19,10 +19,11 @@ export default function Accordion({
           key={e.id} 
           level={level} 
           e={e}
-          parent={parent}
+          parent={undefined}
           setHistoricalItems={setHistoricalItems}
           setParentChildren={e.children}
           threadData={null}
+          refreshParentThread={undefined}
         />
       ))}
     </div>

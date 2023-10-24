@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 
 const MAX_CHAR_PER_CAST = 320;
 
@@ -16,7 +16,25 @@ export default function InputComponent({
   onPublish: (text: string) => Promise<void>;
 }) {
   const [text, setText] = useState("");
-  
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    const listener = (event: KeyboardEvent) => {
+      if ((event.ctrlKey || event.metaKey) && (event.key === "Enter" || event.key === "Return")) {
+        // Click the publish button
+        text && onPublish(text);
+      }
+    };
+    document.addEventListener("keydown", listener);
+    return () => {
+      document.removeEventListener("keydown", listener);
+    };
+  }, [text, onPublish]);
+
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, []);
+
   return (
     <div
       className={
@@ -26,6 +44,7 @@ export default function InputComponent({
       onClick={(e) => e.stopPropagation()}
       >
       <textarea
+        ref={textareaRef}
         placeholder={placeHolder}
         className="w-full h-36 caret-purple-900 border-1"
         value={text}

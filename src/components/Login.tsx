@@ -3,19 +3,27 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useSigner } from 'neynar-next';
-import { User } from 'neynar-next/server'
+import { User, Signer } from 'neynar-next/server'
 import useSWR from 'swr';
 import axios from 'axios';
 
 // Define the fetcher function
 const fetcher = ( url: string ) => axios.get(url).then(res => res.data);
 
-function Login() {
+interface LoginProps {
+  setFarcasterSigner: React.Dispatch<React.SetStateAction<Signer | null>>;
+}
+
+const Login: React.FC<LoginProps> = ({ setFarcasterSigner }) => {
   const { signer, isLoading, signIn } = useSigner();
   const router = useRouter();
-
-  // Use the useSWR hook to fetch the user data
   const { data: user, error } = useSWR<User>(signer?.status === 'approved' ? `/api/users/${signer.fid}` : null, fetcher);
+
+  useEffect(() => {
+    if (user) {
+      setFarcasterSigner(signer);
+    }
+  }, [user]);
 
   useEffect(() => {
     if (signer && signer.status === "pending_approval") {

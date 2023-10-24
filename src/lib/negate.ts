@@ -1,6 +1,5 @@
-import axios from "axios";
 import config from "@/config";
-import { FarcasterUser } from "@/types/FarcasterUser";
+import { Signer } from 'neynar-next/server';
 import publish from "./publish";
 
 type PostCastResponse = {
@@ -15,24 +14,25 @@ type PostCastResponse = {
 export const negate = async ({
   text,
   parentId,
-  farcasterUser,
+  farcasterSigner,
 }: {
   text: string;
   parentId: string;
-  farcasterUser: FarcasterUser;
+  farcasterSigner: Signer;
 }) => {
   try {
-    const castResponse = await publish({text, parentId, farcasterUser});
+    const castResponse = await publish({text, parentId, farcasterSigner});
     if (!castResponse) throw Error;
 
-    const newCast: PostCastResponse = castResponse.data.cast;
+    const newCast: PostCastResponse = castResponse.cast;
 
     const warpcastUrl = "https://warpcast.com/" + newCast.author.username + "/" + newCast.hash.slice(0, 8).toString();
     const embeds = [{ url: warpcastUrl }]
-    const negationResponse = await publish({text, parentId, farcasterUser, embeds})
+    const negation = config.negationSymbol + "\n" + warpcastUrl;
+    const negationResponse = await publish({text: negation, parentId, farcasterSigner, embeds})
     if (!negationResponse) throw Error;
 
-    return negationResponse.data.cast as PostCastResponse;
+    return negationResponse.cast as PostCastResponse;
   } catch (error) {
     console.error(error);
   }

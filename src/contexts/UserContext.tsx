@@ -1,17 +1,17 @@
 import { createContext, useContext } from 'react';
-import { FarcasterUser } from '@/types/FarcasterUser';
+import { Signer } from 'neynar-next/server';
 
-type FarcasterUserContextType = {
-  farcasterUser: FarcasterUser | null;
-  setFarcasterUser: React.Dispatch<React.SetStateAction<FarcasterUser | null>>;
+type FarcasterSignerContextType = {
+  farcasterSigner: Signer | null;
+  setFarcasterUser: React.Dispatch<React.SetStateAction<Signer | null>>;
 };
 
-export const FarcasterUserContext = createContext<FarcasterUserContextType | undefined>(undefined);
+export const FarcasterSignerContext = createContext<FarcasterSignerContextType | undefined>(undefined);
 
-export function useFarcasterUser() {
-  const context = useContext(FarcasterUserContext);
+export function useFarcasterSigner() {
+  const context = useContext(FarcasterSignerContext);
   if (!context) {
-    throw new Error('useFarcasterUser must be used within a FarcasterUserProvider');
+    throw new Error('useFarcasterSigner must be used within a FarcasterSignerProvider');
   }
   return context;
 }

@@ -1,35 +1,39 @@
 import AccordionComponent from "./AccordionComponent";
+import { LinkPointsTree } from "@/types/PointsTree";
 
 type NegationsProps = {
-  negations: any[];
+  negations: LinkPointsTree[];
   level: number;
-  parentTitle: string;
+  parent: LinkPointsTree;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   setParentChildren: React.Dispatch<React.SetStateAction<any[]>>;
   threadData: any;
   negationType: "veracity" | "relevance";
+  refreshParentThread: () => Promise<void>
 };
 
 const Negations: React.FC<NegationsProps> = ({
   negations,
   level,
-  parentTitle,
+  parent,
   setHistoricalItems,
   setParentChildren,
   threadData,
   negationType,
+  refreshParentThread
 }) => {
   return (
   <div className={`flex flex-col w-full gap-1`}>
-    {negations.map((el: any, i: number) => (
+    {negations.map((el: LinkPointsTree, i: number) => (
       <AccordionComponent
-        key={i}
+        key={el.id}
         level={level + 1}
         e={el}
-        parent={parentTitle}
+        parent={parent}
         setHistoricalItems={setHistoricalItems}
         setParentChildren={setParentChildren}
         threadData={threadData}
+        refreshParentThread={refreshParentThread}
       />
     ))}
   </div>
