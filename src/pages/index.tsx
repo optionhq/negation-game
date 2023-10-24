@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
 import Accordion from "@/components/Accordion";
-import HistoricalPoints from "@/components/HistoricalClaims";
+import HistoricalPoints from "@/components/HistoricalPoints";
 import Login from "@/components/Login";
 import { LinkPointsTree } from "@/types/PointsTree";
 import CastComponent from "@/components/Cast";
@@ -99,7 +99,17 @@ export default function Home() {
       <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-48">
         {farcasterUser?.status == "approved" && <CastComponent farcasterUser={farcasterUser} reloadThreads={reloadPage} />}
         {historicalPointIds && historicalPointIds?.length !== 0 && (
-          <HistoricalPoints ids={historicalPointIds.reverse()} />
+          <HistoricalPoints 
+          ids={historicalPointIds.reverse()} 
+          onClick={(id) => {
+            const index = historicalPointIds.indexOf(id);
+            const newIds = historicalPointIds.slice(0, index + 1);
+            router.push({
+              pathname: router.pathname,
+              query: { ...router.query, id: newIds.join(',') },
+            });
+          }}
+        />
         )}
         <FarcasterUserContext.Provider value={{ farcasterUser, setFarcasterUser }}>
           <Accordion 
