@@ -16,7 +16,7 @@ export default function Accordion({
     <div className="flex flex-col w-full gap-1 ">
       {data?.map((e: any, i: number) => (
         <AccordionComponent
-          key={i} 
+          key={e.id} 
           level={level} 
           e={e}
           parent={parent}

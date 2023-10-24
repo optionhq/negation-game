@@ -71,7 +71,7 @@ export default function Home() {
     };
 
     fetchItems();
-  }, [router.isReady]);
+  }, [router.isReady, router.query.id]);
 
   const reloadPage = async () => {
     try {
@@ -102,7 +102,12 @@ export default function Home() {
           <HistoricalPoints ids={historicalPointIds.reverse()} />
         )}
         <FarcasterUserContext.Provider value={{ farcasterUser, setFarcasterUser }}>
-          <Accordion data={filteredItems} level={0} setHistoricalItems={setHistoricalPointIds} />
+          <Accordion 
+            key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
+            data={filteredItems} 
+            level={0} 
+            setHistoricalItems={setHistoricalPointIds} 
+          />
         </FarcasterUserContext.Provider>
       </main>
     </div>

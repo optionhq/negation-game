@@ -1,5 +1,5 @@
 import axios from "axios";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useSearchParams, useRouter as oldRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
 import { EndPointsTree, LinkPointsTree } from "@/types/PointsTree";
@@ -13,17 +13,9 @@ import Negations from "./Negations";
 import { GoUnlink, GoCircleSlash } from "react-icons/go";
 import { Cast, User } from "neynar-next/server";
 import { castToPointsTree, castToLinkPointsTree} from "@/lib/useCasts";
+import { useRouter } from "next/router";
 
 const INDENTATION_PX = 25;
-
-type ThreadEntry = {
-  text: string;
-  hash: string;
-  author: User;
-  parentHash?: string;
-  reactions: { count: number };
-  replies: { count: number };
-};
 
 export default function AccordionComponent({
   level,
@@ -54,13 +46,13 @@ export default function AccordionComponent({
 
   const getNegations = async (point: LinkPointsTree) => {
     const {data: {result: { casts }}} = await axios.get(`/api/cast/${point.id}/thread`);
-    const thread: Cast[] = casts;
-
+  
     const negations: LinkPointsTree[] = [];
-    for (const cast of thread) {
+    for (const cast of casts) {
       const possibleNegation = castToLinkPointsTree(cast);
       if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
         const res = await axios.get(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
+  
         const cast: Cast = res.data;
         const endPoint: EndPointsTree = castToPointsTree(cast)
         
@@ -70,7 +62,7 @@ export default function AccordionComponent({
         negations.push(negation);
       }
     }
-
+  
     return negations;
   };
 
@@ -83,8 +75,8 @@ export default function AccordionComponent({
       setRelevanceNegations(negations);
 
       if (e.endPoint) {
-        const veracityNegations = await getNegations(e.endPoint);
-        setVeracityNegations(veracityNegations);
+        const veracities = await getNegations(e.endPoint);
+        setVeracityNegations(veracities);
       }  
 
     } else {
@@ -96,10 +88,10 @@ export default function AccordionComponent({
 
   useEffect(() => {
 
-    if (isDropdownClicked) {
+    if (detailsOpened) {
       unfurlDropdown();
     }
-  }, [isDropdownClicked]);
+  }, [detailsOpened]);
 
   const onNegate = (pointId: string) => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
     if (!farcasterUser) {
@@ -144,13 +136,25 @@ export default function AccordionComponent({
     e.stopPropagation();
     newRoute();
   }
-
-  function handleArrowClick(e: React.MouseEvent) {
+  
+  const handleArrowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    // expandDetails();
+    setIsDropdownClicked(prevState => !prevState)
+    await unfurlDropdown();
     setDetailsOpened(prevState => !prevState);
-    setIsDropdownClicked(!detailsOpened);
-  }
+  };
+
+  useEffect(() => {
+    const selectedIds = typeof router.query.id === 'string' ? router.query.id.split(',') : [router.query.id];
+    const selectedId = selectedIds[0];
+    if (selectedId === e.id) {
+      setIsDropdownClicked(true);
+      setDetailsOpened(true);
+    } else {
+      setIsDropdownClicked(false);
+      setDetailsOpened(false);
+    }
+  }, [router.query.id, e.id]);
 
   const onPublishNegation = async (text: string) => {
     if (!farcasterUser) {
@@ -174,8 +178,7 @@ export default function AccordionComponent({
     );
   return (
     <details
-      ref={detailsRef}
-      open={false}
+      open={detailsOpened}
       className="flex flex-col gap-1"
       onClick={handleClick}>
       <summary
@@ -194,7 +197,7 @@ export default function AccordionComponent({
               e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"
             }`}
             onClick={handleArrowClick}>
-            <div className={`transition w-full h-full ${detailsOpened ? "rotate-90" : "rotate-0"}`}>
+            <div className={`transition w-full h-full ${isDropdownClicked ? "rotate-90" : "rotate-0"}`}>
               <Arrow />
             </div>
           </div>
@@ -218,14 +221,14 @@ export default function AccordionComponent({
           {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
           <div className="flex flex-row gap-2 text-gray-500">
             {/* if there is no parent this is an endPoint so veracity negates the id */}
-            {!parent && <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="veracity" />}
-            {/* if there is a parent this is a linkPoint so veracity negates the endPoint.id */}
             {currentEntry.endPoint && (
               <>
                 <Points points={e.points} onNegate={onNegate(currentEntry.endPoint!.id)} type="veracity" />
                 <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="relevance" />
               </>
-            )}
+            ) ||
+              <Points points={e.points} onNegate={onNegate(currentEntry.id)} type="veracity" />
+            }
           </div>
         </div>
       </summary>

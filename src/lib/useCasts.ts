@@ -21,7 +21,6 @@ export async function getMaybeNegation(cast: Cast): Promise<LinkPointsTree> {
 
 export function castToLinkPointsTree(cast: Cast): LinkPointsTree {
   const endPointUrl = extractEndPointUrl(cast);
-  console.log("cast to link points tree", cast)
   return {
     title: cast.text,
     id: cast.hash,
