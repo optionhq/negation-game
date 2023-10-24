@@ -193,14 +193,13 @@ export default function AccordionComponent({
         <div className="flex flex-col gap-2">
           <div
             className={`p-1 rounded-md ${
-              e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"
+              e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
             }`}
             onClick={handleArrowClick}>
             <div
-              className={`p-1 rounded-md ${
+              className={`p-1 rounded-lg ${
                 e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"
-              } hover:bg-gray-100`}
-              onClick={handleArrowClick}>
+              } hover:bg-gray-200`}>
               <div className={`transition w-full h-full ${isDropdownClicked ? "rotate-90" : "rotate-0"}`}>
                 <Arrow />
               </div>
