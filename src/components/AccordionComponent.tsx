@@ -181,31 +181,31 @@ export default function AccordionComponent({
       open={detailsOpened}
       className="flex flex-col gap-1"
       onClick={handleClick}>
-      <summary
-        onClick={(e) => {
-          e.preventDefault();
-        }}
-        className={
-          pointBg +
-          `claim relative border ${e.replyCount || (e.endPoint && e.endPoint?.replyCount > 0) ? "cursor-pointer" : ""}`
-        }
-        // style={{ paddingLeft: paddingLeft }}
-      >
+        <summary
+          onClick={(e) => {
+            e.preventDefault();
+          }}
+          className={
+            pointBg +
+            `claim relative border cursor-pointer`
+          }
+        >
         <div className="flex flex-col gap-2">
           <div
             className={`p-1 rounded-md ${
               e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"
             }`}
             onClick={handleArrowClick}>
-            <div className={`transition w-full h-full ${isDropdownClicked ? "rotate-90" : "rotate-0"}`}>
-              <Arrow />
+            <div
+              className={`p-1 rounded-md ${
+                e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"
+              } hover:bg-gray-100`}
+              onClick={handleArrowClick}>
+              <div className={`transition w-full h-full ${isDropdownClicked ? "rotate-90" : "rotate-0"}`}>
+                <Arrow />
+              </div>
             </div>
           </div>
-          {/* {parent && (
-            <div
-              className="w-[1px] h-242 bg-black absolute -top-14 left-0 z-40"
-              style={{ marginLeft: `${22 + INDENTATION_PX * (level - 1)}px` }}></div>
-          )} */}
         </div>
         <div className="flex flex-col gap-3 items-start justify-center w-full">
           {/* <ProfilePreview user={e.author!}/> */}
@@ -233,9 +233,9 @@ export default function AccordionComponent({
         </div>
       </summary>
       {relevanceNegations && relevanceNegations.length > 0 && (
-        <div className=" border-black p-2 border-l  my-3 flex flex-col gap-3" style={{ marginLeft: INDENTATION_PX }}>
-          <div className="flex flex-row gap-2 p-2 items-center font-semibold text-gray-400">
-            <GoUnlink size={20} color="#AAAAAA" />
+        <div className="border-black pl-3 border-l my-2 flex flex-col gap-2" style={{ marginLeft: INDENTATION_PX }}>
+          <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
+            <GoUnlink size={18} color="#AAAAAA" />
             <p>Doesnt matter</p>
           </div>
 
@@ -251,9 +251,9 @@ export default function AccordionComponent({
         </div>
       )}
       {veracityNegations && veracityNegations.length > 0 && (
-        <div className="border-black p-2 border-l  my-3 flex flex-col gap-3" style={{ marginLeft: INDENTATION_PX }}>
-          <div className="flex flex-row gap-2 p-2 items-center font-semibold text-gray-400">
-            <GoCircleSlash size={20} color="#AAAAAA" />
+        <div className="border-black pl-3 border-l  my-2 flex flex-col gap-2" style={{ marginLeft: INDENTATION_PX }}>
+          <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
+            <GoCircleSlash size={18} color="#AAAAAA" />
             <p>Not true</p>
           </div>
           <Negations
