@@ -3,7 +3,7 @@ import React, { useEffect } from "react";
 import Image from "next/image";
 import { useRouter } from "next/router";
 import { useSigner } from 'neynar-next';
-import { type User } from 'neynar-next/server'
+import { User } from 'neynar-next/server'
 import useSWR from 'swr';
 import axios from 'axios';
 
@@ -39,7 +39,7 @@ function Login() {
       {user && (
         <div className="flex flex-col items-center">
           <Image
-            src={user.pfp.url || "/default-avatar.svg"}
+            src={user.pfp_url || "/default-avatar.svg"}
             alt="User profile picture"
             width={50}
             height={50}

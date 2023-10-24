@@ -33,8 +33,8 @@ dependencies:
     specifier: 13.4.12
     version: 13.4.12(react-dom@18.2.0)(react@18.2.0)
   neynar-next:
-    specifier: ^0.2.8
-    version: 0.2.8(next@13.4.12)(react-dom@18.2.0)(react@18.2.0)(viem@1.16.6)
+    specifier: ^0.3.0
+    version: 0.3.0(next@13.4.12)(react-dom@18.2.0)(react@18.2.0)(viem@1.16.6)
   postcss:
     specifier: 8.4.27
     version: 8.4.27
@@ -871,7 +871,7 @@ packages:
     hasBin: true
     dependencies:
       caniuse-lite: 1.0.30001553
-      electron-to-chromium: 1.4.564
+      electron-to-chromium: 1.4.565
       node-releases: 2.0.13
       update-browserslist-db: 1.0.13(browserslist@4.22.1)
 
@@ -1077,8 +1077,8 @@ packages:
       esutils: 2.0.3
     dev: false
 
-  /electron-to-chromium@1.4.564:
-    resolution: {integrity: sha512-bGAx9+teIzL5I4esQwCMtiXtb78Ysc8xOKTPOvmafbJZ4SQ40kDO1ym3yRcGSkfaBtV81fGgHOgPoe6DsmpmkA==}
+  /electron-to-chromium@1.4.565:
+    resolution: {integrity: sha512-XbMoT6yIvg2xzcbs5hCADi0dXBh4//En3oFXmtPX+jiyyiCTiM9DGFT2SLottjpEs9Z8Mh8SqahbR96MaHfuSg==}
 
   /emoji-regex@9.2.2:
     resolution: {integrity: sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==}
@@ -2237,8 +2237,8 @@ packages:
       - babel-plugin-macros
     dev: false
 
-  /neynar-next@0.2.8(next@13.4.12)(react-dom@18.2.0)(react@18.2.0)(viem@1.16.6):
-    resolution: {integrity: sha512-J0pulw8J4VIpsfDY9T/54E4epxGdNq9duR1a+1QUpekISSceHgTeFozZjS36R9DvhJjf6ydOjLnr8J6YnAgFwA==}
+  /neynar-next@0.3.0(next@13.4.12)(react-dom@18.2.0)(react@18.2.0)(viem@1.16.6):
+    resolution: {integrity: sha512-YIGlN1779x5XYPbwwZfW3vwEVMbRzVLJbdQ6rs2J+sjV2EpDSShMa+wWaRhaT7sVDN+7VVQoNjSjqjPrYnbdIg==}
     peerDependencies:
       next: ^13
       react: ^18
