@@ -12,9 +12,9 @@ import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
 import { GoUnlink, GoCircleSlash } from "react-icons/go";
 import { Cast, User } from "neynar-next/server";
-import { castToPointsTree, castToLinkPointsTree} from "@/lib/useCasts";
+import { castToPointsTree, castToLinkPointsTree } from "@/lib/useCasts";
 import { useRouter } from "next/router";
-import TripleDotMenu from './TripleDotMenu';
+import TripleDotMenu from "./TripleDotMenu";
 
 const INDENTATION_PX = 25;
 
@@ -50,24 +50,28 @@ export default function AccordionComponent({
   const [isTripleDotOpen, setTripleDotMenu] = useState(false);
 
   const getNegations = async (point: Negation) => {
-    const {data: {result: { casts }}} = await axios.get(`/api/cast/${point.id}/thread`);
-  
+    const {
+      data: {
+        result: { casts },
+      },
+    } = await axios.get(`/api/cast/${point.id}/thread`);
+
     const negations: Negation[] = [];
     for (const cast of casts) {
       const possibleNegation = castToLinkPointsTree(cast);
       if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
         const res = await axios.get(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
-  
+
         const cast: Cast = res.data;
-        const endPoint: Node = castToPointsTree(cast)
-        
+        const endPoint: Node = castToPointsTree(cast);
+
         possibleNegation.endPoint = endPoint;
         // it's now a negation
         const negation = possibleNegation;
         negations.push(negation);
       }
     }
-  
+
     return negations;
   };
 
@@ -76,20 +80,20 @@ export default function AccordionComponent({
     getNegationsFor: () => Promise<Negation[]>
   ) => {
     const newNegations = await getNegationsFor();
-    setNegations(prevNegations => {
+    setNegations((prevNegations) => {
       // Preserve any existing input box
-      const inputBox = prevNegations?.find(negation => negation.type === "input");
-    
+      const inputBox = prevNegations?.find((negation) => negation.type === "input");
+
       // Negations in newNegations that are also in prevNegations
-      const toKeep = prevNegations ? prevNegations.filter(prevNegation =>
-        newNegations.some(negation => negation.id === prevNegation.id)
-      ) : [];
-    
+      const toKeep = prevNegations
+        ? prevNegations.filter((prevNegation) => newNegations.some((negation) => negation.id === prevNegation.id))
+        : [];
+
       // Negations in newNegations that are not in prevNegations
-      const toAdd = newNegations.filter(negation =>
-        !prevNegations?.some(prevNegation => prevNegation.id === negation.id)
+      const toAdd = newNegations.filter(
+        (negation) => !prevNegations?.some((prevNegation) => prevNegation.id === negation.id)
       );
-    
+
       // If there's an input box, add it to the new state
       if (inputBox) {
         return [...toKeep, ...toAdd, inputBox];
@@ -98,10 +102,10 @@ export default function AccordionComponent({
       }
     });
   };
-  
+
   const unfurlDropdown = async () => {
     setChildrenLoading(true);
-  
+
     if (isNegation(e)) {
       await updateNegationsInPlace(setRelevanceNegations, () => getNegations(e));
       if (e.endPoint) {
@@ -110,7 +114,7 @@ export default function AccordionComponent({
     } else {
       await updateNegationsInPlace(setVeracityNegations, () => getNegations(e));
     }
-  
+
     setChildrenLoading(false);
   };
 
@@ -120,31 +124,33 @@ export default function AccordionComponent({
     }
   }, [detailsOpened, e]);
 
-  const onNegate = (pointId: string, negationType: 'relevance' | 'veracity') => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
-  
-    // Open the details if they're not already open
-    if (!detailsOpened) {
-      setIsDropdownClicked(true)
-      setDetailsOpened(true);
-    }
-  
-    const setNegations = negationType === 'relevance' ? setRelevanceNegations : setVeracityNegations;
-  
-    // add it if there isn't already one in there
-    setNegations(prevNegations => {
-      // Check if there's already an input element in the array
-      const hasInput = prevNegations.some(negation => negation.type === "input");
-    
-      // If there's already an input element, return the previous state
-      if (hasInput) {
-        return prevNegations;
-      }
-    
-      // If there's no input element, add one
-      return [...prevNegations, { type: "input", parentId: pointId, kind: negationType}];
-    });
+  const onNegate =
+    (pointId: string, negationType: "relevance" | "veracity") =>
+    (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
+      if (!(farcasterSigner && "fid" in farcasterSigner)) return;
 
-  };
+      // Open the details if they're not already open
+      if (!detailsOpened) {
+        setIsDropdownClicked(true);
+        setDetailsOpened(true);
+      }
+
+      const setNegations = negationType === "relevance" ? setRelevanceNegations : setVeracityNegations;
+
+      // add it if there isn't already one in there
+      setNegations((prevNegations) => {
+        // Check if there's already an input element in the array
+        const hasInput = prevNegations.some((negation) => negation.type === "input");
+
+        // If there's already an input element, return the previous state
+        if (hasInput) {
+          return prevNegations;
+        }
+
+        // If there's no input element, add one
+        return [...prevNegations, { type: "input", parentId: pointId, kind: negationType }];
+      });
+    };
 
   function removeInput() {
     if (!parent) return;
@@ -160,27 +166,28 @@ export default function AccordionComponent({
 
   function getAncestry(): string {
     // Call the parent's getAncestry function if it exists
-    const parentAncestry = parent && getParentAncestry ? getParentAncestry() : '';
-    
+    const parentAncestry = parent && getParentAncestry ? getParentAncestry() : "";
+
     // Return the current component's ID followed by the parent's ancestry
     return parentAncestry ? `${e.id},${parentAncestry}` : e.id;
   }
 
   function newRoute() {
-    const ancestry = getAncestry().split(',');
+    const ancestry = getAncestry().split(",");
     const current = searchParams.get("id");
-    const currentIds = current ? current.split(',') : [];
-  
+    const currentIds = current ? current.split(",") : [];
+
     // Find the first ancestor that is already in the path
-    const commonAncestorIndex = ancestry.findIndex(ancestor => ancestor === currentIds[0]);
-  
+    const commonAncestorIndex = ancestry.findIndex((ancestor) => ancestor === currentIds[0]);
+
     // If the first ancestor is already in the path, do nothing
     if (commonAncestorIndex === 0) {
       return;
     }
-  
+
     // Prepend the missing ancestors to the path
-    const missingAncestors = commonAncestorIndex > 0 ? ancestry.slice(0, commonAncestorIndex).join(',') : ancestry.join(',');
+    const missingAncestors =
+      commonAncestorIndex > 0 ? ancestry.slice(0, commonAncestorIndex).join(",") : ancestry.join(",");
     const route = current ? `${missingAncestors},${current}` : missingAncestors;
     router.push(`?id=${route}`);
   }
@@ -189,16 +196,16 @@ export default function AccordionComponent({
     e.stopPropagation();
     newRoute();
   }
-  
+
   const handleArrowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsDropdownClicked(prevState => !prevState)
+    setIsDropdownClicked((prevState) => !prevState);
     await unfurlDropdown();
-    setDetailsOpened(prevState => !prevState);
+    setDetailsOpened((prevState) => !prevState);
   };
 
   useEffect(() => {
-    const selectedIds = typeof router.query.id === 'string' ? router.query.id.split(',') : [router.query.id];
+    const selectedIds = typeof router.query.id === "string" ? router.query.id.split(",") : [router.query.id];
     const selectedId = selectedIds[0];
     if (selectedId === e.id) {
       setIsDropdownClicked(true);
@@ -218,7 +225,7 @@ export default function AccordionComponent({
     const negation = await negate({ text, parentId, farcasterSigner });
     removeInput();
     // @ts-ignore
-    refreshParentThread()
+    refreshParentThread();
   };
 
   //@ts-ignore
@@ -226,30 +233,31 @@ export default function AccordionComponent({
     return (
       <InputComponent
         pointBg={pointBg}
-        placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (e?.kind === "relevance" ? "relevant": "true")+ " because ..."}
+        placeHolder={
+          "This point `" +
+          (parent?.endPoint ? parent?.endPoint.title : parent?.title) +
+          "` is not " +
+          (e?.kind === "relevance" ? "relevant" : "true") +
+          " because ..."
+        }
         onCancel={removeInput}
         onPublish={onPublishNegation}
       />
     );
   return (
-    <details
-      open={detailsOpened}
-      className="flex flex-col gap-1"
-    >
+    <details open={detailsOpened} className="flex flex-col gap-1">
       <summary
         onClick={(e) => {
           // Toggle the details
-          setDetailsOpened(prevState => !prevState);
+          setDetailsOpened((prevState) => !prevState);
         }}
-        className={
-          pointBg +
-          `claim relative border cursor-pointer`
-        }
-      >
+        className={pointBg + `claim relative border cursor-pointer`}>
         <div className="flex flex-col gap-2">
           <div
             className={`p-1 rounded-md ${
-              e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
+              e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0)
+                ? "opacity-100"
+                : "opacity-0 pointer-events-none"
             }`}
             onClick={handleArrowClick}>
             <div
@@ -262,14 +270,9 @@ export default function AccordionComponent({
             </div>
           </div>
         </div>
-        <div 
-          className="flex flex-col gap-3 items-start justify-center w-full"
-          onClick={handleClick}
-        >
+        <div className="flex flex-col gap-3 items-start justify-center w-full" onClick={handleClick}>
           {/* <ProfilePreview user={e.author!}/> */}
-          <span className="w-full">
-            {e.endPoint && isNegation(e) && e.endPoint.title}
-          </span>
+          <span className="w-full">{e.endPoint && isNegation(e) && e.endPoint.title}</span>
           {!e.endPoint && (
             <>
               {e.title}
@@ -279,23 +282,46 @@ export default function AccordionComponent({
           {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
           <div className="flex flex-row gap-2 text-gray-500">
             {/* if there is no parent this is an endPoint so veracity negates the id */}
-            {e.endPoint && (
+            {(e.endPoint && (
               <>
-                <Score id={e.endPoint!.id} points={e.points} onNegate={onNegate(e.endPoint!.id, 'veracity')} type="veracity" advocates={e.advocates} farcasterSigner={farcasterSigner} />
-                <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'relevance')} type="relevance" advocates={e.advocates} farcasterSigner={farcasterSigner} />
+                <Score
+                  id={e.endPoint!.id}
+                  points={e.points}
+                  onNegate={onNegate(e.endPoint!.id, "veracity")}
+                  type="veracity"
+                  advocates={e.advocates}
+                  farcasterSigner={farcasterSigner}
+                />
+                <Score
+                  id={e.id}
+                  points={e.points}
+                  onNegate={onNegate(e.id, "relevance")}
+                  type="relevance"
+                  advocates={e.advocates}
+                  farcasterSigner={farcasterSigner}
+                />
               </>
-            ) ||
-              <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'veracity')} type="veracity" advocates={e.advocates} farcasterSigner={farcasterSigner} />
-            }
+            )) || (
+              <Score
+                id={e.id}
+                points={e.points}
+                onNegate={onNegate(e.id, "veracity")}
+                type="veracity"
+                advocates={e.advocates}
+                farcasterSigner={farcasterSigner}
+              />
+            )}
           </div>
         </div>
-        <TripleDotMenu
-          isTripleDotOpen={isTripleDotOpen}
-          setTripleDotMenu={setTripleDotMenu}
-          farcasterSigner={farcasterSigner}
-          e={e}
-          refreshParentThread={refreshParentThread}
-        />
+        {farcasterSigner && "fid" in farcasterSigner && (
+          <TripleDotMenu
+            isTripleDotOpen={isTripleDotOpen}
+            setTripleDotMenu={setTripleDotMenu}
+            farcasterSigner={farcasterSigner}
+            e={e}
+            refreshParentThread={refreshParentThread}
+          />
+        )}
       </summary>
       {relevanceNegations && relevanceNegations.length > 0 && (
         <div className="border-black pl-3 border-l my-2 flex flex-col gap-2" style={{ marginLeft: INDENTATION_PX }}>

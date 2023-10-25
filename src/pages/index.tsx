@@ -74,11 +74,13 @@ export default function Home() {
   return (
     <div>
       <header className="flex justify-end px-6 py-2 gap-6 bg-slate-50 border fixed top-0 w-screen z-40">
-        {farcasterSigner && <NotificationButton/>}
+      
+
+        {(farcasterSigner && 'fid' in farcasterSigner) && <NotificationButton/>}
         <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
       <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-48">
-        {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
+        {(farcasterSigner && 'fid' in farcasterSigner) && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
         {historicalPointIds && historicalPointIds?.length !== 0 && (
           <HistoricalPoints 
           ids={historicalPointIds.reverse()} 

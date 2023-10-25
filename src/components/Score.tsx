@@ -34,18 +34,20 @@ function NegateLikeButtons({
   const handleLike = useCallback((e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
     e.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
+    console.log("FARCASTER SIGNER", farcasterSigner)
+    if(!(farcasterSigner && 'fid' in farcasterSigner)) return
 
     const toggleLike = async () => {
       if (isLiked) {
         // Call the internal API to unlike
-        await axios.delete(`/api/cast/${id}/like`, { data: { signerUuid: farcasterSigner?.signer_uuid } })
+        await axios.delete(`/api/cast/${id}/like`, { data: { signerUuid: farcasterSigner.signer_uuid } })
           .then(() => {
             setScore(prevScore => prevScore - 1);
             setIsLiked(false);
           });
       } else {
         // Call the internal API to like
-        await axios.post(`/api/cast/${id}/like`, { signerUuid: farcasterSigner?.signer_uuid })
+        await axios.post(`/api/cast/${id}/like`, { signerUuid: farcasterSigner.signer_uuid })
           .then(() => {
             setScore(prevScore => prevScore + 1);
             setIsLiked(true);
