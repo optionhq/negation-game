@@ -35,28 +35,12 @@ async function POST(req: NextApiRequest, res: NextApiResponse) {
   return res.status(201).json(result)
 }
 
-const deleteSchema = Joi.object({
-  signerUuid: Joi.string().required(),
-  castHash: Joi.string().required(),
-})
-
-async function DELETE(req: NextApiRequest, res: NextApiResponse) {
-  const { error, value } = deleteSchema.validate(req.query)
-  if (error) return res.status(400).json({ error: error.details[0].message })
-
-  await neynarClient.deleteCast(value.signerUuid, `0x${value.castHash}`)
-
-  return res.status(204).end()
-}
-
 export default function handler(req: NextApiRequest, res: NextApiResponse) {
   switch (req.method) {
     case 'GET':
       return GET(req, res)
     case 'POST':
       return POST(req, res)
-    case 'DELETE':
-      return DELETE(req, res)
     default:
       res.status(405).end()
       break

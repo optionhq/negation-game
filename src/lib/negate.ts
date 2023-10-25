@@ -24,7 +24,7 @@ export const negate = async ({
     const castResponse = await publish({text, parentId, farcasterSigner});
     if (!castResponse) throw Error;
 
-    const newCast: PostCastResponse = castResponse.cast;
+    const newCast: PostCastResponse = castResponse.data.cast;
 
     const warpcastUrl = "https://warpcast.com/" + newCast.author.username + "/" + newCast.hash.slice(0, 8).toString();
     const embeds = [{ url: warpcastUrl }]
@@ -32,7 +32,7 @@ export const negate = async ({
     const negationResponse = await publish({text: negation, parentId, farcasterSigner, embeds})
     if (!negationResponse) throw Error;
 
-    return negationResponse.cast as PostCastResponse;
+    return negationResponse.data.cast as PostCastResponse;
   } catch (error) {
     console.error(error);
   }

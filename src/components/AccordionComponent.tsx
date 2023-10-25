@@ -14,6 +14,7 @@ import { GoUnlink, GoCircleSlash } from "react-icons/go";
 import { Cast, User } from "neynar-next/server";
 import { castToPointsTree, castToLinkPointsTree} from "@/lib/useCasts";
 import { useRouter } from "next/router";
+import TripleDotMenu from './TripleDotMenu';
 
 const INDENTATION_PX = 25;
 
@@ -32,7 +33,7 @@ export default function AccordionComponent({
   setParentChildren: any;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   threadData: any;
-  refreshParentThread: undefined | (() => Promise<void>)
+  refreshParentThread: () => Promise<void>
 }) {
   const [veracityNegations, setVeracityNegations] = useState<any[]>(e.children || []);
   const [relevanceNegations, setRelevanceNegations] = useState<any[]>(e.children || []);
@@ -45,6 +46,7 @@ export default function AccordionComponent({
   const { text, link } = extractLink(e.title);
   const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
   const [childrenLoading, setChildrenLoading] = useState(false);
+  const [isTripleDotOpen, setTripleDotMenu] = useState(false);
 
   const getNegations = async (point: LinkPointsTree) => {
     const {data: {result: { casts }}} = await axios.get(`/api/cast/${point.id}/thread`);
@@ -74,10 +76,17 @@ export default function AccordionComponent({
   ) => {
     const newNegations = await getNegationsFor();
     setNegations(prevNegations => {
-      const uniqueNegations = newNegations.filter(negation => 
+      // Negations in newNegations that are also in prevNegations
+      const toKeep = prevNegations.filter(prevNegation =>
+        newNegations.some(negation => negation.id === prevNegation.id)
+      );
+  
+      // Negations in newNegations that are not in prevNegations
+      const toAdd = newNegations.filter(negation =>
         !prevNegations.some(prevNegation => prevNegation.id === negation.id)
       );
-      return [...prevNegations, ...uniqueNegations];
+  
+      return [...toKeep, ...toAdd];
     });
   };
   
@@ -247,12 +256,19 @@ export default function AccordionComponent({
             }
           </div>
         </div>
+        <TripleDotMenu
+          isTripleDotOpen={isTripleDotOpen}
+          setTripleDotMenu={setTripleDotMenu}
+          farcasterSigner={farcasterSigner}
+          e={e}
+          refreshParentThread={refreshParentThread}
+        />
       </summary>
       {relevanceNegations && relevanceNegations.length > 0 && (
         <div className="border-black pl-3 border-l my-2 flex flex-col gap-2" style={{ marginLeft: INDENTATION_PX }}>
           <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
             <GoUnlink size={18} color="#AAAAAA" />
-            <p>Doesn't matter</p>
+            <p>Doesn&lsquo;t matter</p>
           </div>
 
           <Negations

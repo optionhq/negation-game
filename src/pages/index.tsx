@@ -52,33 +52,24 @@ export default function Home() {
   const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
   const [farcasterSigner, setFarcasterSigner] = useState<Signer | null>(null);
 
-  useEffect(() => {
-    const fetchItems = async () => {
-      let ids: string[] = [];
-      if (typeof router.query.id === 'string') {
-        ids = router.query.id.split(",");
-      }
-      if (ids.length !== 0) {
-        const {historicalPoints, points} = await getHomeItems(ids || null);
-        setFilteredItems(points);
-        setHistoricalPointIds(historicalPoints);
-      } else if (router.isReady && ids.length === 0) {
-        const {historicalPoints, points} = await getHomeItems(ids || null);
-        setFilteredItems(points);
-      }
-    };
-
-    fetchItems();
-  }, [router.isReady, router.query.id]);
-
-  const reloadPage = async () => {
-    try {
-      const response = await axios.get(`/api/feed`);
-      setFilteredItems(response.data.pointsTree);
-    } catch (error) {
-      console.error("Could not reload threads", error);
+  const fetchItems = async () => {
+    let ids: string[] = [];
+    if (typeof router.query.id === 'string') {
+      ids = router.query.id.split(",");
+    }
+    if (ids.length !== 0) {
+      const {historicalPoints, points} = await getHomeItems(ids || null);
+      setFilteredItems(points);
+      setHistoricalPointIds(historicalPoints);
+    } else if (router.isReady && ids.length === 0) {
+      const {historicalPoints, points} = await getHomeItems(ids || null);
+      setFilteredItems(points);
     }
   };
+
+  useEffect(() => {
+    fetchItems();
+  }, [router.isReady, router.query.id]);
 
   return (
     <div>
@@ -87,7 +78,7 @@ export default function Home() {
         <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
       <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-48">
-        {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={reloadPage} />}
+        {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
         {historicalPointIds && historicalPointIds?.length !== 0 && (
           <HistoricalPoints 
           ids={historicalPointIds.reverse()} 
@@ -107,6 +98,7 @@ export default function Home() {
             data={filteredItems} 
             level={0} 
             setHistoricalItems={setHistoricalPointIds} 
+            refreshThread={fetchItems}
           />
         </FarcasterSignerContext.Provider>
       </main>

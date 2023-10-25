@@ -10,10 +10,12 @@ function CastComponent({ farcasterSigner, reloadThreads }: { farcasterSigner: Si
 
   const onPublish = async (text: string) => {
     try {
-      const resp = await publish({ text: text, farcasterSigner: farcasterSigner });
-      if (!resp) throw Error;
+      const res = await publish({ text: text, farcasterSigner: farcasterSigner });
+      if (!res) throw Error;
 
-      if (resp.status === 200) {
+      console.log(res)
+
+      if (Math.floor(res.status / 100) === 2) {
         reloadThreads();
         setCastModal(false);
       }
@@ -26,11 +28,11 @@ function CastComponent({ farcasterSigner, reloadThreads }: { farcasterSigner: Si
     <div>
       <button className="fixed bottom-3 left-3 button" onClick={() => setCastModal(true)}>
         <BiSolidPencil />
-        <p>Make a Point</p>
+        <p>Make a new point</p>
       </button>
       {castModal && (
         <Modal setSelected={setCastModal}>
-          <InputComponent onPublish={onPublish} placeHolder="Enter a new point!" onCancel={() => setCastModal(false)} />
+          <InputComponent onPublish={onPublish} placeHolder="Make a good point" onCancel={() => setCastModal(false)} />
         </Modal>
       )}
     </div>

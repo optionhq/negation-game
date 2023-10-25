@@ -6,11 +6,13 @@ export default function Accordion({
   level,
   parent,
   setHistoricalItems,
+  refreshThread,
 }: {
   data: LinkPointsTree[] | null;
   level: number;
   parent?: string | undefined;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
+  refreshThread: () => Promise<void>;
 }) {
   return (
     <div className="flex flex-col w-full gap-1 ">
@@ -23,7 +25,7 @@ export default function Accordion({
           setHistoricalItems={setHistoricalItems}
           setParentChildren={e.children}
           threadData={null}
-          refreshParentThread={undefined}
+          refreshParentThread={refreshThread}
         />
       ))}
     </div>

@@ -21,7 +21,7 @@ export default async function publish({
       signerUuid: farcasterSigner.signer_uuid,
       embeds: embeds
     });
-    return castResponse.data
+    return castResponse
   } catch (error) {
     console.error(error);
   }
