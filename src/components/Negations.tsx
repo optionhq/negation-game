@@ -9,7 +9,8 @@ type NegationsProps = {
   setParentChildren: React.Dispatch<React.SetStateAction<any[]>>;
   threadData: any;
   negationType: "veracity" | "relevance";
-  refreshParentThread: () => Promise<void>
+  refreshParentThread: () => Promise<void>,
+  getParentAncestry: undefined | (() => string)
 };
 
 const Negations: React.FC<NegationsProps> = ({
@@ -20,7 +21,8 @@ const Negations: React.FC<NegationsProps> = ({
   setParentChildren,
   threadData,
   negationType,
-  refreshParentThread
+  refreshParentThread,
+  getParentAncestry
 }) => {
   return (
   <div className={`flex flex-col w-full gap-1`}>
@@ -34,6 +36,7 @@ const Negations: React.FC<NegationsProps> = ({
         setParentChildren={setParentChildren}
         threadData={threadData}
         refreshParentThread={refreshParentThread}
+        getParentAncestry={getParentAncestry}
       />
     ))}
   </div>

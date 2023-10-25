@@ -26,6 +26,7 @@ export default function Accordion({
           setParentChildren={e.children}
           threadData={null}
           refreshParentThread={refreshThread}
+          getParentAncestry={undefined}
         />
       ))}
     </div>

@@ -26,6 +26,7 @@ export default function AccordionComponent({
   setHistoricalItems,
   threadData,
   refreshParentThread,
+  getParentAncestry,
 }: {
   level: number;
   e: Negation;
@@ -33,7 +34,8 @@ export default function AccordionComponent({
   setParentChildren: any;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   threadData: any;
-  refreshParentThread: () => Promise<void>
+  refreshParentThread: () => Promise<void>;
+  getParentAncestry: undefined | (() => string);
 }) {
   const [veracityNegations, setVeracityNegations] = useState<any[]>(e.children || []);
   const [relevanceNegations, setRelevanceNegations] = useState<any[]>(e.children || []);
@@ -76,18 +78,18 @@ export default function AccordionComponent({
     const newNegations = await getNegationsFor();
     setNegations(prevNegations => {
       // Preserve any existing input box
-      const inputBox = prevNegations.find(negation => negation.type === "input");
-  
+      const inputBox = prevNegations?.find(negation => negation.type === "input");
+    
       // Negations in newNegations that are also in prevNegations
-      const toKeep = prevNegations.filter(prevNegation =>
+      const toKeep = prevNegations ? prevNegations.filter(prevNegation =>
         newNegations.some(negation => negation.id === prevNegation.id)
-      );
-  
+      ) : [];
+    
       // Negations in newNegations that are not in prevNegations
       const toAdd = newNegations.filter(negation =>
-        !prevNegations.some(prevNegation => prevNegation.id === negation.id)
+        !prevNegations?.some(prevNegation => prevNegation.id === negation.id)
       );
-  
+    
       // If there's an input box, add it to the new state
       if (inputBox) {
         return [...toKeep, ...toAdd, inputBox];
@@ -156,10 +158,30 @@ export default function AccordionComponent({
   const paddingLeft = `${0}px`;
   const pointBg = `${level % 2 ? " bg-indigo-700 bg-opacity-10 " : " bg-slate-50 "}`;
 
+  function getAncestry(): string {
+    // Call the parent's getAncestry function if it exists
+    const parentAncestry = parent && getParentAncestry ? getParentAncestry() : '';
+    
+    // Return the current component's ID followed by the parent's ancestry
+    return parentAncestry ? `${e.id},${parentAncestry}` : e.id;
+  }
+
   function newRoute() {
+    const ancestry = getAncestry().split(',');
     const current = searchParams.get("id");
-    if (current?.includes(e.id)) return;
-    const route = current ? `${e.id},${current}` : e.id;
+    const currentIds = current ? current.split(',') : [];
+  
+    // Find the first ancestor that is already in the path
+    const commonAncestorIndex = ancestry.findIndex(ancestor => ancestor === currentIds[0]);
+  
+    // If the first ancestor is already in the path, do nothing
+    if (commonAncestorIndex === 0) {
+      return;
+    }
+  
+    // Prepend the missing ancestors to the path
+    const missingAncestors = commonAncestorIndex > 0 ? ancestry.slice(0, commonAncestorIndex).join(',') : ancestry.join(',');
+    const route = current ? `${missingAncestors},${current}` : missingAncestors;
     router.push(`?id=${route}`);
   }
 
@@ -213,16 +235,17 @@ export default function AccordionComponent({
     <details
       open={detailsOpened}
       className="flex flex-col gap-1"
-      onClick={handleClick}>
-        <summary
-          onClick={(e) => {
-            e.preventDefault();
-          }}
-          className={
-            pointBg +
-            `claim relative border cursor-pointer`
-          }
-        >
+    >
+      <summary
+        onClick={(e) => {
+          // Toggle the details
+          setDetailsOpened(prevState => !prevState);
+        }}
+        className={
+          pointBg +
+          `claim relative border cursor-pointer`
+        }
+      >
         <div className="flex flex-col gap-2">
           <div
             className={`p-1 rounded-md ${
@@ -239,7 +262,10 @@ export default function AccordionComponent({
             </div>
           </div>
         </div>
-        <div className="flex flex-col gap-3 items-start justify-center w-full">
+        <div 
+          className="flex flex-col gap-3 items-start justify-center w-full"
+          onClick={handleClick}
+        >
           {/* <ProfilePreview user={e.author!}/> */}
           <span className="w-full">
             {e.endPoint && isNegation(e) && e.endPoint.title}
@@ -287,6 +313,7 @@ export default function AccordionComponent({
             threadData={threadData}
             negationType="relevance"
             refreshParentThread={unfurlDropdown}
+            getParentAncestry={getAncestry}
           />
         </div>
       )}
@@ -305,6 +332,7 @@ export default function AccordionComponent({
             threadData={threadData}
             negationType="veracity"
             refreshParentThread={unfurlDropdown}
+            getParentAncestry={getAncestry}
           />
         </div>
       )}
