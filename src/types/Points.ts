@@ -7,6 +7,8 @@ export type Point = {
   parentId?: string;
   points: number;
   replyCount: number;
+  advocates: {fid: number}[];
+  lovers: {fid: number}[];
   children?: Negation[];
   // used when it's an input type
   type?: string

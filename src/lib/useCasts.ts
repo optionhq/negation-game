@@ -27,6 +27,8 @@ export function castToLinkPointsTree(cast: Cast): Negation {
     author: cast.author,
     parentId: cast.parent_hash as string,
     points: cast.reactions.likes.length,
+    advocates: cast.reactions.likes,
+    lovers: cast.reactions.recasts,
     replyCount: cast.replies.count,
     children: [],
     endPointUrl: endPointUrl || undefined,
@@ -40,6 +42,8 @@ export function castToPointsTree(cast: Cast): Node {
     author: cast.author,
     parentId: cast.parent_hash || undefined,
     replyCount: cast.replies.count,
+    advocates: cast.reactions.likes,
+    lovers: cast.reactions.recasts,
     points: cast.reactions.likes.length,
     children: []
   }

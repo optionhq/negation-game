@@ -1,32 +1,64 @@
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import { FiCheck, FiHeart, FiLink2, FiXCircle } from "react-icons/fi";
 import ReactButtonWrapper from "./ReactButtonWrapper";
 import { AiOutlineCheckCircle, AiOutlineCiCircle } from "react-icons/ai";
 import { HiOutlineCheckCircle, HiOutlineXCircle } from "react-icons/hi";
 import Tooltip from "./Tooltip";
+import { Signer } from 'neynar-next/server'
 
 function NegateLikeButtons({
+  id,
   points,
   onNegate,
   type,
+  advocates,
+  farcasterSigner,
 }: {
+  id: string;
   points: number;
   onNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => void;
   type: "relevance" | "veracity";
+  advocates: {fid: number}[];
+  farcasterSigner: Signer | null;
 }) {
-  function onLike(e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) {
+  const [isLiked, setIsLiked] = useState(
+    farcasterSigner && 'fid' in farcasterSigner && advocates.some(advocate => advocate.fid === farcasterSigner.fid)
+  );
+  const [score, setScore] = useState(points);
+
+  useEffect(() => {
+    // This will run every time `isLiked` or `score` changes
+  }, [isLiked, score]);
+
+  const handleLike = async (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
     e.nativeEvent.stopPropagation();
     e.nativeEvent.stopImmediatePropagation();
     e.stopPropagation();
-
-    // e.nativeEvent.stopPropagation();
-  }
+  
+    if (isLiked) {
+      // Call the internal API to unlike
+      await axios.delete(`/api/cast/${id}/like`, { data: { signerUuid: farcasterSigner?.signer_uuid } })
+        .then(() => {
+          setScore(prevScore => prevScore - 1);
+          setIsLiked(false);
+        });
+    } else {
+      // Call the internal API to like
+      await axios.post(`/api/cast/${id}/like`, { signerUuid: farcasterSigner?.signer_uuid })
+        .then(() => {
+          setScore(prevScore => prevScore + 1);
+          setIsLiked(true);
+        });
+    }
+  };
 
   return (
     <div className="group/points w-16 flex flex-col items-center">
-      <p className="group-hover/points:hidden h-6">{points}</p>
+      <p className={`group-hover/points:hidden h-6 ${isLiked ? 'font-bold' : ''}`}>{score}</p>
       <div className="flex-row gap-1 transition-opacity hidden opacity-0 group-hover/points:flex group-hover/points:opacity-100 h-6">
-        <Tooltip text={type == "veracity" ? "Yep" : "Matters"} orientation="bottom">
-          <span className="hover:text-green-500 text-xl" onClick={onLike}>
+        <Tooltip text={isLiked ? (type == "veracity" ? "Undo yep" : "Undo matters") : (type == "veracity" ? "Yep" : "Matters")} orientation="bottom">
+          <span className={isLiked ? "text-green-500 text-xl" : "hover:text-green-500 text-xl"} onClick={handleLike}>
             <HiOutlineCheckCircle size={24} />
           </span>
         </Tooltip>
@@ -40,14 +72,20 @@ function NegateLikeButtons({
   );
 }
 
-export default function Points({
+export default function Score({
   points,
   onNegate,
   type = "veracity",
+  advocates,
+  farcasterSigner,
+  id,
 }: {
   points: number;
   onNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => void;
   type: "relevance" | "veracity";
+  advocates: {fid: number}[];
+  farcasterSigner: Signer | null;
+  id: string;
 }) {
   return (
     <div
@@ -62,23 +100,12 @@ export default function Points({
             {type == "relevance" ? <p>Relevance</p> : <p>Veracity</p>}
           </div>
           <hr className="w-full h-[1.5px] bg-slate-300" />
-          <NegateLikeButtons points={points} onNegate={onNegate} type={type}/>
+          <NegateLikeButtons id={id} points={points} onNegate={onNegate} type={type} advocates={advocates} farcasterSigner={farcasterSigner}/>
         </div>
 
         {/* {type == "veracity" ? <FiHeart /> : <FiLink2 />} */}
         {/* {points} */}
       </ReactButtonWrapper>
-    </div>
-  );
-}
-
-function Linkage({ points = 0 }: { points?: number }) {
-  return (
-    <div className="w-fit border border-slate-500 rounded-md px-4 py-2 flex flex-col bg-white items-center justify-center ">
-      <div className="flex flex-row gap-2 items-center justify-center">
-        <FiLink2 />
-        <p>{points}</p>
-      </div>
     </div>
   );
 }

@@ -1,7 +1,7 @@
 import axios from "axios";
 import { useSearchParams, useRouter as oldRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
+import { Score, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
 import { Node, Negation } from "@/types/Points";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
@@ -42,7 +42,6 @@ export default function AccordionComponent({
   const [detailsOpened, setDetailsOpened] = useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentEntry, setCurrentEntry] = useState<Negation>(e);
   const { text, link } = extractLink(e.title);
   const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
   const [childrenLoading, setChildrenLoading] = useState(false);
@@ -235,24 +234,24 @@ export default function AccordionComponent({
         <div className="flex flex-col gap-3 items-start justify-center w-full">
           {/* <ProfilePreview user={e.author!}/> */}
           <span className="w-full">
-            {currentEntry.endPoint && isNegation(currentEntry) && currentEntry.endPoint.title}
+            {e.endPoint && isNegation(e) && e.endPoint.title}
           </span>
-          {!currentEntry.endPoint && (
+          {!e.endPoint && (
             <>
-              {currentEntry.title}
+              {e.title}
               {link && <RecastedComponent url={link} />}
             </>
           )}
           {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
           <div className="flex flex-row gap-2 text-gray-500">
             {/* if there is no parent this is an endPoint so veracity negates the id */}
-            {currentEntry.endPoint && (
+            {e.endPoint && (
               <>
-                <Points points={e.points} onNegate={onNegate(currentEntry.endPoint!.id, 'veracity')} type="veracity" />
-                <Points points={e.points} onNegate={onNegate(currentEntry.id, 'relevance')} type="relevance" />
+                <Score id={e.endPoint!.id} points={e.points} onNegate={onNegate(e.endPoint!.id, 'veracity')} type="veracity" advocates={e.advocates} farcasterSigner={farcasterSigner} />
+                <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'relevance')} type="relevance" advocates={e.advocates} farcasterSigner={farcasterSigner} />
               </>
             ) ||
-              <Points points={e.points} onNegate={onNegate(currentEntry.id, 'veracity')} type="veracity" />
+              <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'veracity')} type="veracity" advocates={e.advocates} farcasterSigner={farcasterSigner} />
             }
           </div>
         </div>
