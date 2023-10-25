@@ -21,7 +21,7 @@ export const negate = async ({
   farcasterSigner: Signer;
 }) => {
   try {
-    const castResponse = await publish({text, parentId, farcasterSigner});
+    const castResponse = await publish({text, farcasterSigner});
     if (!castResponse) throw Error;
 
     const newCast: PostCastResponse = castResponse.data.cast;
