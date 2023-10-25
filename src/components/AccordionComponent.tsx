@@ -75,6 +75,9 @@ export default function AccordionComponent({
   ) => {
     const newNegations = await getNegationsFor();
     setNegations(prevNegations => {
+      // Preserve any existing input box
+      const inputBox = prevNegations.find(negation => negation.type === "input");
+  
       // Negations in newNegations that are also in prevNegations
       const toKeep = prevNegations.filter(prevNegation =>
         newNegations.some(negation => negation.id === prevNegation.id)
@@ -85,7 +88,12 @@ export default function AccordionComponent({
         !prevNegations.some(prevNegation => prevNegation.id === negation.id)
       );
   
-      return [...toKeep, ...toAdd];
+      // If there's an input box, add it to the new state
+      if (inputBox) {
+        return [...toKeep, ...toAdd, inputBox];
+      } else {
+        return [...toKeep, ...toAdd];
+      }
     });
   };
   
