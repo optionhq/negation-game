@@ -4,7 +4,7 @@ import { useRouter } from "next/router";
 import Accordion from "@/components/Accordion";
 import HistoricalPoints from "@/components/HistoricalPoints";
 import Login from "@/components/Login";
-import { LinkPointsTree } from "@/types/PointsTree";
+import { Negation } from "@/types/Points";
 import CastComponent from "@/components/Cast";
 import axios from "axios";
 import { FarcasterSignerContext } from "@/contexts/UserContext";
@@ -14,10 +14,10 @@ import { Cast, Signer } from "neynar-next/server";
 import { getMaybeNegation } from "@/lib/useCasts";
 
 
-async function getHomeItems(castIds: string[] | string | null): Promise<{ historicalPoints: string[], points: LinkPointsTree[] }> {
+async function getHomeItems(castIds: string[] | string | null): Promise<{ historicalPoints: string[], points: Negation[] }> {
     let selectedPoint = null;
     let historicalPoints: string[] = [];
-    let points: LinkPointsTree[] = [];
+    let points: Negation[] = [];
 
     if (castIds === null || castIds.length === 0) {
       // if there's no path selected, get the feed
@@ -48,7 +48,7 @@ async function getHomeItems(castIds: string[] | string | null): Promise<{ histor
 export default function Home() {
   const router = useRouter();
 
-  const [filteredItems, setFilteredItems] = useState<LinkPointsTree[]>([]);
+  const [filteredItems, setFilteredItems] = useState<Negation[]>([]);
   const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
   const [farcasterSigner, setFarcasterSigner] = useState<Signer | null>(null);
 

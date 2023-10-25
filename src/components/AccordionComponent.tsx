@@ -2,7 +2,7 @@ import axios from "axios";
 import { useSearchParams, useRouter as oldRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Points, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
-import { EndPointsTree, LinkPointsTree } from "@/types/PointsTree";
+import { Node, Negation } from "@/types/Points";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
 import { extractLink } from "@/lib/extractLink";
@@ -28,8 +28,8 @@ export default function AccordionComponent({
   refreshParentThread,
 }: {
   level: number;
-  e: LinkPointsTree;
-  parent: LinkPointsTree | undefined;
+  e: Negation;
+  parent: Negation | undefined;
   setParentChildren: any;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   threadData: any;
@@ -42,23 +42,23 @@ export default function AccordionComponent({
   const [detailsOpened, setDetailsOpened] = useState<boolean>(false);
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [currentEntry, setCurrentEntry] = useState<LinkPointsTree>(e);
+  const [currentEntry, setCurrentEntry] = useState<Negation>(e);
   const { text, link } = extractLink(e.title);
   const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
   const [childrenLoading, setChildrenLoading] = useState(false);
   const [isTripleDotOpen, setTripleDotMenu] = useState(false);
 
-  const getNegations = async (point: LinkPointsTree) => {
+  const getNegations = async (point: Negation) => {
     const {data: {result: { casts }}} = await axios.get(`/api/cast/${point.id}/thread`);
   
-    const negations: LinkPointsTree[] = [];
+    const negations: Negation[] = [];
     for (const cast of casts) {
       const possibleNegation = castToLinkPointsTree(cast);
       if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
         const res = await axios.get(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
   
         const cast: Cast = res.data;
-        const endPoint: EndPointsTree = castToPointsTree(cast)
+        const endPoint: Node = castToPointsTree(cast)
         
         possibleNegation.endPoint = endPoint;
         // it's now a negation
@@ -71,8 +71,8 @@ export default function AccordionComponent({
   };
 
   const updateNegationsInPlace = async (
-    setNegations: React.Dispatch<React.SetStateAction<LinkPointsTree[]>>,
-    getNegationsFor: () => Promise<LinkPointsTree[]>
+    setNegations: React.Dispatch<React.SetStateAction<Negation[]>>,
+    getNegationsFor: () => Promise<Negation[]>
   ) => {
     const newNegations = await getNegationsFor();
     setNegations(prevNegations => {

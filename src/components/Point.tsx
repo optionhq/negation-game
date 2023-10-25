@@ -3,11 +3,11 @@ import axios from "axios";
 import { Cast } from "neynar-next/server";
 import { useState } from "react";
 import { getMaybeNegation } from "@/lib/useCasts";
-import { EndPointsTree, LinkPointsTree } from "@/types/PointsTree";
+import { Node, Negation } from "@/types/Points";
 
 export default function Point({ id, onClick }: { id: string, onClick: () => void }) {
 
-  const [cast, setCast] = useState<LinkPointsTree | null>(null);
+  const [cast, setCast] = useState<Negation | null>(null);
 
   useEffect(() => {
     const fetchCast = async () => {

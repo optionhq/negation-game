@@ -1,7 +1,7 @@
 // src/lib/isNegation.ts
 import config from "@/config";
 import { okUrls } from "@/lib/useEndPoints";
-import { LinkPointsTree } from "@/types/PointsTree";
+import { Negation } from "@/types/Points";
 
 const validNegation = (title: string): boolean => {
   // a title is a valid negation if it starts with config.negationSymbol 
@@ -16,7 +16,7 @@ const validNegation = (title: string): boolean => {
   return false;
 }
 
-const isNegation = (entry: LinkPointsTree): boolean => {
+const isNegation = (entry: Negation): boolean => {
   if (entry.endPoint && validNegation(entry.title)) {
     return true;
   } else {

@@ -1,4 +1,4 @@
-import { LinkPointsTree } from '@/types/PointsTree';
+import { Negation } from '@/types/Points';
 import axios from 'axios';
 import React, { useEffect, useRef } from 'react';
 import { Signer } from 'neynar-next/server'
@@ -7,7 +7,7 @@ interface TripleDotMenuProps {
   isTripleDotOpen: boolean;
   setTripleDotMenu: React.Dispatch<React.SetStateAction<boolean>>;
   farcasterSigner: Signer | null;
-  e: LinkPointsTree;
+  e: Negation;
   refreshParentThread: () => Promise<void>;
 }
 

@@ -1,10 +1,10 @@
 import AccordionComponent from "./AccordionComponent";
-import { LinkPointsTree } from "@/types/PointsTree";
+import { Negation } from "@/types/Points";
 
 type NegationsProps = {
-  negations: LinkPointsTree[];
+  negations: Negation[];
   level: number;
-  parent: LinkPointsTree;
+  parent: Negation;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
   setParentChildren: React.Dispatch<React.SetStateAction<any[]>>;
   threadData: any;
@@ -24,7 +24,7 @@ const Negations: React.FC<NegationsProps> = ({
 }) => {
   return (
   <div className={`flex flex-col w-full gap-1`}>
-    {negations.map((el: LinkPointsTree, i: number) => (
+    {negations.map((el: Negation, i: number) => (
       <AccordionComponent
         key={el.id}
         level={level + 1}

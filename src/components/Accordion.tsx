@@ -1,5 +1,5 @@
 import AccordionComponent from "./AccordionComponent";
-import { LinkPointsTree } from "@/types/PointsTree";
+import { Negation } from "@/types/Points";
 
 export default function Accordion({
   data,
@@ -8,7 +8,7 @@ export default function Accordion({
   setHistoricalItems,
   refreshThread,
 }: {
-  data: LinkPointsTree[] | null;
+  data: Negation[] | null;
   level: number;
   parent?: string | undefined;
   setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
