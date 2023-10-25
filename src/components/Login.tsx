@@ -18,20 +18,18 @@ const Login: React.FC<LoginProps> = ({ setFarcasterSigner }) => {
   const { signer, isLoading, signIn } = useSigner();
   const router = useRouter();
   const { data: user, error } = useSWR<User>(signer?.status === 'approved' ? `/api/users/${signer.fid}` : null, fetcher);
-
+  
   useEffect(() => {
-    if (user) {
+    if (signer) {
       setFarcasterSigner(signer);
     }
-  }, [user]);
+  }, [signer]);
 
   useEffect(() => {
     if (signer && signer.status === "pending_approval") {
       router.push("/qr-code");
     }
   }, [signer, router]);
-
-  if (!user) return null;
 
   return (
     <div>
