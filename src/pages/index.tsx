@@ -100,7 +100,7 @@ export default function Home() {
         />
         )}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
-          {!historicalPointIds?.length && pinnedCasts.length > 0 && (
+          {!router.query.id && pinnedCasts.length > 0 && (
             <>
               <h2>Pinned conversations</h2>
               <Accordion 
