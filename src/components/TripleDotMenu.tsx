@@ -2,6 +2,7 @@ import { Negation } from '@/types/Points';
 import axios from 'axios';
 import React, { useEffect, useRef } from 'react';
 import { Signer } from 'neynar-next/server'
+import makeWarpcastUrl from '@/lib/makeWarpcastUrl';
 
 interface TripleDotMenuProps {
   isTripleDotOpen: boolean;
@@ -48,6 +49,16 @@ const TripleDotMenu: React.FC<TripleDotMenuProps> = ({
       </button>
       {isTripleDotOpen && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg">
+          <button
+            className="w-full px-4 py-2 text-left"
+            onClick={(event) => {
+              event.stopPropagation();
+              const warpcastUrl = makeWarpcastUrl(e);
+              window.open(warpcastUrl, '_blank');
+            }}
+          >
+            Open in Warpcast
+          </button>
           <button
             className={`w-full px-4 py-2 text-left ${(!farcasterSigner || 'fid' in farcasterSigner && e?.author?.fid !== farcasterSigner.fid) ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={async (event) => {

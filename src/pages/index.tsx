@@ -86,7 +86,6 @@ export default function Home() {
             const reverseIds = historicalPointIds.reverse()
             const index = reverseIds.indexOf(id);
             const newIds = reverseIds.slice(index);
-            console.log(historicalPointIds)
             router.push({
               pathname: router.pathname,
               query: { ...router.query, id: newIds.join(',') },

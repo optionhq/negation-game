@@ -2,7 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import axios from 'axios';
 import { FiCheck, FiHeart, FiLink2, FiXCircle } from "react-icons/fi";
 import ReactButtonWrapper from "./ReactButtonWrapper";
-import { AiOutlineCheckCircle, AiOutlineCiCircle } from "react-icons/ai";
+import { AiOutlineCheckCircle, AiOutlineCiCircle, AiOutlineCheck } from "react-icons/ai";
 import { HiOutlineCheckCircle, HiOutlineXCircle } from "react-icons/hi";
 import Tooltip from "./Tooltip";
 import { Signer } from 'neynar-next/server'
@@ -59,7 +59,10 @@ function NegateLikeButtons({
   return (
     <div>
       <div className="group/points w-16 flex flex-col items-center">
-        <p className={`group-hover/points:hidden h-6 ${isLiked ? 'font-bold' : ''}`}>{score}</p>
+      <div className={`group-hover/points:hidden h-6 ${isLiked ? 'font-bold' : ''} flex items-center gap-1`}>
+        <span>{score}</span>
+        {isLiked && <AiOutlineCheck />}
+      </div>
         <div className="flex-row gap-1 transition-opacity hidden opacity-0 group-hover/points:flex group-hover/points:opacity-100 h-6">
           <Tooltip text={isLiked ? (type == "veracity" ? "Undo yep" : "Undo matters") : (type == "veracity" ? "Yep" : "Matters")} orientation="bottom">
             <span 

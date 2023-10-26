@@ -18,10 +18,17 @@ const Login: React.FC<LoginProps> = ({ setFarcasterSigner }) => {
   const { signer, isLoading, signIn } = useSigner();
   const router = useRouter();
   const { data: user, error } = useSWR<User>(signer?.status === 'approved' ? `/api/users/${signer.fid}` : null, fetcher);
+  const playlist = process.env.NEXT_PUBLIC_PLAYLIST?.split(',').map(fid => Number(fid.trim()));
   
   useEffect(() => {
-    if (signer) {
-      setFarcasterSigner(signer);
+    if (signer && 'fid' in signer) {
+      if (playlist?.includes(signer.fid)) {
+        console.log("you're in")
+        setFarcasterSigner(signer);
+      } else {
+        console.log("you're not in")
+        setFarcasterSigner(null);
+      }
     }
   }, [signer]);
 
@@ -42,7 +49,16 @@ const Login: React.FC<LoginProps> = ({ setFarcasterSigner }) => {
           {isLoading ? "Loading..." : "Sign in with farcaster"}
         </button>
       )}
-      {user && (
+      {signer && "fid" in signer && !playlist?.includes(signer.fid) && (
+        <button
+          className="button"
+          style={{ cursor: "not-allowed", backgroundColor: "grey", color: "white" }}
+          disabled={true}>
+          You are not playlisted, ask @nor
+        </button>
+      )}
+      {/* this extra stuff added as a hacky waitlist */}
+      {user && signer && 'fid' in signer && playlist?.includes(signer.fid) && (
         <div className="flex flex-col items-center">
           <Image
             src={user.pfp_url || "/default-avatar.svg"}

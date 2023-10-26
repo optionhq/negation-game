@@ -15,6 +15,7 @@ import { Cast, User } from "neynar-next/server";
 import { castToPointsTree, castToLinkPointsTree} from "@/lib/useCasts";
 import { useRouter } from "next/router";
 import TripleDotMenu from './TripleDotMenu';
+import { GoInfo } from "react-icons/go";
 
 const INDENTATION_PX = 25;
 
@@ -281,7 +282,7 @@ export default function AccordionComponent({
             {/* if there is no parent this is an endPoint so veracity negates the id */}
             {e.endPoint && (
               <>
-                <Score id={e.endPoint!.id} points={e.points} onNegate={onNegate(e.endPoint!.id, 'veracity')} type="veracity" advocates={e.advocates} farcasterSigner={farcasterSigner} />
+                <Score id={e.endPoint!.id} points={e.endPoint.points} onNegate={onNegate(e.endPoint.id, 'veracity')} type="veracity" advocates={e.endPoint.advocates} farcasterSigner={farcasterSigner} />
                 <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'relevance')} type="relevance" advocates={e.advocates} farcasterSigner={farcasterSigner} />
               </>
             ) ||
@@ -302,6 +303,9 @@ export default function AccordionComponent({
           <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
             <GoUnlink size={18} color="#AAAAAA" />
             <p>Doesn&lsquo;t matter</p>
+            <button onClick={() => window.open('https://responses.negationgame.com/', '_blank')}>
+              <GoInfo size={18} color="#AAAAAA" />
+            </button>
           </div>
 
           <Negations
@@ -322,6 +326,9 @@ export default function AccordionComponent({
           <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
             <GoCircleSlash size={18} color="#AAAAAA" />
             <p>Not true</p>
+            <button onClick={() => window.open('https://responses.negationgame.com/', '_blank')}>
+              <GoInfo size={18} color="#AAAAAA" />
+            </button>
           </div>
           <Negations
             negations={veracityNegations}
