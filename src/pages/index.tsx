@@ -49,6 +49,7 @@ export default function Home() {
   const router = useRouter();
 
   const [filteredItems, setFilteredItems] = useState<Negation[]>([]);
+  const [pinnedCasts, setPinnedCasts] = useState<Negation[]>([])
   const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
   const [farcasterSigner, setFarcasterSigner] = useState<Signer | null>(null);
 
@@ -57,14 +58,19 @@ export default function Home() {
     if (typeof router.query.id === 'string') {
       ids = router.query.id.split(",");
     }
-    if (ids.length !== 0) {
-      const {historicalPoints, points} = await getHomeItems(ids || null);
-      setFilteredItems(points);
-      setHistoricalPointIds(historicalPoints);
-    } else if (router.isReady && ids.length === 0) {
-      const {historicalPoints, points} = await getHomeItems(ids || null);
-      setFilteredItems(points);
+    // get the pinned casts
+    const fetchedPinnedCasts: Negation[] = [];
+    const pinnedHashes = process.env.NEXT_PUBLIC_PINNED?.split(',');
+    if (pinnedHashes) {
+      for (const hash of pinnedHashes) {
+        const cast = await axios.get(`/api/cast?type=hash&identifier=${hash.trim()}`);
+        fetchedPinnedCasts.push(await getMaybeNegation(cast.data as Cast));
+      }
     }
+    setPinnedCasts(fetchedPinnedCasts); // Set the pinned casts
+    const {historicalPoints, points} = await getHomeItems(ids || null);
+    setFilteredItems(points);
+    setHistoricalPointIds(historicalPoints);
   };
 
   useEffect(() => {
@@ -94,6 +100,19 @@ export default function Home() {
         />
         )}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
+          {!historicalPointIds?.length && pinnedCasts.length > 0 && (
+            <>
+              <h2>Pinned conversations</h2>
+              <Accordion 
+                key="pinned"
+                data={pinnedCasts} // Use the pinnedCasts state variable
+                level={0} 
+                setHistoricalItems={setHistoricalPointIds} 
+                refreshThread={fetchItems}
+              />
+              <hr className="my-4" />
+            </>
+          )}
           <Accordion 
             key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
             data={filteredItems} 
