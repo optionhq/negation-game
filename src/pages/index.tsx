@@ -84,6 +84,15 @@ export default function Home() {
         <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
       <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-48">
+        {router.query.id && (
+          <div className="flex justify-center w-full my-3">
+            <div 
+              onClick={() => router.push({ pathname: '/' })}
+              className="relative justify-between items-center gap-4 font-medium cursor-pointer list-none border border-grey-100 -mt-3 bg-white px-5 py-4 rounded-md w-full h-10"
+            >
+            </div>
+          </div>
+        )}
         {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
         {historicalPointIds && historicalPointIds?.length !== 0 && (
           <HistoricalPoints 
