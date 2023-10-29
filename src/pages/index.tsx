@@ -1,5 +1,5 @@
 // src/pages/index.tsx
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Accordion from "@/components/Accordion";
 import HistoricalPoints from "@/components/HistoricalPoints";
@@ -12,16 +12,37 @@ import NotificationButton from "@/components/notifications/NotificationButton";
 import config from "@/config";
 import { Cast, Signer } from "neynar-next/server";
 import { getMaybeNegation } from "@/lib/useCasts";
+import next from "next";
 
+export default function Home() {
+  const router = useRouter();
 
-async function getHomeItems(castIds: string[] | string | null): Promise<{ historicalPoints: string[], points: Negation[] }> {
+  const [filteredItems, setFilteredItems] = useState<Negation[]>([]);
+  const [feed, setFeed] = useState<Negation[]>([]);
+  const [pinnedCasts, setPinnedCasts] = useState<Negation[]>([])
+  const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
+  const [farcasterSigner, setFarcasterSigner] = useState<Signer | null>(null);
+  const [feedCursor, setFeedCursor] = useState<string | null>(null)
+  const loader = useRef(null);
+  const isFetching = useRef(false);
+  const feedCursorRef = useRef<string | null>(null);
+
+  async function getHomeItems(castIds: string[] | string | null, cursor: string | null, existingPoints: Negation[] | null = null): Promise<{ historicalPoints: string[], points: Negation[], nextCursor: string | null }> {
     let selectedPoint = null;
     let historicalPoints: string[] = [];
     let points: Negation[] = [];
+    let nextCursor: string | null = null;
 
     if (castIds === null || castIds.length === 0) {
       // if there's no path selected, get the feed
-      const feed = await axios.get(`/api/feed/${encodeURIComponent(config.channelId)}`)
+
+      // here's the existing feed
+      points = existingPoints ? existingPoints : []
+
+      const feed = await axios.get(`/api/feed/${encodeURIComponent(config.channelId)}?cursor=${cursor}`)
+
+      nextCursor = feed.data.next?.cursor
+
       for (const cast of feed.data.casts) {
         if (cast !== null) {
           points.push(await getMaybeNegation(cast))
@@ -42,22 +63,32 @@ async function getHomeItems(castIds: string[] | string | null): Promise<{ histor
       points = [await getMaybeNegation(cast.data as Cast)]
     }
 
-    return { historicalPoints, points }
+    return { historicalPoints, points, nextCursor }
 }
 
-export default function Home() {
-  const router = useRouter();
+  useEffect(() => {
+    var options = {
+      root: null,
+      rootMargin: "20px",
+      threshold: 1.0
+    };
 
-  const [filteredItems, setFilteredItems] = useState<Negation[]>([]);
-  const [pinnedCasts, setPinnedCasts] = useState<Negation[]>([])
-  const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
-  const [farcasterSigner, setFarcasterSigner] = useState<Signer | null>(null);
-
-  const fetchItems = async () => {
-    let ids: string[] = [];
-    if (typeof router.query.id === 'string') {
-      ids = router.query.id.split(",");
+    const observer = new IntersectionObserver(handleObserver, options);
+    if (loader.current) {
+      observer.observe(loader.current)
     }
+
+  }, [router.isReady, router.query.id]);
+
+  const handleObserver: IntersectionObserverCallback = (entities, observer) => {
+    const target = entities[0];
+    if (target.isIntersecting) {   
+      // Fetch the next set of casts here
+      fetchItems();
+    }
+  }
+
+  const fetchPinnedCasts = async () => {
     // get the pinned casts
     const fetchedPinnedCasts: Negation[] = [];
     const pinnedHashes = process.env.NEXT_PUBLIC_PINNED?.split(',');
@@ -68,13 +99,41 @@ export default function Home() {
       }
     }
     setPinnedCasts(fetchedPinnedCasts); // Set the pinned casts
-    const {historicalPoints, points} = await getHomeItems(ids || null);
+  }
+
+  const fetchItems = async () => {
+    if (isFetching.current) {
+      // A fetch operation is already in progress, so we return early
+      return;
+    }
+
+    isFetching.current = true;
+
+    let ids: string[] = [];
+    if (typeof router.query.id === 'string') {
+      ids = router.query.id.split(",");
+    }
+
+    const {historicalPoints, points, nextCursor} = await getHomeItems(ids || null, feedCursorRef.current, feed);
+    feedCursorRef.current = nextCursor;
     setFilteredItems(points);
+    // we set feed if we haven't selected any ids, then we pass feed to getHomeItems
+    if (!ids) {
+      setFeed(points);
+    }
     setHistoricalPointIds(historicalPoints);
+
+    isFetching.current = false;
   };
 
   useEffect(() => {
-    fetchItems();
+    fetchPinnedCasts();
+  }, []);
+
+  useEffect(() => {
+    if (router.isReady && router.query.id) {
+      fetchItems();
+    }
   }, [router.isReady, router.query.id]);
 
   return (
@@ -114,10 +173,10 @@ export default function Home() {
               <h2>Pinned conversations</h2>
               <Accordion 
                 key="pinned"
-                data={pinnedCasts} // Use the pinnedCasts state variable
+                data={pinnedCasts}
                 level={0} 
                 setHistoricalItems={setHistoricalPointIds} 
-                refreshThread={fetchItems}
+                refreshThread={fetchPinnedCasts}
               />
               <hr className="my-4" />
             </>
@@ -131,6 +190,11 @@ export default function Home() {
           />
         </FarcasterSignerContext.Provider>
       </main>
+      {!router.query.id &&
+        <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>
+          <h2 style={{ fontSize: '1.5em', color: '#333' }}>Loading...</h2>
+        </div>
+      }
     </div>
   );
 }
