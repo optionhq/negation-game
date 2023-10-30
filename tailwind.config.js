@@ -8,7 +8,7 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'light-gold': 'rgba(255, 223, 0, .1)',
+        'light-gold': 'rgba(255, 223, 0, .2)',
         'indigo-25': '#F5F5FC',
       },
       backgroundImage: {
