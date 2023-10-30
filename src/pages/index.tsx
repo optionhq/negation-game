@@ -83,7 +83,7 @@ export default function Home() {
         {/* {farcasterSigner && <NotificationButton/>} */}
         <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
-      <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-48">
+      <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-40">
         {router.query.id && (
           <div className="flex justify-center w-full my-3">
             <div 
@@ -93,7 +93,6 @@ export default function Home() {
             </div>
           </div>
         )}
-        {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
         {historicalPointIds && historicalPointIds?.length !== 0 && (
           <HistoricalPoints 
           ids={historicalPointIds.reverse()} 
@@ -110,26 +109,31 @@ export default function Home() {
         )}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
           {!router.query.id && pinnedCasts.length > 0 && (
-            <>
-              <h2>Pinned conversations</h2>
-              <Accordion 
-                key="pinned"
-                data={pinnedCasts} // Use the pinnedCasts state variable
-                level={0} 
-                setHistoricalItems={setHistoricalPointIds} 
-                refreshThread={fetchItems}
-              />
-              <hr className="my-4" />
-            </>
+            <div className="w-full flex-grow bg-light-gold p-7 pt-2 rounded-xl">
+              <h2 className="text-center pb-2">Pinned conversations</h2>
+              <div className="w-full">
+                <Accordion 
+                  key="pinned"
+                  data={pinnedCasts}
+                  level={0} 
+                  setHistoricalItems={setHistoricalPointIds} 
+                  refreshThread={fetchItems}
+                />
+              </div>
+            </div>
           )}
-          <Accordion 
-            key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
-            data={filteredItems} 
-            level={0} 
-            setHistoricalItems={setHistoricalPointIds} 
-            refreshThread={fetchItems}
-          />
+          <hr className="my-2" />
+          <div className="w-full flex-grow px-7">
+            <Accordion 
+              key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
+              data={filteredItems} 
+              level={0} 
+              setHistoricalItems={setHistoricalPointIds} 
+              refreshThread={fetchItems}
+            />
+          </div>
         </FarcasterSignerContext.Provider>
+        {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
       </main>
     </div>
   );
