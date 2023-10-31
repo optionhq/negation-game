@@ -171,6 +171,7 @@ const fetchItems = async () => {
         )}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
           {!router.query.id && pinnedCasts.length > 0 && (
+            <>
             <div className="w-full flex-grow bg-light-gold p-10 pt-2 rounded-xl">
               <h2 className="text-center pb-2">Pinned conversations</h2>
               <div className="w-full">
@@ -183,8 +184,10 @@ const fetchItems = async () => {
                 />
               </div>
             </div>
+            <hr className="my-2" />
+            </>
           )}
-          <hr className="my-2" />
+          
           <div className="w-full flex-grow px-10">
             <Accordion 
               key={`${Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}-${Date.now()}`}
