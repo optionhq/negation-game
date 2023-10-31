@@ -26,9 +26,9 @@ function CastComponent({ farcasterSigner, reloadThreads }: { farcasterSigner: Si
 
   return (
     <div>
-      <button className="fixed bottom-3 left-3 button" onClick={() => setCastModal(true)}>
+      <button className="fixed bottom-5 left-5 button" onClick={() => setCastModal(true)}>
         <BiSolidPencil />
-        <p>Make a new point</p>
+        <p>Make a point</p>
       </button>
       {castModal && (
         <Modal setSelected={setCastModal}>

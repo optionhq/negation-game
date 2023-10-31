@@ -168,7 +168,7 @@ export default function AccordionComponent({
   }
 
   const paddingLeft = `${0}px`;
-  const pointBg = `${level % 2 ? " bg-indigo-700 bg-opacity-10 " : " bg-slate-50 "}`;
+  const pointBg = `${level % 2 ? " bg-indigo-25 " : " bg-slate-50 "}`;
 
   function getAncestry(): string {
     // Call the parent's getAncestry function if it exists
@@ -255,7 +255,7 @@ export default function AccordionComponent({
         }}
         className={
           pointBg +
-          `claim relative border cursor-pointer`
+          `claim relative border cursor-pointer ${level % 2 === 0 ? "hover:bg-gray-100" : "hover:bg-indigo-50"}`
         }
       >
         <div className="flex flex-col gap-2">

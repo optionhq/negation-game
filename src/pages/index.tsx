@@ -142,9 +142,9 @@ export default function Home() {
         {/* {farcasterSigner && <NotificationButton/>} */}
         <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
-      <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-48">
+      <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-32">
         {router.query.id && (
-          <div className="flex justify-center w-full my-3">
+          <div className="flex justify-center w-full my-4 px-10">
             <div 
               onClick={() => router.push({ pathname: '/' })}
               className="relative justify-between items-center gap-4 font-medium cursor-pointer list-none border border-grey-100 -mt-3 bg-white px-5 py-4 rounded-md w-full h-10"
@@ -152,43 +152,49 @@ export default function Home() {
             </div>
           </div>
         )}
-        {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
         {historicalPointIds && historicalPointIds?.length !== 0 && (
-          <HistoricalPoints 
-          ids={historicalPointIds.reverse()} 
-          onClick={(id) => {
-            const reverseIds = historicalPointIds.reverse()
-            const index = reverseIds.indexOf(id);
-            const newIds = reverseIds.slice(index);
-            router.push({
-              pathname: router.pathname,
-              query: { ...router.query, id: newIds.join(',') },
-            });
-          }}
-        />
+          <div className="w-full flex px-10">
+            <HistoricalPoints 
+              ids={historicalPointIds.reverse()} 
+              onClick={(id) => {
+                const reverseIds = historicalPointIds.reverse()
+                const index = reverseIds.indexOf(id);
+                const newIds = reverseIds.slice(index);
+                router.push({
+                  pathname: router.pathname,
+                  query: { ...router.query, id: newIds.join(',') },
+                });
+              }}
+            />
+          </div>
         )}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
           {!router.query.id && pinnedCasts.length > 0 && (
-            <>
-              <h2>Pinned conversations</h2>
-              <Accordion 
-                key="pinned"
-                data={pinnedCasts}
-                level={0} 
-                setHistoricalItems={setHistoricalPointIds} 
-                refreshThread={fetchPinnedCasts}
-              />
-              <hr className="my-4" />
-            </>
+            <div className="w-full flex-grow bg-light-gold p-10 pt-2 rounded-xl">
+              <h2 className="text-center pb-2">Pinned conversations</h2>
+              <div className="w-full">
+                <Accordion 
+                  key="pinned"
+                  data={pinnedCasts}
+                  level={0} 
+                  setHistoricalItems={setHistoricalPointIds} 
+                  refreshThread={fetchItems}
+                />
+              </div>
+            </div>
           )}
-          <Accordion 
-            key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
-            data={filteredItems} 
-            level={0} 
-            setHistoricalItems={setHistoricalPointIds} 
-            refreshThread={fetchItems}
-          />
+          <hr className="my-2" />
+          <div className="w-full flex-grow px-10">
+            <Accordion 
+              key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
+              data={filteredItems} 
+              level={0} 
+              setHistoricalItems={setHistoricalPointIds} 
+              refreshThread={fetchItems}
+            />
+          </div>
         </FarcasterSignerContext.Provider>
+        {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
       </main>
       {!router.query.id &&
         <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>
