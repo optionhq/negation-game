@@ -12,7 +12,6 @@ import NotificationButton from "@/components/notifications/NotificationButton";
 import config from "@/config";
 import { Cast, Signer } from "neynar-next/server";
 import { getMaybeNegation } from "@/lib/useCasts";
-import next from "next";
 
 export default function Home() {
   const router = useRouter();
@@ -22,7 +21,6 @@ export default function Home() {
   const [pinnedCasts, setPinnedCasts] = useState<Negation[]>([])
   const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
   const [farcasterSigner, setFarcasterSigner] = useState<Signer | null>(null);
-  const [feedCursor, setFeedCursor] = useState<string | null>(null)
   const loader = useRef(null);
   const isFetching = useRef(false);
   const feedCursorRef = useRef<string | null>(null);
@@ -101,40 +99,43 @@ export default function Home() {
     setPinnedCasts(fetchedPinnedCasts); // Set the pinned casts
   }
 
-  const fetchItems = async () => {
-    if (isFetching.current) {
-      // A fetch operation is already in progress, so we return early
-      return;
-    }
+const fetchItems = async () => {
+  if (!router.isReady || isFetching.current) {
+    // A fetch operation is already in progress, so we return early
+    return;
+  }
 
-    isFetching.current = true;
+  isFetching.current = true;
 
-    let ids: string[] = [];
-    if (typeof router.query.id === 'string') {
-      ids = router.query.id.split(",");
-    }
+  let ids: string[] = [];
+  if (typeof router.query.id === 'string') {
+    ids = router.query.id.split(",");
+  }
 
-    const {historicalPoints, points, nextCursor} = await getHomeItems(ids || null, feedCursorRef.current, feed);
-    feedCursorRef.current = nextCursor;
-    setFilteredItems(points);
-    // we set feed if we haven't selected any ids, then we pass feed to getHomeItems
-    if (!ids) {
-      setFeed(points);
-    }
-    setHistoricalPointIds(historicalPoints);
+  const {historicalPoints, points, nextCursor} = await getHomeItems(ids || null, feedCursorRef.current, feed);
+  feedCursorRef.current = nextCursor;
+  setFilteredItems(points);
+  // we set feed if we haven't selected any ids, then we pass feed to getHomeItems
+  if (ids.length === 0) {
+    setFeed(points);
+  }
+  setHistoricalPointIds(historicalPoints);
 
-    isFetching.current = false;
-  };
+  isFetching.current = false;
+};
 
   useEffect(() => {
     fetchPinnedCasts();
   }, []);
 
   useEffect(() => {
-    if (router.isReady && router.query.id) {
       fetchItems();
-    }
-  }, [router.isReady, router.query.id]);
+  }, [router.query.id]);
+
+  const returnToHome = () => {
+    setFeed([]);
+    router.push({ pathname: '/' });
+  };
 
   return (
     <div>
@@ -146,7 +147,7 @@ export default function Home() {
         {router.query.id && (
           <div className="flex justify-center w-full my-4 px-10">
             <div 
-              onClick={() => router.push({ pathname: '/' })}
+              onClick={returnToHome}
               className="relative justify-between items-center gap-4 font-medium cursor-pointer list-none border border-grey-100 -mt-3 bg-white px-5 py-4 rounded-md w-full h-10"
             >
             </div>
@@ -186,7 +187,7 @@ export default function Home() {
           <hr className="my-2" />
           <div className="w-full flex-grow px-10">
             <Accordion 
-              key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
+              key={`${Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}-${Date.now()}`}
               data={filteredItems} 
               level={0} 
               setHistoricalItems={setHistoricalPointIds} 
