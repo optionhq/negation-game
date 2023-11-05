@@ -31,7 +31,19 @@ export default function Home() {
     let points: Negation[] = [];
     let nextCursor: string | null = null;
 
-    if (castIds === null || castIds.length === 0) {
+
+    if (router.pathname.startsWith('/question/')) {
+      const org = router.pathname.split('/')[2] as keyof typeof config.orgs;
+      const questionUrls = config.orgs[org]
+      
+      if (questionUrls) {
+        // Fetch the parent casts
+        for (const url of Object.values(questionUrls)) {
+          const parentCast = await axios.get(`/api/cast?type=url&identifier=${url}`);
+          points.push(await getMaybeNegation(parentCast.data as Cast));
+        }
+      }
+    } else if (castIds === null || castIds.length === 0) {
       // if there's no path selected, get the feed
 
       // here's the existing feed
