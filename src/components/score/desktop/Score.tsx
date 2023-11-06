@@ -46,7 +46,7 @@ export default function Score({
           <p className='text-sm font-thin'>{type[0].toUpperCase() + type.slice(1)}</p>
           <hr className="w-full h-[1.5px] bg-slate-300" />
           <div className='group/points h-6 w-16 flex items-center justify-center'>
-            <div className={`group-hover/points:hidden gap-1`}>
+            <div className={`group-hover/points:hidden gap-1 flex items-center`}>
               <span>{points}</span>
               {isLiked && <AiOutlineCheck />}
             </div>
