@@ -32,9 +32,12 @@ textarea {
 }
 
 .claim {
-  @apply relative flex flex-row items-start gap-3 font-medium list-none px-5 py-3 rounded-md z-0;
+  @apply relative flex flex-row items-start gap-3 font-medium list-none px-2 sm:px-3 md:px-5 py-2 sm:py-3 md:py-3 rounded-md z-0 min-w-[16rem] ;
 }
 
+p {
+@apply text-ellipsis;
+}
 .button {
   @apply bg-purple-900 px-3 py-2 text-white rounded-md cursor-pointer flex flex-row gap-2 items-center hover:bg-purple-900/70 disabled:bg-slate-500 disabled:cursor-default;
 }

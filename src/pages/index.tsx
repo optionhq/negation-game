@@ -79,11 +79,11 @@ export default function Home() {
 
   return (
     <div>
-      <header className="flex justify-end px-6 py-2 gap-6 bg-slate-50 border fixed top-0 w-screen z-40">
+      <header className="flex justify-end px-6 py-2 gap-6 bg-slate-50 border fixed top-0 w-full z-40">
         {/* {farcasterSigner && <NotificationButton/>} */}
         <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
-      <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-40">
+      <main className="flex min-h-screen flex-col items-center justify-start pt-24 px-1 sm:px-2 md:px-8 lg:px-24 xl:px-40 text-sm sm:text-base">
         {router.query.id && (
           <div className="flex justify-center w-full my-3">
             <div 
@@ -109,7 +109,7 @@ export default function Home() {
         )}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
           {!router.query.id && pinnedCasts.length > 0 && (
-            <div className="w-full flex-grow bg-light-gold p-7 pt-2 rounded-xl">
+            <div className="w-full flex-grow bg-light-gold pb-7 px-2 lg:px-7 pt-2 rounded-xl">
               <h2 className="text-center pb-2">Pinned conversations</h2>
               <div className="w-full">
                 <Accordion 
@@ -123,7 +123,7 @@ export default function Home() {
             </div>
           )}
           <hr className="my-2" />
-          <div className="w-full flex-grow px-7">
+          <div className="w-full flex-grow px-2 lg:px-7 pb-12">
             <Accordion 
               key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
               data={filteredItems} 
