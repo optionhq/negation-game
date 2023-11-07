@@ -169,7 +169,7 @@ export default function AccordionComponent({
     // add it if there isn't already one in there
     setNegations(prevNegations => {
       // Check if there's already an input element in the array
-      const hasInput = prevNegations.some(negation => negation.type === "input");
+      const hasInput = prevNegations?.some(negation => negation.type === "input");
 
       // If there's already an input element, return the previous state
       if (hasInput) {
@@ -177,7 +177,7 @@ export default function AccordionComponent({
       }
 
       // If there's no input element, add one
-      return [...prevNegations, { type: "input", parentId: pointId, kind: negationType }];
+      return [...(prevNegations || []), { type: "input", parentId: pointId, kind: negationType }];
     });
 
   };
