@@ -1,7 +1,7 @@
 import AccordionComponent from "./AccordionComponent";
 import { Negation } from "@/types/Points";
 
-export default function Accordion({
+export default function Feed({
   data,
   level,
   parent,
@@ -15,7 +15,7 @@ export default function Accordion({
   refreshThread: () => Promise<void>;
 }) {
   return (
-    <div className="flex flex-col w-full gap-1 ">
+    <div className="flex flex-col gap-1 centered-element">
       {data?.map((e: any, i: number) => (
         <AccordionComponent
           key={e.id} 

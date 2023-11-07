@@ -190,6 +190,7 @@ export default function AccordionComponent({
       return filtered.length ? filtered : null;
     });
   }
+  console.log(level)
 
   const paddingLeft = `${0}px`;
   const pointBg = `${level % 2 ? " bg-indigo-25 " : " bg-slate-50 "}`;

@@ -19,18 +19,12 @@ export default function Point({ id, onClick }: { id: string, onClick: () => void
     fetchCast();
   }, [id]);
 
-  return (
-    <>
-      {cast ? (
-        <div 
-          onClick={onClick}
-          className="relative justify-between items-center gap-4 font-medium cursor-pointer list-none border border-grey-100 -mt-3 bg-white px-5 py-4 rounded-md"
-        >
-          {cast.endPoint ? cast.endPoint.title : cast.title}
-        </div>
-      ) : ( 
-        <div> Loading... </div> 
-      )}
-    </>
-  );
+  if (!cast)
+    return <p> Loading... </p>
+  return <p
+    onClick={onClick}
+    className="claim font-medium cursor-pointer border border-grey-100"
+  >
+    {cast.endPoint ? cast.endPoint.title : cast.title}
+  </p>
 }

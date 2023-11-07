@@ -1,7 +1,7 @@
 // src/pages/index.tsx
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import Accordion from "@/components/Accordion";
+import Feed from "@/components/Feed";
 import HistoricalPoints from "@/components/HistoricalPoints";
 import Login from "@/components/Login";
 import { Negation } from "@/types/Points";
@@ -12,37 +12,38 @@ import NotificationButton from "@/components/notifications/NotificationButton";
 import config from "@/config";
 import { Cast, Signer } from "neynar-next/server";
 import { getMaybeNegation } from "@/lib/useCasts";
+import { BiChevronLeft } from "react-icons/bi";
+import { AiOutlinePushpin } from "react-icons/ai";
 
 
 async function getHomeItems(castIds: string[] | string | null): Promise<{ historicalPoints: string[], points: Negation[] }> {
-    let selectedPoint = null;
-    let historicalPoints: string[] = [];
-    let points: Negation[] = [];
+  let selectedPoint = null;
+  let historicalPoints: string[] = [];
+  let points: Negation[] = [];
 
-    if (castIds === null || castIds.length === 0) {
-      // if there's no path selected, get the feed
-      const feed = await axios.get(`/api/feed/${encodeURIComponent(config.channelId)}`)
-      for (const cast of feed.data.casts) {
-        if (cast !== null) {
-          points.push(await getMaybeNegation(cast))
-        }
+  if (castIds === null || castIds.length === 0) {
+    // if there's no path selected, get the feed
+    const feed = await axios.get(`/api/feed/${encodeURIComponent(config.channelId)}`)
+    for (const cast of feed.data.casts) {
+      if (cast !== null) {
+        points.push(await getMaybeNegation(cast))
+      }
 
-      }
-  
-    } else {
-      if (Array.isArray(castIds)) {
-        // if it's a history of selected casts, get the first one
-        selectedPoint = castIds[0]
-        historicalPoints = castIds.slice(1)
-      } else {
-        selectedPoint = castIds
-      }
-      // get the selected cast    
-      const cast = await axios.get(`/api/cast?type=hash&identifier=${selectedPoint}`)
-      points = [await getMaybeNegation(cast.data as Cast)]
     }
+  } else {
+    if (Array.isArray(castIds)) {
+      // if it's a history of selected casts, get the first one
+      selectedPoint = castIds[0]
+      historicalPoints = castIds.slice(1)
+    } else {
+      selectedPoint = castIds
+    }
+    // get the selected cast    
+    const cast = await axios.get(`/api/cast?type=hash&identifier=${selectedPoint}`)
+    points = [await getMaybeNegation(cast.data as Cast)]
+  }
 
-    return { historicalPoints, points }
+  return { historicalPoints, points }
 }
 
 export default function Home() {
@@ -68,7 +69,7 @@ export default function Home() {
       }
     }
     setPinnedCasts(fetchedPinnedCasts); // Set the pinned casts
-    const {historicalPoints, points} = await getHomeItems(ids || null);
+    const { historicalPoints, points } = await getHomeItems(ids || null);
     setFilteredItems(points);
     setHistoricalPointIds(historicalPoints);
   };
@@ -83,55 +84,37 @@ export default function Home() {
         {/* {farcasterSigner && <NotificationButton/>} */}
         <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
-      <main className="flex min-h-screen flex-col items-center justify-start pt-24 px-1 sm:px-2 md:px-8 lg:px-24 xl:px-40 text-sm sm:text-base">
-        {router.query.id && (
-          <div className="flex justify-center w-full my-3">
-            <div 
-              onClick={() => router.push({ pathname: '/' })}
-              className="relative justify-between items-center gap-4 font-medium cursor-pointer list-none border border-grey-100 -mt-3 bg-white px-5 py-4 rounded-md w-full h-10"
-            >
-            </div>
-          </div>
-        )}
-        {historicalPointIds && historicalPointIds?.length !== 0 && (
-          <HistoricalPoints 
-          ids={historicalPointIds.reverse()} 
-          onClick={(id) => {
-            const reverseIds = historicalPointIds.reverse()
-            const index = reverseIds.indexOf(id);
-            const newIds = reverseIds.slice(index);
-            router.push({
-              pathname: router.pathname,
-              query: { ...router.query, id: newIds.join(',') },
-            });
-          }}
-        />
-        )}
+      <main className="flex min-h-screen flex-col pt-16 pb-12 text-sm sm:text-base gap-8">
+        {router.query.id && <div
+          onClick={() => router.push({ pathname: '/' })}
+          className="flex flex-row py-2 font-medium cursor-pointer w-fit hover:bg-slate-100 rounded-md text-gray-500 centered-element">
+          <BiChevronLeft size={20} />
+          <p className='px-2'>Go to Home</p>
+        </div>}
+        {historicalPointIds && historicalPointIds?.length !== 0 && ( <HistoricalPoints ids={historicalPointIds.reverse()} />)}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
           {!router.query.id && pinnedCasts.length > 0 && (
-            <div className="w-full flex-grow bg-light-gold pb-7 px-2 lg:px-7 pt-2 rounded-xl">
-              <h2 className="text-center pb-2">Pinned conversations</h2>
-              <div className="w-full">
-                <Accordion 
-                  key="pinned"
-                  data={pinnedCasts}
-                  level={0} 
-                  setHistoricalItems={setHistoricalPointIds} 
-                  refreshThread={fetchItems}
-                />
+            <div className="w-full flex flex-col bg-light-gold pb-5 rounded-xl py-4 gap-2">
+              <div className="flex flex-row gap-2 items-center centered-element">
+                <AiOutlinePushpin size={20}/>
+                <h2 className="font-semibold">Pinned conversations</h2>
               </div>
+              <Feed
+                key="pinned"
+                data={pinnedCasts}
+                level={0}
+                setHistoricalItems={setHistoricalPointIds}
+                refreshThread={fetchItems}
+              />
             </div>
           )}
-          <hr className="my-2" />
-          <div className="w-full flex-grow px-2 lg:px-7 pb-12">
-            <Accordion 
-              key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
-              data={filteredItems} 
-              level={0} 
-              setHistoricalItems={setHistoricalPointIds} 
-              refreshThread={fetchItems}
-            />
-          </div>
+          <Feed
+            key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
+            data={filteredItems}
+            level={0}
+            setHistoricalItems={setHistoricalPointIds}
+            refreshThread={fetchItems}
+          />
         </FarcasterSignerContext.Provider>
         {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
       </main>

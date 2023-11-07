@@ -45,3 +45,8 @@ p {
 .secondary-button {
   @apply border text-black/80 px-3 py-2 rounded-md flex items-center justify-center hover:border-black/20 bg-slate-100/80 hover:bg-white hover:text-black;
 }
+
+.centered-element {
+  @apply mx-3 sm:mx-4 md:mx-8 lg:mx-24 xl:mx-40;
+
+}
