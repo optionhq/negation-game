@@ -282,9 +282,9 @@ export default function AccordionComponent({
           `claim relative border cursor-pointer ${level % 2 === 0 ? "hover:bg-gray-100" : "hover:bg-indigo-50"}`
         }
       >
-        <div className="flex flex-col gap-1 md:gap-2">
+        <div className="flex flex-col  md:gap-2">
           <div
-            className={`p-1 rounded-md ${e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
+            className={`py-1 rounded-md ${e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
               }`}
             onClick={handleArrowClick}>
             <div
