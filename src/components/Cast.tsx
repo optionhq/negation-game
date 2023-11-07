@@ -4,9 +4,12 @@ import Modal from "./Modal"
 import { InputComponent } from "."
 import { Signer } from "neynar-next/server"
 import publish from "@/lib/publish"
+import { getDeviceType } from "@/lib/getDeviceType";
 
 function CastComponent({ farcasterSigner, reloadThreads }: { farcasterSigner: Signer; reloadThreads: () => void }) {
   const [castModal, setCastModal] = useState(false);
+
+  const deviceType = getDeviceType()
 
   const onPublish = async (text: string) => {
     try {
@@ -27,8 +30,8 @@ function CastComponent({ farcasterSigner, reloadThreads }: { farcasterSigner: Si
   return (
     <div>
       <button className="fixed bottom-5 left-5 button" onClick={() => setCastModal(true)}>
-        <BiSolidPencil />
-        <p>Make a point</p>
+        <BiSolidPencil size={18}/>
+        {deviceType == "desktop" && <p>Make a point</p>}
       </button>
       {castModal && (
         <Modal setSelected={setCastModal}>
