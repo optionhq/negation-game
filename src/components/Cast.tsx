@@ -29,7 +29,7 @@ function CastComponent({ farcasterSigner, reloadThreads }: { farcasterSigner: Si
 
   return (
     <div>
-      <button className="fixed bottom-5 left-5 button" onClick={() => setCastModal(true)}>
+      <button className="fixed bottom-5 right-5 button" onClick={() => setCastModal(true)}>
         <BiSolidPencil size={18}/>
         {deviceType == "desktop" && <p>Make a point</p>}
       </button>
