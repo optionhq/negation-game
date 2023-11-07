@@ -1,5 +1,5 @@
 import { Signer } from 'neynar-next/server'
-import ReactButtonWrapper from '../ReactButtonWrapper';
+import ReactButtonWrapper from '../../ReactButtonWrapper';
 import NegateLikeButtons from './NegateLikeButtons';
 import { useState } from 'react';
 
@@ -12,11 +12,13 @@ export default function Score({ points, onNegate, type, advocates, farcasterSign
     farcasterSigner: Signer | null;
     id: string;
 }) {
+    const [score, setScore] = useState(points);
 
     const [isLiked, setIsLiked] = useState(
         farcasterSigner && 'fid' in farcasterSigner && advocates.some(advocate => advocate.fid === farcasterSigner.fid)
     );
 
+    console.log(points)
     return (
         <div
             onClick={(e) => {
@@ -30,11 +32,11 @@ export default function Score({ points, onNegate, type, advocates, farcasterSign
             <ReactButtonWrapper>
                 <div className="flex flex-col items-center w-fit gap-[2px]">
                     <div className="flex flex-row items-center gap-1">
-                        <span>{points}</span>
+                        <span>{score}</span>
                         <p className='text-sm font-thin'>{type[0].toUpperCase() + type.slice(1)}</p>
                     </div>
                     <hr className="w-full h-[1.5px] bg-slate-300" />
-                    <NegateLikeButtons id={id} points={points} onNegate={onNegate} type={type} advocates={advocates} farcasterSigner={farcasterSigner} setIsLiked={setIsLiked} isLiked={isLiked} />
+                    <NegateLikeButtons id={id} points={points} onNegate={onNegate} type={type} advocates={advocates} farcasterSigner={farcasterSigner} setIsLiked={setIsLiked} isLiked={isLiked}  setScore={setScore}/>
                 </div>
             </ReactButtonWrapper>
         </div>

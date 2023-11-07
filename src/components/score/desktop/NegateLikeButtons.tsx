@@ -17,7 +17,8 @@ export default function NegateLikeButtons({
     advocates,
     farcasterSigner,
     isLiked,
-    setIsLiked
+    setIsLiked,
+    setScore
 }: {
     id: string;
     points: number;
@@ -27,16 +28,12 @@ export default function NegateLikeButtons({
     farcasterSigner: Signer | null;
     isLiked: boolean | null;
     setIsLiked: React.Dispatch<React.SetStateAction<boolean | null>>
+    setScore: React.Dispatch<React.SetStateAction<number>>
 }) {
-    const [score, setScore] = useState(points);
 
-    useEffect(() => {
-        // This will run every time `isLiked` or `score` changes
-    }, [isLiked, score]);
 
     const handleLike = useCallback((e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
         e.stopPropagation();
-        e.nativeEvent.stopImmediatePropagation();
         e.preventDefault();
 
         if (!farcasterSigner) return
@@ -45,11 +42,11 @@ export default function NegateLikeButtons({
                 await unlike(id, farcasterSigner).then(() => { setScore(prev => prev - 1) });
             else
                 await like(id, farcasterSigner).then(() => { setScore(prevScore => prevScore + 1) })
-            setIsLiked(!isLiked);
+            setIsLiked(!isLiked)
         };
 
         toggleLike();
-    }, [farcasterSigner, id, setScore, setIsLiked]);
+    }, [farcasterSigner, id, isLiked]);
 
     return (
         <div className=" hidden group-hover/points:flex flex-row gap-1">
