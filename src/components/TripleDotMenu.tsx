@@ -43,12 +43,12 @@ const TripleDotMenu: React.FC<TripleDotMenuProps> = ({
           e.stopPropagation();
           setTripleDotMenu(prevState => !prevState)
         }}
-        className="absolute right-0 top-0 p-2"
+        className=""
       >
         ...
       </button>
       {isTripleDotOpen && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg">
+        <div className="absolute right-0 w-48 bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg">
           <button
             className="w-full px-4 py-2 text-left"
             onClick={(event) => {

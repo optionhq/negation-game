@@ -12,12 +12,10 @@ import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
 import { GoUnlink, GoCircleSlash } from "react-icons/go";
 import { Cast, User } from "neynar-next/server";
-import { castToPointsTree, castToLinkPointsTree} from "@/lib/useCasts";
+import { castToPointsTree, castToLinkPointsTree } from "@/lib/useCasts";
 import { useRouter } from "next/router";
 import TripleDotMenu from './TripleDotMenu';
 import { GoInfo } from "react-icons/go";
-
-const INDENTATION_PX = 25;
 
 export default function AccordionComponent({
   level,
@@ -50,25 +48,51 @@ export default function AccordionComponent({
   const [childrenLoading, setChildrenLoading] = useState(false);
   const [isTripleDotOpen, setTripleDotMenu] = useState(false);
 
+
+
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setWindowWidth(window.innerWidth);
+    };
+
+    window.addEventListener('resize', handleResize);
+
+    return () => {
+      window.removeEventListener('resize', handleResize);
+    };
+  }, []);
+
+  // let INDENTATION_PX = 25
+  let INDENTATION_PX = windowWidth > 768 ? 25 : 15;
+  if (windowWidth > 1024) {
+    INDENTATION_PX = 30;
+  } else if (windowWidth < 480) {
+    INDENTATION_PX = 10;
+  }
+
+
+
   const getNegations = async (point: Negation) => {
-    const {data: {result: { casts }}} = await axios.get(`/api/cast/${point.id}/thread`);
-  
+    const { data: { result: { casts } } } = await axios.get(`/api/cast/${point.id}/thread`);
+
     const negations: Negation[] = [];
     for (const cast of casts) {
       const possibleNegation = castToLinkPointsTree(cast);
       if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
         const res = await axios.get(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
-  
+
         const cast: Cast = res.data;
         const endPoint: Node = castToPointsTree(cast)
-        
+
         possibleNegation.endPoint = endPoint;
         // it's now a negation
         const negation = possibleNegation;
         negations.push(negation);
       }
     }
-  
+
     return negations;
   };
 
@@ -80,17 +104,17 @@ export default function AccordionComponent({
     setNegations(prevNegations => {
       // Preserve any existing input box
       const inputBox = prevNegations?.find(negation => negation.type === "input");
-  
+
       // Negations in newNegations that are also in prevNegations
       const toKeep = prevNegations ? prevNegations.filter(prevNegation =>
         newNegations.some(negation => negation.id === prevNegation.id)
       ) : [];
-  
+
       // Negations in newNegations that are not in prevNegations
       const toAdd = newNegations.filter(negation =>
         !prevNegations?.some(prevNegation => prevNegation.id === negation.id)
       );
-  
+
       // Sort the negations by points (relevance), then by endPoint.points (veracity)
       const sortedNegations = [...toKeep, ...toAdd].sort((a, b) => {
         if (b.points !== a.points) {
@@ -101,7 +125,7 @@ export default function AccordionComponent({
           return 0;
         }
       });
-  
+
       // If there's an input box, add it to the start of the new state
       if (inputBox) {
         return [inputBox, ...sortedNegations];
@@ -110,10 +134,10 @@ export default function AccordionComponent({
       }
     });
   };
-  
+
   const unfurlDropdown = async () => {
     setChildrenLoading(true);
-  
+
     if (isNegation(e)) {
       await updateNegationsInPlace(setRelevanceNegations, () => getNegations(e));
       if (e.endPoint) {
@@ -122,7 +146,7 @@ export default function AccordionComponent({
     } else {
       await updateNegationsInPlace(setVeracityNegations, () => getNegations(e));
     }
-  
+
     setChildrenLoading(false);
   };
 
@@ -133,27 +157,27 @@ export default function AccordionComponent({
   }, [detailsOpened, e]);
 
   const onNegate = (pointId: string, negationType: 'relevance' | 'veracity') => (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
-  
+
     // Open the details if they're not already open
     if (!detailsOpened) {
       setIsDropdownClicked(true)
       setDetailsOpened(true);
     }
-  
+
     const setNegations = negationType === 'relevance' ? setRelevanceNegations : setVeracityNegations;
-  
+
     // add it if there isn't already one in there
     setNegations(prevNegations => {
       // Check if there's already an input element in the array
-      const hasInput = prevNegations.some(negation => negation.type === "input");
-    
+      const hasInput = prevNegations?.some(negation => negation.type === "input");
+
       // If there's already an input element, return the previous state
       if (hasInput) {
         return prevNegations;
       }
-    
+
       // If there's no input element, add one
-      return [...prevNegations, { type: "input", parentId: pointId, kind: negationType}];
+      return [...(prevNegations || []), { type: "input", parentId: pointId, kind: negationType }];
     });
 
   };
@@ -166,6 +190,7 @@ export default function AccordionComponent({
       return filtered.length ? filtered : null;
     });
   }
+  console.log(level)
 
   const paddingLeft = `${0}px`;
   const pointBg = `${level % 2 ? " bg-indigo-25 " : " bg-slate-50 "}`;
@@ -173,7 +198,7 @@ export default function AccordionComponent({
   function getAncestry(): string {
     // Call the parent's getAncestry function if it exists
     const parentAncestry = parent && getParentAncestry ? getParentAncestry() : '';
-    
+
     // Return the current component's ID followed by the parent's ancestry
     return parentAncestry ? `${e.id},${parentAncestry}` : e.id;
   }
@@ -182,15 +207,15 @@ export default function AccordionComponent({
     const ancestry = getAncestry().split(',');
     const current = searchParams.get("id");
     const currentIds = current ? current.split(',') : [];
-  
+
     // Find the first ancestor that is already in the path
     const commonAncestorIndex = ancestry.findIndex(ancestor => ancestor === currentIds[0]);
-  
+
     // If the first ancestor is already in the path, do nothing
     if (commonAncestorIndex === 0) {
       return;
     }
-  
+
     // Prepend the missing ancestors to the path
     const missingAncestors = commonAncestorIndex > 0 ? ancestry.slice(0, commonAncestorIndex).join(',') : ancestry.join(',');
     const route = current ? `${missingAncestors},${current}` : missingAncestors;
@@ -201,7 +226,7 @@ export default function AccordionComponent({
     e.stopPropagation();
     newRoute();
   }
-  
+
   const handleArrowClick = async (e: React.MouseEvent) => {
     e.stopPropagation();
     setIsDropdownClicked(prevState => !prevState)
@@ -238,7 +263,7 @@ export default function AccordionComponent({
     return (
       <InputComponent
         pointBg={pointBg}
-        placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (e?.kind === "relevance" ? "relevant": "true")+ " because ..."}
+        placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (e?.kind === "relevance" ? "relevant" : "true") + " because ..."}
         onCancel={removeInput}
         onPublish={onPublishNegation}
       />
@@ -258,35 +283,33 @@ export default function AccordionComponent({
           `claim relative border cursor-pointer ${level % 2 === 0 ? "hover:bg-gray-100" : "hover:bg-indigo-50"}`
         }
       >
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col  md:gap-2">
           <div
-            className={`p-1 rounded-md ${
-              e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
-            }`}
+            className={`py-1 rounded-md ${e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0 pointer-events-none"
+              }`}
             onClick={handleArrowClick}>
             <div
-              className={`p-1 rounded-lg ${
-                e.replyCount > 0 || (e.endPoint && e.endPoint?.replyCount > 0) ? "opacity-100" : "opacity-0"
-              } hover:bg-gray-200`}>
+              className={`p-1 rounded-lg hover:bg-gray-200`}>
               <div className={`transition w-full h-full ${isDropdownClicked ? "rotate-90" : "rotate-0"}`}>
                 <Arrow />
               </div>
             </div>
           </div>
         </div>
-        <div 
+        <div
           className="flex flex-col gap-3 items-start justify-center w-full"
           onClick={handleClick}
         >
           {/* <ProfilePreview user={e.author!}/> */}
-          <span className="w-full">
+          <p className="w-full text-ellipsis">
             {e.endPoint && isNegation(e) && e.endPoint.title}
-          </span>
+          </p>
           {!e.endPoint && (
-            <>
-              {e.title}
+            <div className=" overflow-hidden text-ellipsis w-full table table-fixed">
+              <p className=" text-ellipsis table-cell">{e.title}</p>
+
               {link && <RecastedComponent url={link} />}
-            </>
+            </div>
           )}
           {/* <hr className="w-full h-[2px] bg-slate-400"/> */}
           <div className="flex flex-row gap-2 text-gray-500">

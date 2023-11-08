@@ -1,7 +1,7 @@
 // src/pages/index.tsx
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
-import Accordion from "@/components/Accordion";
+import Feed from "@/components/Feed";
 import HistoricalPoints from "@/components/HistoricalPoints";
 import Login from "@/components/Login";
 import { Negation } from "@/types/Points";
@@ -12,6 +12,8 @@ import NotificationButton from "@/components/notifications/NotificationButton";
 import config from "@/config";
 import { Cast, Signer } from "neynar-next/server";
 import { getMaybeNegation } from "@/lib/useCasts";
+import { BiChevronLeft } from "react-icons/bi";
+import { AiOutlinePushpin } from "react-icons/ai";
 
 export default function Home() {
   const router = useRouter();
@@ -59,7 +61,6 @@ export default function Home() {
         }
 
       }
-  
     } else {
       if (Array.isArray(castIds)) {
         // if it's a history of selected casts, get the first one
@@ -74,7 +75,7 @@ export default function Home() {
     }
 
     return { historicalPoints, points, nextCursor }
-}
+  }
 
   useEffect(() => {
     var options = {
@@ -87,12 +88,11 @@ export default function Home() {
     if (loader.current) {
       observer.observe(loader.current)
     }
-
   }, [router.isReady, router.query.id]);
 
   const handleObserver: IntersectionObserverCallback = (entities, observer) => {
     const target = entities[0];
-    if (target.isIntersecting) {   
+    if (target.isIntersecting) {
       // Fetch the next set of casts here
       fetchItems();
     }
@@ -109,114 +109,89 @@ export default function Home() {
       }
     }
     setPinnedCasts(fetchedPinnedCasts); // Set the pinned casts
-  }
+  };
 
-const fetchItems = async () => {
-  if (!router.isReady || isFetching.current) {
-    // A fetch operation is already in progress, so we return early
-    return;
-  }
+  const fetchItems = async () => {
+    if (!router.isReady || isFetching.current) {
+      // A fetch operation is already in progress, so we return early
+      return;
+    }
 
-  isFetching.current = true;
+    isFetching.current = true;
 
-  let ids: string[] = [];
-  if (typeof router.query.id === 'string') {
-    ids = router.query.id.split(",");
-  }
+    let ids: string[] = [];
+    if (typeof router.query.id === 'string') {
+      ids = router.query.id.split(",");
+    }
 
-  const {historicalPoints, points, nextCursor} = await getHomeItems(ids || null, feedCursorRef.current, feed);
-  feedCursorRef.current = nextCursor;
-  setFilteredItems(points);
-  // we set feed if we haven't selected any ids, then we pass feed to getHomeItems
-  if (ids.length === 0) {
-    setFeed(points);
-  }
-  setHistoricalPointIds(historicalPoints);
+    const { historicalPoints, points, nextCursor } = await getHomeItems(ids || null, feedCursorRef.current, feed);
+    feedCursorRef.current = nextCursor;
+    setFilteredItems(points);
+    // we set feed if we haven't selected any ids, then we pass feed to getHomeItems
+    if (ids.length === 0) {
+      setFeed(points);
+    }
+    setHistoricalPointIds(historicalPoints);
 
-  isFetching.current = false;
-};
+    isFetching.current = false;
+  };
 
   useEffect(() => {
     fetchPinnedCasts();
   }, []);
 
   useEffect(() => {
-      fetchItems();
+    fetchItems();
   }, [router.query.id]);
-
-  const returnToHome = () => {
-    setFeed([]);
-    router.push({ pathname: '/' });
-  };
 
   return (
     <div>
-      <header className="flex justify-end px-6 py-2 gap-6 bg-slate-50 border fixed top-0 w-screen z-40">
+      <header className="flex justify-end px-6 py-2 gap-6 bg-slate-50 border fixed top-0 w-full z-40">
         {/* {farcasterSigner && <NotificationButton/>} */}
         <Login setFarcasterSigner={setFarcasterSigner} />
       </header>
-      <main className="flex min-h-screen flex-col items-center justify-start p-12 pt-24 px-32">
-        {router.query.id && (
-          <div className="flex justify-center w-full my-4 px-10">
-            <div 
-              onClick={returnToHome}
-              className="relative justify-between items-center gap-4 font-medium cursor-pointer list-none border border-grey-100 -mt-3 bg-white px-5 py-4 rounded-md w-full h-10"
-            >
-            </div>
-          </div>
-        )}
-        {historicalPointIds && historicalPointIds?.length !== 0 && (
-          <div className="w-full flex px-10">
-            <HistoricalPoints 
-              ids={historicalPointIds.reverse()} 
-              onClick={(id) => {
-                const reverseIds = historicalPointIds.reverse()
-                const index = reverseIds.indexOf(id);
-                const newIds = reverseIds.slice(index);
-                router.push({
-                  pathname: router.pathname,
-                  query: { ...router.query, id: newIds.join(',') },
-                });
-              }}
-            />
-          </div>
-        )}
+      <main className="flex min-h-screen flex-col pt-16 pb-12 text-sm sm:text-base gap-8">
+        {router.query.id && <div
+          onClick={() => {
+            router.push({ pathname: '/' })
+            setFeed([])
+          }}
+          className="flex flex-row py-2 font-medium cursor-pointer w-fit hover:bg-slate-100 rounded-md text-gray-500 centered-element">
+          <BiChevronLeft size={20} />
+          <p className='px-2'>Go to Home</p>
+        </div>}
+        {historicalPointIds && historicalPointIds?.length !== 0 && (<HistoricalPoints ids={historicalPointIds.reverse()} />)}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
           {!router.query.id && pinnedCasts.length > 0 && (
-            <>
-            <div className="w-full flex-grow bg-light-gold p-10 pt-2 rounded-xl">
-              <h2 className="text-center pb-2">Pinned conversations</h2>
-              <div className="w-full">
-                <Accordion 
-                  key="pinned"
-                  data={pinnedCasts}
-                  level={0} 
-                  setHistoricalItems={setHistoricalPointIds} 
-                  refreshThread={fetchItems}
-                />
+            <div className="w-full flex flex-col bg-light-gold pb-5 rounded-xl py-4 gap-2">
+              <div className="flex flex-row gap-2 items-center centered-element">
+                <AiOutlinePushpin size={20} />
+                <h2 className="font-semibold">Pinned conversations</h2>
               </div>
+              <Feed
+                key="pinned"
+                data={pinnedCasts}
+                level={0}
+                setHistoricalItems={setHistoricalPointIds}
+                refreshThread={fetchItems}
+              />
             </div>
-            <hr className="my-2" />
-            </>
           )}
-          
-          <div className="w-full flex-grow px-10">
-            <Accordion 
-              key={`${Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}-${Date.now()}`}
-              data={filteredItems} 
-              level={0} 
-              setHistoricalItems={setHistoricalPointIds} 
-              refreshThread={fetchItems}
-            />
-          </div>
-        </FarcasterSignerContext.Provider>
+          <Feed
+            key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
+            data={filteredItems}
+            level={0}
+            setHistoricalItems={setHistoricalPointIds}
+            refreshThread={fetchItems}
+          />
+        </FarcasterSignerContext.Provider >
         {farcasterSigner && <CastComponent farcasterSigner={farcasterSigner} reloadThreads={fetchItems} />}
-      </main>
+      </main >
       {!router.query.id &&
         <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>
           <h2 style={{ fontSize: '1.5em', color: '#333' }}>Loading...</h2>
         </div>
       }
-    </div>
+    </div >
   );
 }

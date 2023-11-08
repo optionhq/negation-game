@@ -8,7 +8,7 @@ import useSWR from 'swr';
 import axios from 'axios';
 
 // Define the fetcher function
-const fetcher = ( url: string ) => axios.get(url).then(res => res.data);
+const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 interface LoginProps {
   setFarcasterSigner: React.Dispatch<React.SetStateAction<Signer | null>>;
@@ -19,7 +19,7 @@ const Login: React.FC<LoginProps> = ({ setFarcasterSigner }) => {
   const router = useRouter();
   const { data: user, error } = useSWR<User>(signer?.status === 'approved' ? `/api/users/${signer.fid}` : null, fetcher);
   const playlist = process.env.NEXT_PUBLIC_PLAYLIST?.split(',').map(fid => Number(fid.trim()));
-  
+
   useEffect(() => {
     if (signer && 'fid' in signer) {
       if (playlist?.includes(signer.fid)) {
@@ -59,15 +59,19 @@ const Login: React.FC<LoginProps> = ({ setFarcasterSigner }) => {
       )}
       {/* this extra stuff added as a hacky waitlist */}
       {user && signer && 'fid' in signer && playlist?.includes(signer.fid) && (
-        <div className="flex flex-col items-center">
-          <Image
-            src={user.pfp_url || "/default-avatar.svg"}
-            alt="User profile picture"
-            width={50}
-            height={50}
-            className="rounded-full object-cover"
-          />
-          <span className="text-sm text-center">{user.username}</span>
+        <div className="flex flex-row items-center gap-3">
+          <div className="h-12 w-12 relative">
+            <Image
+              src={user.pfp_url || "/default-avatar.svg"}
+              alt="User profile picture"
+              fill
+              className="rounded-full object-cover"
+            />
+          </div>
+          <div className="flex flex-col items-start">
+            <span className="">{user.display_name}</span>
+            <span className="text-sm text-center text-black/50">{user.username}</span>
+          </div>
         </div>
       )}
     </div>
