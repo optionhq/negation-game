@@ -25,7 +25,7 @@ function QRCodePage() {
           rel="noopener noreferrer" 
           className="text-blue-500 hover:underline"
         >
-          Click there to view the signer URL
+          Or click here if you&lsquo;re on your phone
         </a>
       </div>
     </div>
