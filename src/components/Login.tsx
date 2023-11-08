@@ -23,28 +23,25 @@ const Login: React.FC<LoginProps> = ({ setFarcasterSigner }) => {
   useEffect(() => {
     if (signer && 'fid' in signer) {
       if (playlist?.includes(signer.fid)) {
-        console.log("you're in")
         setFarcasterSigner(signer);
       } else {
-        console.log("you're not in")
         setFarcasterSigner(null);
       }
     }
   }, [signer]);
 
-  useEffect(() => {
-    if (signer && signer.status === "pending_approval") {
-      router.push("/qr-code");
-    }
-  }, [signer, router]);
-
   return (
     <div>
-      {!signer?.status && (
+      {(!signer || signer.status !== 'approved') && (
         <button
           className="button"
           style={{ cursor: isLoading ? "not-allowed" : "pointer" }}
-          onClick={signIn}
+          onClick={() => {
+            if (!signer) {
+              signIn(); 
+            }
+            router.push("/qr-code")
+          }}
           disabled={isLoading}>
           {isLoading ? "Loading..." : "Sign in with farcaster"}
         </button>
