@@ -1,17 +1,17 @@
 import { Cast } from "neynar-next/server";
-import { Negation, Node, Point } from "@/types/Points";
+import { Negation, Point, Node } from "@/types/Points";
 import { extractEndPointUrl } from "@/lib/useEndPoints";
 import axios from "axios";
 
 export async function getMaybeNegation(cast: Cast): Promise<Negation> {
-  const maybeNegation = castToLinkPointsTree(cast)
+  const maybeNegation = castToNegation(cast)
 
   if (maybeNegation.endPointUrl) {
     const res = await axios.get(`/api/cast?type=url&identifier=${maybeNegation.endPointUrl}`);
     res.status === 200 || console.error("Failed to fetch cast", res);
     const cast: Cast = res.data;
     if (!cast) return maybeNegation;
-    const endPoint: Node = castToPointsTree(cast)
+    const endPoint: Point = castToPoint(cast)
     
     maybeNegation.endPoint = endPoint;
   }
@@ -19,7 +19,7 @@ export async function getMaybeNegation(cast: Cast): Promise<Negation> {
   return maybeNegation;
 }
 
-export function castToLinkPointsTree(cast: Cast): Negation {
+export function castToNegation(cast: Cast): Negation {
   const endPointUrl = extractEndPointUrl(cast);
   return {
     title: cast.text,
@@ -35,7 +35,7 @@ export function castToLinkPointsTree(cast: Cast): Negation {
   };
 };
 
-export function castToPointsTree(cast: Cast): Node {
+export function castToPoint(cast: Cast): Point {
   return {
     title: cast.text,
     id: cast.hash,

@@ -3,7 +3,7 @@ import axios from "axios";
 import { Cast } from "neynar-next/server";
 import { useState } from "react";
 import { getMaybeNegation } from "@/lib/useCasts";
-import { Node, Negation } from "@/types/Points";
+import { Point, Negation } from "@/types/Points";
 
 export default function Point({ id, onClick }: { id: string, onClick: () => void }) {
 

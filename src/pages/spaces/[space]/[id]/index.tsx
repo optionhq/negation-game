@@ -4,6 +4,7 @@ import { useRouter } from "next/router";
 import axios from "axios";
 import { Cast } from "neynar-next/server";
 import { getMaybeNegation } from "@/lib/useCasts";
+import Home from '@/components/Home';
 
 export default function ConversationPage() {
   const router = useRouter();
@@ -11,21 +12,9 @@ export default function ConversationPage() {
 
   const [thread, setThread] = useState<Cast[]>([]);
 
-  // useEffect(() => {
-  //   if (id) {
-  //     // Fetch the thread of responses to the selected conversation cast
-  //     axios.get(`/api/cast/${id}/thread`)
-  //       .then(response => {
-  //         const thread = response.data.result.casts.map(cast => getMaybeNegation(cast));
-  //         setThread(thread);
-  //       })
-  //       .catch(error => console.error('Error fetching thread:', error));
-  //   }
-  // }, [id]);
-
   return (
     <div>
-      <h1>Thread for cast {id}</h1>
+      <Home />
     </div>
   );
 }

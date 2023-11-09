@@ -1,6 +1,6 @@
 import { User } from "neynar-next/server";
 
-export type Point = {
+export type Node = {
   title: string;
   id: string;
   author?: User;
@@ -15,10 +15,10 @@ export type Point = {
   kind?: "relevance" | "veracity"
 };
 
-export type Node = Point;
+export type Point = Node;
 
 // TODO: once we've switched to the real network, endPoint should be required
-export interface Negation extends Point {
-  endPoint?: Point;
+export interface Negation extends Node {
+  endPoint?: Node;
   endPointUrl?: string;
 }

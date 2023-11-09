@@ -2,7 +2,7 @@ import axios from "axios";
 import { useSearchParams, useRouter as oldRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { Score, Accordion, ExternalLink, Arrow, InputComponent } from "@/components";
-import { Node, Negation } from "@/types/Points";
+import { Point, Negation } from "@/types/Points";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
 import { extractLink } from "@/lib/extractLink";
@@ -12,7 +12,7 @@ import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
 import { GoUnlink, GoCircleSlash } from "react-icons/go";
 import { Cast, User } from "neynar-next/server";
-import { castToPointsTree, castToLinkPointsTree } from "@/lib/useCasts";
+import { castToPoint, castToNegation } from "@/lib/useCasts";
 import { useRouter } from "next/router";
 import TripleDotMenu from './TripleDotMenu';
 import { GoInfo } from "react-icons/go";
@@ -79,12 +79,12 @@ export default function AccordionComponent({
 
     const negations: Negation[] = [];
     for (const cast of casts) {
-      const possibleNegation = castToLinkPointsTree(cast);
+      const possibleNegation = castToNegation(cast);
       if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
         const res = await axios.get(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
 
         const cast: Cast = res.data;
-        const endPoint: Node = castToPointsTree(cast)
+        const endPoint: Point = castToPoint(cast)
 
         possibleNegation.endPoint = endPoint;
         // it's now a negation
