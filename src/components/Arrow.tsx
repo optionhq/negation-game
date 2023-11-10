@@ -1,6 +1,6 @@
 export default function Arrow() {
   const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !(window as any).MSStream;
-  const path = isIOS ? "M9 6l6 6-6 6" : "M6 9l6 6 6-6";
+  const path = isIOS ? "M9 6l6 6-6 6" : "M9 6l6 6-6 6";
 
   return (
     <svg
