@@ -33,43 +33,47 @@ export default function Home() {
     let points: Negation[] = [];
     let nextCursor: string | null = null;
 
+    if (Array.isArray(castIds)) {
+      // if it's a history of selected casts, get the first one
+      selectedPoint = castIds[0]
+      historicalPoints = castIds.slice(1)
+    } else {
+      selectedPoint = castIds
+    }
 
-    if (router.pathname.includes('/spaces/')) {
-      // if this is a space, fetch the direct responses to the cast of interest
-      const castId = router.query.id as string;
-      const response = await axios.get(`/api/cast/${castId}/thread`);
-      for (const cast of response.data.result.casts) {
-        const point = castToPoint(cast);
-        if (point.parentId === castId) {
-          points.push(point);
-        }
-      }
-      points.sort((a, b) => b.advocates?.length - a.advocates?.length);
-    } else if (castIds === null || castIds.length === 0) {
+    if (castIds === null || castIds.length === 0) {
       // if there's no path selected, get the feed
 
-      // here's the existing feed
-      points = existingPoints ? existingPoints : []
-
-      const feed = await axios.get(`/api/feed/${encodeURIComponent(config.channelId)}?cursor=${cursor}`)
-
-      nextCursor = feed.data.next?.cursor
-
-      for (const cast of feed.data.casts) {
-        if (cast !== null) {
-          points.push(await getMaybeNegation(cast))
+      if (router.pathname.includes('/spaces/')) {
+        // if this is a space, fetch the direct responses to the cast of interest
+        const castId = selectedPoint ? selectedPoint : router.query.conversation as string;
+        const response = await axios.get(`/api/cast/${castId}/thread`);
+        for (const cast of response.data.result.casts) {
+          const point = await getMaybeNegation(cast);
+          if (point.parentId === castId) {
+            points.push(point);
+          }
         }
+        points.sort((a, b) => b.advocates?.length - a.advocates?.length);
 
-      }
-      points.sort((a: Negation, b: Negation) => b.advocates.length - a.advocates.length);
-    } else {
-      if (Array.isArray(castIds)) {
-        // if it's a history of selected casts, get the first one
-        selectedPoint = castIds[0]
-        historicalPoints = castIds.slice(1)
       } else {
-        selectedPoint = castIds
+
+        // here's the existing feed
+        points = existingPoints ? existingPoints : []
+
+        const feed = await axios.get(`/api/feed/${encodeURIComponent(config.channelId)}?cursor=${cursor}`)
+
+        nextCursor = feed.data.next?.cursor
+
+        for (const cast of feed.data.casts) {
+          if (cast !== null) {
+            points.push(await getMaybeNegation(cast))
+          }
+
+        }
+        points.sort((a: Negation, b: Negation) => b.advocates.length - a.advocates.length);
       }
+    } else {
       // get the selected cast    
       const cast = await axios.get(`/api/cast?type=hash&identifier=${selectedPoint}`)
       points = [await getMaybeNegation(cast.data as Cast)]
@@ -146,8 +150,8 @@ export default function Home() {
   }, [router.query.id]);
 
   useEffect(() => {
-    if (router.pathname.includes('spaces') && typeof router.query.id === 'string') {
-      axios.get(`/api/cast?type=hash&identifier=${router.query.id}`)
+    if (router.pathname.includes('spaces') && typeof router.query.conversation === 'string') {
+      axios.get(`/api/cast?type=hash&identifier=${router.query.conversation}`)
         .then(response => setTopic(response.data.text))
         .catch(error => console.error(error));
     }
@@ -161,16 +165,20 @@ export default function Home() {
       <main className="flex min-h-screen flex-col pb-12 pt-2 text-sm sm:text-base gap-8">
         {router.query.id && <div
           onClick={() => {
-            router.push({ pathname: router.pathname.includes('spaces') ? `/spaces/${router.query.space}` : '/' })
-            setFeed([])
+            if (router.pathname.includes('spaces')) {
+              router.push(`/spaces/${router.query.space}/${router.query.conversation}`);
+            } else {
+              router.push('/');
+            }
+            setFeed([]);
           }}
           className="flex flex-row py-2 font-medium cursor-pointer w-fit hover:bg-slate-100 rounded-md text-gray-500 centered-element">
           <BiChevronLeft size={20} />
-          <p className='px-2'>{router.pathname.includes('spaces') ? `Return to ${router.query.space}` : 'Go to Home'}</p>
+          <p className='px-2'>{router.pathname.includes('spaces') ? `Go back to conversation` : 'Go to Home'}</p>
         </div>}
         {historicalPointIds && historicalPointIds?.length !== 0 && (<HistoricalPoints ids={historicalPointIds.reverse()} />)}
         <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
-          {!router.query.id && pinnedCasts.length > 0 && (
+          {!router.query.id && !router.query.conversation && pinnedCasts.length > 0 && (
             <div className="w-full flex flex-col bg-light-gold pb-5 rounded-xl py-4 gap-2">
               <div className="flex flex-row gap-2 items-center centered-element">
                 <AiOutlinePushpin size={20} />

@@ -190,7 +190,6 @@ export default function AccordionComponent({
       return filtered.length ? filtered : null;
     });
   }
-  console.log(level)
 
   const paddingLeft = `${0}px`;
   const pointBg = `${level % 2 ? " bg-indigo-25 " : " bg-slate-50 "}`;
@@ -207,19 +206,31 @@ export default function AccordionComponent({
     const ancestry = getAncestry().split(',');
     const current = searchParams.get("id");
     const currentIds = current ? current.split(',') : [];
-
+  
     // Find the first ancestor that is already in the path
     const commonAncestorIndex = ancestry.findIndex(ancestor => ancestor === currentIds[0]);
-
+  
     // If the first ancestor is already in the path, do nothing
     if (commonAncestorIndex === 0) {
       return;
     }
-
+  
     // Prepend the missing ancestors to the path
     const missingAncestors = commonAncestorIndex > 0 ? ancestry.slice(0, commonAncestorIndex).join(',') : ancestry.join(',');
     const route = current ? `${missingAncestors},${current}` : missingAncestors;
-    router.push(`?id=${route}`);
+  
+    // Check if space and conversation parameters exist
+    if (router.query.space && router.query.conversation) {
+      router.push({
+        pathname: `/spaces/${router.query.space}/${router.query.conversation}`,
+        query: { id: route }
+      });
+    } else {
+      router.push({
+        pathname: '/',
+        query: { id: route }
+      });
+    }
   }
 
   function handleClick(e: React.MouseEvent) {
