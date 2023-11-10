@@ -47,6 +47,7 @@ export default function AccordionComponent({
   const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
   const [childrenLoading, setChildrenLoading] = useState(false);
   const [isTripleDotOpen, setTripleDotMenu] = useState(false);
+  const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 
 
@@ -290,7 +291,7 @@ export default function AccordionComponent({
             onClick={handleArrowClick}>
             <div
               className={`p-1 rounded-lg hover:bg-gray-200`}>
-              <div className={`transition w-full h-full ${isDropdownClicked ? "rotate-90" : "rotate-0"}`}>
+              <div className={`transition transform ${isDropdownClicked ? "rotate-90" : ""}`}>
                 <Arrow />
               </div>
             </div>

@@ -50,3 +50,7 @@ p {
   @apply mx-3 sm:mx-4 md:mx-8 lg:mx-24 xl:mx-40;
 
 }
+
+summary::-webkit-details-marker {
+  display: none;
+}
