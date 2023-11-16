@@ -11,24 +11,13 @@ import axios from 'axios';
 const fetcher = (url: string) => axios.get(url).then(res => res.data);
 
 interface LoginProps {
-  setFarcasterSigner: React.Dispatch<React.SetStateAction<Signer | null>>;
 }
 
-const Login: React.FC<LoginProps> = ({ setFarcasterSigner }) => {
+const Login: React.FC<LoginProps> = () => {
   const { signer, isLoading, signIn } = useSigner();
   const router = useRouter();
   const { data: user, error } = useSWR<User>(signer?.status === 'approved' ? `/api/users/${signer.fid}` : null, fetcher);
   const playlist = process.env.NEXT_PUBLIC_PLAYLIST?.split(',').map(fid => Number(fid.trim()));
-
-  useEffect(() => {
-    if (signer && 'fid' in signer) {
-      if (playlist?.includes(signer.fid)) {
-        setFarcasterSigner(signer);
-      } else {
-        setFarcasterSigner(null);
-      }
-    }
-  }, [signer]);
 
   return (
     <div>

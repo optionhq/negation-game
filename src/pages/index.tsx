@@ -1,5 +1,9 @@
 import Home from '@/components/Home'
 
 export default function Index() {
-  return <Home />
+  return (
+    <main className='flex-1'>
+      <Home />
+    </main>
+  )
 }
