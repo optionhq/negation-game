@@ -6,7 +6,6 @@ import { Point, Negation } from "@/types/Points";
 import RecastedComponent from "./RecastedComponent";
 import ProfilePreview from "./ProfilePreview";
 import { extractLink } from "@/lib/extractLink";
-import { useFarcasterSigner } from "@/contexts/UserContext";
 import { negate } from "@/lib/negate";
 import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
@@ -16,6 +15,7 @@ import { castToPoint, castToNegation } from "@/lib/useCasts";
 import { useRouter } from "next/router";
 import TripleDotMenu from './TripleDotMenu';
 import { GoInfo } from "react-icons/go";
+import { useSigner } from "neynar-next";
 
 export default function AccordionComponent({
   level,
@@ -44,7 +44,8 @@ export default function AccordionComponent({
   const router = useRouter();
   const searchParams = useSearchParams();
   const { text, link } = extractLink(e.title);
-  const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
+  const {signer} = useSigner()
+  // const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
   const [childrenLoading, setChildrenLoading] = useState(false);
   const [isTripleDotOpen, setTripleDotMenu] = useState(false);
 
@@ -258,12 +259,12 @@ export default function AccordionComponent({
   }, [router.query.id, e.id]);
 
   const onPublishNegation = async (text: string) => {
-    if (!farcasterSigner) {
+    if (!signer) {
       window.alert("Must be logged in to publish. farcasterUser is null");
       return;
     }
     const parentId = e.parentId!;
-    const negation = await negate({ text, parentId, farcasterSigner });
+    const negation = await negate({ text, parentId, signer});
     removeInput();
     // @ts-ignore
     refreshParentThread()
@@ -327,18 +328,18 @@ export default function AccordionComponent({
             {/* if there is no parent this is an endPoint so veracity negates the id */}
             {e.endPoint && (
               <>
-                <Score id={e.endPoint!.id} points={e.endPoint.points} onNegate={onNegate(e.endPoint.id, 'veracity')} type="veracity" advocates={e.endPoint.advocates} farcasterSigner={farcasterSigner} />
-                <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'relevance')} type="relevance" advocates={e.advocates} farcasterSigner={farcasterSigner} />
+                <Score id={e.endPoint!.id} points={e.endPoint.points} onNegate={onNegate(e.endPoint.id, 'veracity')} type="veracity" advocates={e.endPoint.advocates} farcasterSigner={signer} />
+                <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'relevance')} type="relevance" advocates={e.advocates} farcasterSigner={signer} />
               </>
             ) ||
-              <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'veracity')} type="veracity" advocates={e.advocates} farcasterSigner={farcasterSigner} />
+              <Score id={e.id} points={e.points} onNegate={onNegate(e.id, 'veracity')} type="veracity" advocates={e.advocates} farcasterSigner={signer} />
             }
           </div>
         </div>
         <TripleDotMenu
           isTripleDotOpen={isTripleDotOpen}
           setTripleDotMenu={setTripleDotMenu}
-          farcasterSigner={farcasterSigner}
+          farcasterSigner={signer}
           e={e}
           refreshParentThread={refreshParentThread}
         />

@@ -6,11 +6,11 @@ import { Cast } from 'neynar-next/server'
 export default async function publish({
   text,
   parentId,
-  farcasterSigner,
+  signer,
   embeds
 }: {
   text: string;
-  farcasterSigner: Signer;
+  signer: Signer;
   parentId?: string | null;
   embeds?: {url: string}[]
 }) {
@@ -18,7 +18,7 @@ export default async function publish({
     const castResponse = await axios.post(`/api/cast`, {
       text: text,
       parent: parentId ? parentId : config.channelId,
-      signerUuid: farcasterSigner.signer_uuid,
+      signerUuid: signer.signer_uuid,
       embeds: embeds
     });
     return castResponse
