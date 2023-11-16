@@ -18,7 +18,7 @@ export default function Header() {
       <div className="hidden md:flex-1 md:flex"/>
       <ul className="hidden sm:flex flex-row gap-1 text-sm md:text-base md:gap-4">
         <HeaderElement Icon={HiHome} name="Home" path="/" currentPath={pathName == "/"} />
-        <HeaderElement Icon={BiSolidGroup} name="Spaces" path="/spaces" currentPath={pathName == "/spaces"} />
+        <HeaderElement Icon={BiSolidGroup} name="Spaces" path="/spaces" currentPath={pathName?.split("/")[1] == "spaces"} />
         {signer &&
           <HeaderElement Icon={MdNotifications} name="Notifications" path="/notifications" currentPath={pathName == "/notifications"} />
         }
