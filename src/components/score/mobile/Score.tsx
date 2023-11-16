@@ -17,8 +17,7 @@ export default function Score({ points, onNegate, type, advocates, farcasterSign
     const [isLiked, setIsLiked] = useState(
         farcasterSigner && 'fid' in farcasterSigner && advocates.some(advocate => advocate.fid === farcasterSigner.fid)
     );
-
-    console.log(points)
+    
     return (
         <div
             onClick={(e) => {
