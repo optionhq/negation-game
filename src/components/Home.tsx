@@ -209,7 +209,7 @@ export default function Home() {
         </FarcasterSignerContext.Provider >
         {farcasterSigner && <CastComponent reloadThreads={fetchItems} />}
       </main >
-      {!router.query.id &&
+      {!router.query.id && !router.query.conversation &&
         <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>
           <h2 style={{ fontSize: '1.5em', color: '#333' }}>Loading...</h2>
         </div>
