@@ -1,4 +1,4 @@
-
+// src/pages/index.tsx
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
 import Feed from "@/components/Feed";
@@ -8,13 +8,11 @@ import CastComponent from "@/components/Cast";
 import axios from "axios";
 import { FarcasterSignerContext } from "@/contexts/UserContext";
 import config from "@/config";
-import Header from "@/components/header/Header"
 import { Cast, Signer } from "neynar-next/server";
 import { getMaybeNegation, castToPoint } from "@/lib/useCasts";
 import { BiChevronLeft } from "react-icons/bi";
 import { AiOutlinePushpin } from "react-icons/ai";
-import { useSigner } from "neynar-next";
-import { usePathname } from "next/navigation";
+import { GoListUnordered } from 'react-icons/go';
 
 export default function Home() {
   const router = useRouter();
@@ -23,18 +21,18 @@ export default function Home() {
   const [feed, setFeed] = useState<Negation[]>([]);
   const [pinnedCasts, setPinnedCasts] = useState<Negation[]>([])
   const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
+  const [farcasterSigner, setFarcasterSigner] = useState<Signer | null>(null);
   const loader = useRef(null);
   const isFetching = useRef(false);
   const feedCursorRef = useRef<string | null>(null);
   const [topic, setTopic] = useState<string | null>(null);
-  const {signer} = useSigner()
-  let pathName = usePathname()
 
   async function getHomeItems(castIds: string[] | string | null, cursor: string | null, existingPoints: Negation[] | null = null): Promise<{ historicalPoints: string[], points: Negation[], nextCursor: string | null }> {
     let selectedPoint = null;
     let historicalPoints: string[] = [];
     let points: Negation[] = [];
     let nextCursor: string | null = null;
+
     if (Array.isArray(castIds)) {
       // if it's a history of selected casts, get the first one
       selectedPoint = castIds[0]
@@ -73,7 +71,6 @@ export default function Home() {
           }
 
         }
-        points.sort((a: Negation, b: Negation) => b.advocates.length - a.advocates.length);
       }
     } else {
       // get the selected cast    
@@ -160,9 +157,10 @@ export default function Home() {
   }, [router.pathname, router.query.id]);
 
   return (
-    <div className="mt-6">
+    <div>
+      <div className="mt-5"></div> 
       {topic && <h2 className="text-xl font-bold text-center w-3/5 mx-auto p-4 border border-gray-300 rounded-xl">{topic}</h2>}
-      <div className="flex flex-col pb-12 pt-2 text-sm sm:text-base gap-8">
+      <main className="flex min-h-screen flex-col text-sm sm:text-base gap-1">
         {router.query.id && <div
           onClick={() => {
             if (router.pathname.includes('spaces')) {
@@ -177,9 +175,13 @@ export default function Home() {
           <p className='px-2'>{router.pathname.includes('spaces') ? `Go back to conversation` : 'Go to Home'}</p>
         </div>}
         {historicalPointIds && historicalPointIds?.length !== 0 && (<HistoricalPoints ids={historicalPointIds.reverse()} />)}
-
+        <FarcasterSignerContext.Provider value={{ farcasterSigner: farcasterSigner, setFarcasterUser: setFarcasterSigner }}>
           {!router.query.id && !router.query.conversation && pinnedCasts.length > 0 && (
-
+            <div>
+              <div className="flex flex-row gap-2 pb-3 items-center centered-element">
+                <AiOutlinePushpin size={20} />
+                <h2 className="font-semibold">Starting points</h2>
+              </div>
               <Feed
                 key="pinned"
                 data={pinnedCasts}
@@ -187,22 +189,31 @@ export default function Home() {
                 setHistoricalItems={setHistoricalPointIds}
                 refreshThread={fetchItems}
               />
-            // {/* </div> */}
+            </div>
           )}
-          {pathName?.split("/")[1] == "spaces" && <Feed
-            key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
-            data={filteredItems}
-            level={0}
-            setHistoricalItems={setHistoricalPointIds}
-            refreshThread={fetchItems}
-          />}
-        <CastComponent reloadThreads={fetchItems} />
-      </div >
-      {/* // {!router.query.id &&
-      //   <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>
-      //     <h2 style={{ fontSize: '1.5em', color: '#333' }}>Loading...</h2>
-      //   </div>
-      // } */}
+          <div>
+            {!router.query.id && !router.query.conversation && pinnedCasts.length > 0 &&
+              <div className="flex flex-row gap-2 pb-3 items-center centered-element pt-24">
+                <GoListUnordered size={20} />
+                <h2 className="font-semibold">All points</h2>
+              </div>
+            }
+            <Feed
+              key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
+              data={filteredItems}
+              level={0}
+              setHistoricalItems={setHistoricalPointIds}
+              refreshThread={fetchItems}
+            />
+          </div>
+        </FarcasterSignerContext.Provider >
+        {farcasterSigner && <CastComponent reloadThreads={fetchItems} />}
+      </main >
+      {!router.query.id &&
+        <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>
+          <h2 style={{ fontSize: '1.5em', color: '#333' }}>Loading...</h2>
+        </div>
+      }
     </div >
   );
 }
