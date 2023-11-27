@@ -7,7 +7,7 @@ import { Negation } from "@/types/Points";
 import CastComponent from "@/components/Cast";
 import axios from "axios";
 import { FarcasterSignerContext } from "@/contexts/UserContext";
-import config from "@/config";
+import { DEFAULT_CHANNELID } from "@/components/constants"
 import { Cast, Signer } from "neynar-next/server";
 import { getMaybeNegation, castToPoint } from "@/lib/useCasts";
 import { BiChevronLeft } from "react-icons/bi";
@@ -61,7 +61,7 @@ export default function Home() {
         // here's the existing feed
         points = existingPoints ? existingPoints : []
 
-        const feed = await axios.get(`/api/feed/${encodeURIComponent(config.channelId)}?cursor=${cursor}`)
+        const feed = await axios.get(`/api/feed/${encodeURIComponent(DEFAULT_CHANNELID)}?cursor=${cursor}`)
 
         nextCursor = feed.data.next?.cursor
 
@@ -206,8 +206,8 @@ export default function Home() {
               refreshThread={fetchItems}
             />
           </div>
+          <CastComponent conversationId={router.query.conversation} reloadThreads={fetchItems} />
         </FarcasterSignerContext.Provider >
-        {farcasterSigner && <CastComponent reloadThreads={fetchItems} />}
       </main >
       {!router.query.id && !router.query.conversation &&
         <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>

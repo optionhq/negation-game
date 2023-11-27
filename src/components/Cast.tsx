@@ -8,10 +8,19 @@ import publish from "@/lib/publish"
 import { getDeviceType } from "@/lib/getDeviceType";
 import { useSigner } from "neynar-next";
 
-function CastComponent({ reloadThreads }: { reloadThreads: () => void }) {
+function CastComponent({ reloadThreads, conversationId }: { reloadThreads: () => void, conversationId: string | string[] | undefined }) {
   const [castModal, setCastModal] = useState(false);
   const { signer } = useSigner()
   const [deviceType, setDeviceType] = useState("");
+
+  let parentId: string | null = null;
+  if (Array.isArray(conversationId)) {
+    parentId = conversationId[0];
+  } else if ( conversationId ) {
+    parentId = conversationId;
+  } else {
+    parentId = null
+  }
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -22,11 +31,11 @@ function CastComponent({ reloadThreads }: { reloadThreads: () => void }) {
   const onPublish = async (text: string) => {
     if (!signer) return
     try {
-      const res = await publish({ text: text, signer: signer });
+      const res = await publish({ text: text, signer: signer, parentId: parentId });
       if (!res) throw Error;
-
+  
       console.log(res)
-
+  
       if (Math.floor(res.status / 100) === 2) {
         reloadThreads();
         setCastModal(false);
