@@ -146,7 +146,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchItems();
-  }, [router.query.id]);
+  }, [router.query.id, router.query.conversation]);
 
   useEffect(() => {
     if (router.pathname.includes('spaces') && typeof router.query.conversation === 'string') {
@@ -154,7 +154,7 @@ export default function Home() {
         .then(response => setTopic(response.data.text))
         .catch(error => console.error(error));
     }
-  }, [router.pathname, router.query.id]);
+  }, [router.pathname, router.query.id, router.query.conversation]);
 
   return (
     <div>
