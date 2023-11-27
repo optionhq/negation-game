@@ -85,6 +85,10 @@ export default function AccordionComponent({
       if (possibleNegation.parentId === point.id && possibleNegation.endPointUrl) {
         const res = await axios.get(`/api/cast?type=url&identifier=${possibleNegation.endPointUrl}`);
 
+        // if the cast has been deleted the response will be empty
+        if (!res.data) {
+          continue
+        }
         const cast: Cast = res.data;
         const endPoint: Point = castToPoint(cast)
 

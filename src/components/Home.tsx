@@ -9,7 +9,7 @@ import axios from "axios";
 import { FarcasterSignerContext } from "@/contexts/UserContext";
 import { DEFAULT_CHANNELID } from "@/components/constants"
 import { Cast, Signer } from "neynar-next/server";
-import { getMaybeNegation, castToPoint } from "@/lib/useCasts";
+import { getMaybeNegation } from "@/lib/useCasts";
 import { BiChevronLeft } from "react-icons/bi";
 import { AiOutlinePushpin } from "react-icons/ai";
 import { GoListUnordered } from 'react-icons/go';
