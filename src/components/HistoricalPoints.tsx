@@ -26,7 +26,7 @@ function HistoricalPoint({ id, onClick }: { id: string, onClick: () => void }) {
     <p className='flex items-center p-7 text-gray-500'>{cast.endPoint ? cast.endPoint.advocates.length : cast.advocates.length}</p>
     <p
       onClick={onClick}
-      className="min-h-[70px] font-medium text-gray-900 flex items-center py-5"
+      className="min-h-[70px] font-medium text-gray-900 flex items-center py-5 pr-2"
     >
       {cast.endPoint ? cast.endPoint.title : cast.title}
     </p>

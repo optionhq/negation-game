@@ -180,7 +180,7 @@ export default function Home() {
             <div>
               <div className="flex flex-row gap-2 pb-3 items-center centered-element">
                 <AiOutlinePushpin size={20} />
-                <h2 className="font-semibold">Starting points</h2>
+                <h2 className="font-semibold">Good starting points</h2>
               </div>
               <Feed
                 key="pinned"

@@ -50,12 +50,12 @@ export default function NegateLikeButtons({
 
     return (
         <div className=" hidden group-hover/points:flex flex-row gap-1">
-            <Tooltip text={isLiked ? (type == "veracity" ? "Undo yep" : "Undo matters") : (type == "veracity" ? "Yep" : "Matters")} orientation="bottom">
+            <Tooltip text={isLiked ? (type == "veracity" ? "Undo accurate" : "Undo matters") : (type == "veracity" ? "Accurate" : "Matters")} orientation="bottom">
                 <span className={isLiked ? "text-green-500 text-xl" : "hover:text-green-500 text-xl"} onMouseDown={(e) => handleLike(e)}>
                     <HiOutlineCheckCircle size={24} />
                 </span>
             </Tooltip>
-            <Tooltip text={type == "veracity" ? "Nope" : "Doesn't matter"} orientation="bottom">
+            <Tooltip text={type == "veracity" ? "Inaccurate" : "Doesn't matter"} orientation="bottom">
                 <span
                     className="hover:text-purple-600 text-xl"
                     onMouseDown={(e) => {

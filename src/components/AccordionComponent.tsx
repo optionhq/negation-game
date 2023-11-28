@@ -9,12 +9,12 @@ import { extractLink } from "@/lib/extractLink";
 import { negate } from "@/lib/negate";
 import isNegation from "@/lib/isNegation";
 import Negations from "./Negations";
-import { GoUnlink, GoCircleSlash } from "react-icons/go";
+import { GoUnlink, GoCircleSlash, GoInfo } from "react-icons/go";
+import { BsChevronExpand, BsChevronDown, BsChevronUp } from "react-icons/bs";
 import { Cast, User } from "neynar-next/server";
 import { castToPoint, castToNegation } from "@/lib/useCasts";
 import { useRouter } from "next/router";
 import TripleDotMenu from './TripleDotMenu';
-import { GoInfo } from "react-icons/go";
 import { useSigner } from "neynar-next";
 
 export default function AccordionComponent({
@@ -48,6 +48,7 @@ export default function AccordionComponent({
   // const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
   const [childrenLoading, setChildrenLoading] = useState(false);
   const [isTripleDotOpen, setTripleDotMenu] = useState(false);
+  const [isRelevanceVisible, setIsRelevanceVisible] = useState(false);
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 
@@ -352,24 +353,49 @@ export default function AccordionComponent({
       {relevanceNegations && relevanceNegations.length > 0 && (
         <div className="border-black pl-3 border-l my-2 flex flex-col gap-2" style={{ marginLeft: INDENTATION_PX }}>
           <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
-            <GoUnlink size={18} color="#AAAAAA" />
-            <p>Doesn&lsquo;t matter</p>
-            <button onClick={() => window.open('https://responses.negationgame.com/', '_blank')}>
-              <GoInfo size={18} color="#AAAAAA" />
+            <button className="flex flex-row items-center gap-1" onClick={() => setIsRelevanceVisible(!isRelevanceVisible)} >
+              {!isRelevanceVisible &&
+                <BsChevronExpand size={18}/> ||
+                <GoUnlink size={18} color="#AAAAAA" />
+              }
+              <p>Doesn&lsquo;t matter</p>
+              {!isRelevanceVisible && <p className="font-normal"> tap to expand</p>}
             </button>
+            {isRelevanceVisible && 
+              <button className="flex flex-row gap-1 items-center" onClick={() => window.open('https://responses.negationgame.com/', '_blank')}>
+                <p className="font-normal">these points ↓ argue that the current point ↑ doesn&lsquo;t apply to the point above it</p>
+                <GoInfo size={16} color="#AAAAAA" />
+              </button>
+            }
           </div>
-
-          <Negations
-            negations={relevanceNegations}
-            level={level}
-            parent={e}
-            setHistoricalItems={setHistoricalItems}
-            setParentChildren={setRelevanceNegations}
-            threadData={threadData}
-            negationType="relevance"
-            refreshParentThread={unfurlDropdown}
-            getParentAncestry={getAncestry}
-          />
+          {isRelevanceVisible &&
+            <>
+              <Negations
+                negations={relevanceNegations}
+                level={level}
+                parent={e}
+                setHistoricalItems={setHistoricalItems}
+                setParentChildren={setRelevanceNegations}
+                threadData={threadData}
+                negationType="relevance"
+                refreshParentThread={unfurlDropdown}
+                getParentAncestry={getAncestry}
+              />
+              <button 
+                onClick={() => setIsRelevanceVisible(!isRelevanceVisible)} 
+                className="flex items-center justify-center border-1 border-gray-300 h-6 rounded"
+              >
+                <BsChevronUp size={18} className="text-gray-400" />
+              </button>
+            </>
+            // ||
+            // <button 
+            //   onClick={() => setIsRelevanceVisible(!isRelevanceVisible)} 
+            //   className="flex items-center justify-center border-1 border-gray-300 h-6 rounded"
+            // >
+            //   <BsChevronDown size={18} className="text-gray-400" />
+            // </button>
+          }
         </div>
       )}
       {veracityNegations && veracityNegations.length > 0 && (
@@ -377,8 +403,9 @@ export default function AccordionComponent({
           <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
             <GoCircleSlash size={18} color="#AAAAAA" />
             <p>Not true</p>
-            <button onClick={() => window.open('https://responses.negationgame.com/', '_blank')}>
-              <GoInfo size={18} color="#AAAAAA" />
+            <button className="flex flex-row gap-1 items-center" onClick={() => window.open('https://responses.negationgame.com/', '_blank')}>
+              <p className="font-normal">these points ↓ argue that the current point ↑ isn&lsquo;t true</p>
+              <GoInfo size={16} color="#AAAAAA" />
             </button>
           </div>
           <Negations
