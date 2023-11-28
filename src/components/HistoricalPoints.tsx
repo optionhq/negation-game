@@ -23,7 +23,7 @@ function HistoricalPoint({ id, onClick }: { id: string, onClick: () => void }) {
   if (!cast)
     return <p> Loading... </p>
   return <>
-    <p className='flex items-center p-7 text-gray-500'>{cast.advocates.length}</p>
+    <p className='flex items-center p-7 text-gray-500'>{cast.endPoint ? cast.endPoint.advocates.length : cast.advocates.length}</p>
     <p
       onClick={onClick}
       className="min-h-[70px] font-medium text-gray-900 flex items-center"
