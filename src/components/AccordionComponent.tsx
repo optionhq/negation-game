@@ -351,8 +351,8 @@ export default function AccordionComponent({
         />
       </summary>
       {relevanceNegations && relevanceNegations.length > 0 && (
-        <div className="border-black pl-3 border-l my-2 flex flex-col gap-2" style={{ marginLeft: INDENTATION_PX }}>
-          <div className="flex flex-row gap-2 pt-3 pl-2 pb-2 items-center font-semibold text-gray-400">
+        <div className={`border-black pl-3 border-l my-2 flex flex-col ${isRelevanceVisible ? 'gap-2' : ''}`} style={{ marginLeft: INDENTATION_PX }}>
+          <div className={`flex flex-row items-center font-semibold text-gray-400 ${isRelevanceVisible ? 'gap-2' : ''}`}>
             <button className="flex flex-row items-center gap-1" onClick={() => setIsRelevanceVisible(!isRelevanceVisible)} >
               {!isRelevanceVisible &&
                 <BsChevronExpand size={18}/> ||
@@ -388,13 +388,14 @@ export default function AccordionComponent({
                 <BsChevronUp size={18} className="text-gray-400" />
               </button>
             </>
-            // ||
-            // <button 
-            //   onClick={() => setIsRelevanceVisible(!isRelevanceVisible)} 
-            //   className="flex items-center justify-center border-1 border-gray-300 h-6 rounded"
-            // >
-            //   <BsChevronDown size={18} className="text-gray-400" />
-            // </button>
+            ||
+            <button 
+              onClick={() => setIsRelevanceVisible(!isRelevanceVisible)} 
+              className="flex flex-row items-center justify-center border-1 border-gray-300 text-gray-400 h-6 rounded"
+            >
+              <BsChevronDown size={18} />
+              <p className="ml-1 text-sm">{relevanceNegations.length}</p>
+            </button>
           }
         </div>
       )}
