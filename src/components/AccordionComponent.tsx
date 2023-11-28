@@ -356,10 +356,13 @@ export default function AccordionComponent({
             <button className="flex flex-row items-center gap-1" onClick={() => setIsRelevanceVisible(!isRelevanceVisible)} >
               {!isRelevanceVisible &&
                 <BsChevronExpand size={18}/> ||
-                <GoUnlink size={18} color="#AAAAAA" />
+                <>
+                  <p>Doesn&lsquo;t matter</p>
+                  <GoUnlink size={18} color="#AAAAAA" />
+                </>
               }
-              <p>Doesn&lsquo;t matter</p>
-              {!isRelevanceVisible && <p className="font-normal"> tap to expand</p>}
+              
+              {!isRelevanceVisible && <><p>Relevance</p> <p className="font-normal"> tap to expand</p></>}
             </button>
             {isRelevanceVisible && 
               <button className="flex flex-row gap-1 items-center" onClick={() => window.open('https://responses.negationgame.com/', '_blank')}>
