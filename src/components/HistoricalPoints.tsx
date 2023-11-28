@@ -50,8 +50,8 @@ export default function HistoricalPoints({ ids }: { ids: string[] } ) {
   return (
     <div className="flex flex-col h-fit space-y-0 gap-1 pb-1 centered-element">
       {ids.map((id, i) => (
-        <div className="flex cursor-pointer rounded-md border border-grey-100 hover:bg-gray-100">
-          <HistoricalPoint key={id} id={id} onClick={() => onClick(id)} />
+        <div key={id} className="flex cursor-pointer rounded-md border border-grey-100 hover:bg-gray-100">
+          <HistoricalPoint id={id} onClick={() => onClick(id)} />
         </div>
       ))}
     </div>
