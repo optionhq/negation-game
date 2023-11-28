@@ -357,8 +357,8 @@ export default function AccordionComponent({
               {!isRelevanceVisible &&
                 <BsChevronExpand size={18}/> ||
                 <>
-                  <p>Doesn&lsquo;t matter</p>
                   <GoUnlink size={18} color="#AAAAAA" />
+                  <p>Doesn&lsquo;t matter</p>
                 </>
               }
               
