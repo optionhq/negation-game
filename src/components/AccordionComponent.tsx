@@ -368,7 +368,7 @@ export default function AccordionComponent({
             </button>
             {isRelevanceVisible && 
               <button className="flex flex-row gap-1 items-center" onClick={() => window.open('https://responses.negationgame.com/', '_blank')}>
-                <p className="font-normal">these points ↓ argue that the current point ↑ doesn&lsquo;t apply to the point above it</p>
+                <p className="font-normal">these points ↓ argue that the current point ↑ doesn&lsquo;t apply to the point above it ↑↑</p>
                 <GoInfo size={16} color="#AAAAAA" />
               </button>
             }
