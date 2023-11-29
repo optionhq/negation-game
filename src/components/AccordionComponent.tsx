@@ -48,7 +48,7 @@ export default function AccordionComponent({
   // const { farcasterSigner, setFarcasterUser } = useFarcasterSigner();
   const [childrenLoading, setChildrenLoading] = useState(false);
   const [isTripleDotOpen, setTripleDotMenu] = useState(false);
-  const [isRelevanceVisible, setIsRelevanceVisible] = useState(false);
+  const [isRelevanceVisible, setIsRelevanceVisible] = useState(true);
   const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 
 
@@ -182,6 +182,8 @@ export default function AccordionComponent({
       if (hasInput) {
         return prevNegations;
       }
+
+      setIsRelevanceVisible(true)
 
       // If there's no input element, add one
       return [...(prevNegations || []), { type: "input", parentId: pointId, kind: negationType }];
