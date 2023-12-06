@@ -1,12 +1,9 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { Node } from '@/types/Points';
-import { useFarcasterSigner } from './UserContext';
 import unlike from '@/lib/unlike';
 import like from '@/lib/like';
-import { Cast, Signer } from 'neynar-next/server';
-import { useSigner } from 'neynar-next';
-import isNegation from '@/lib/isNegation';
-import { castToNegation, castToPoint, getMaybeNegation } from '@/lib/useCasts';
+import { Signer } from 'neynar-next/server';
+import { getMaybeNegation } from '@/lib/useCasts';
 import axios from 'axios';
 
 type PointContextType = {
@@ -119,7 +116,6 @@ export function PointProvider({ children: _children, point, signer, refreshParen
                 return 0;
             }
         });
-
 
         return inputBox ? [inputBox, ...sortedNegations] : sortedNegations;
     };
