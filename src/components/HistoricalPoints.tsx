@@ -18,17 +18,26 @@ export function HistoricalPoint({ id, onClick }: { id: string, onClick: () => vo
     fetchCast();
   }, [id]);
 
-  if (!cast)
-    return <p> Loading... </p>
-  return <p
-    onClick={onClick}
-    className="claim font-medium cursor-pointer border border-grey-100"
-  >
-    {cast.endPoint ? cast.endPoint.title : cast.title}
-  </p>
+  return (
+    <div className="flex cursor-pointer rounded-md border border-grey-100 hover:bg-gray-100 p-7 gap-4">
+      {!cast && <p>Loading ...</p>}
+      {
+        cast && <>
+          <p className='text-gray-500'>{cast.endPoint ? cast.endPoint.advocates?.length : cast.advocates?.length}</p>
+          <p
+            onClick={onClick}
+            className="font-medium text-gray-900"
+          >
+            {cast.endPoint ? cast.endPoint.title : cast.title}
+          </p>
+        </>
+      }
+    </div>
+  )
+
 }
 
-export default function HistoricalPoints({ ids }: { ids: string[] } ) {
+export default function HistoricalPoints({ ids }: { ids: string[] }) {
   const router = useRouter();
 
   function onClick(id: string) {
@@ -43,9 +52,9 @@ export default function HistoricalPoints({ ids }: { ids: string[] } ) {
 
 
   return (
-    <div className="flex flex-col h-fit text-gray-500 space-y-0 gap-1 centered-element">
+    <div className="flex flex-col h-fit space-y-0 gap-1 pb-1 centered-element">
       {ids.map((id, i) => (
-        <HistoricalPoint key={id} id={id} onClick={() => onClick(id)} />
+        <HistoricalPoint id={id} onClick={() => onClick(id)} key={i} />
       ))}
     </div>
   );

@@ -4,12 +4,12 @@ import { useRouter } from "next/router";
 import HistoricalPoints from "@/components/HistoricalPoints";
 import { Node } from "@/types/Points";
 import axios from "axios";
-import config from "@/config";
 import { Cast } from "neynar-next/server";
 import { getMaybeNegation } from "@/lib/useCasts";
 import { BiChevronLeft } from "react-icons/bi";
-import CastButton from "@/components/CastButton";
-import RootFeed from "@/components/RootFeed";
+import RootFeed from "./RootFeed";
+import CastButton from "./CastButton";
+import { DEFAULT_CHANNELID } from "./constants";
 
 export default function Home() {
   const router = useRouter();
@@ -64,7 +64,7 @@ export default function Home() {
         // here's the existing feed
         points = existingPoints ? existingPoints : []
 
-        const feed = await axios.get(`/api/feed/${encodeURIComponent(config.channelId)}`)
+        const feed = await axios.get(`/api/feed/${encodeURIComponent(DEFAULT_CHANNELID)}`)
 
         // nextCursor = feed.data.next?.cursor
 
@@ -145,7 +145,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchItems();
-  }, [router.query.id]);
+  }, [router.query.id, router.query.conversation]);
 
   useEffect(() => {
     if (router.pathname.includes('spaces') && typeof router.query.conversation === 'string') {
@@ -153,7 +153,7 @@ export default function Home() {
         .then(response => setTopic(response.data.text))
         .catch(error => console.error(error));
     }
-  }, [router.pathname, router.query.id]);
+  }, [router.pathname, router.query.id, router.query.conversation]);
 
   return (
     <main className="flex flex-col text-sm sm:text-base gap-4 my-8">
