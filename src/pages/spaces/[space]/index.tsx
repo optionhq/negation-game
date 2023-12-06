@@ -1,9 +1,15 @@
 // src/pages/spaces/[space].tsx
 import { useRouter } from 'next/router';
-import React, { useState } from "react";
-import Header from '@/components/header/Header';
-import { Signer } from "neynar-next/server";
-import Conversation from '@/components/Conversation'
+import React from "react";
+import ConversationPreview from '@/components/ConversationPreview'
+
+export const metadata = {
+  title: 'Acme',
+  openGraph: {
+    title: 'Acme',
+    description: 'Acme is a...',
+  },
+}
 
 function SpacePage() {
   const router = useRouter();
@@ -16,14 +22,11 @@ function SpacePage() {
   const conversationIds = spaces[space as string];
 
   return (
-    <>
-      <div>
-        <h2 className="text-2xl font-bold mb-2 text-center pt-20">Open conversations in {space}</h2>
-        {conversationIds?.map((id: string) => (
-          <Conversation key={id} id={id} />
-        ))}
-      </div>
-    </>
+    <div className='flex flex-col gap-2 h-full items-center justify-center my-12'>
+      {conversationIds?.map((id: string) => (
+        <ConversationPreview key={id} id={id} />
+      ))}
+    </div>
   );
 }
 

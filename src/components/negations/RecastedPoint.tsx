@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Point } from "@/types/Points";
+import { Node } from "@/types/Points";
 
-export default function RecastedComponent({ url }: { url: string }) {
-  const [data, setData] = useState<Point>();
+export default function RecastedPoint({ url }: { url: string }) {
+  const [data, setData] = useState<Node>();
 
   useEffect(() => {
     const fetchPointData = async () => {

@@ -11,17 +11,13 @@ type PostCastResponse = {
   text: string;
 };
 
-export const negate = async ({
-  text,
-  parentId,
-  signer,
-}: {
-  text: string;
-  parentId: string;
-  signer: Signer;
-}) => {
+export const negate = async (
+  text: string,
+  parentId: string,
+  signer?: Signer) => {
+  if (!signer) return
   try {
-    const castResponse = await publish({text, signer});
+    const castResponse = await publish(text, signer);
     if (!castResponse) throw Error;
 
     const newCast: PostCastResponse = castResponse.data.cast;
@@ -29,7 +25,7 @@ export const negate = async ({
     const warpcastUrl = "https://warpcast.com/" + newCast.author.username + "/" + newCast.hash.slice(0, 8).toString();
     const embeds = [{ url: warpcastUrl }]
     const negation = config.negationSymbol + "\n" + warpcastUrl;
-    const negationResponse = await publish({text: negation, parentId, signer, embeds})
+    const negationResponse = await publish(negation, signer, parentId, embeds)
     if (!negationResponse) throw Error;
 
     return negationResponse.data.cast as PostCastResponse;

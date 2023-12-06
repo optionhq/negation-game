@@ -1,32 +1,24 @@
-import { Negation } from '@/types/Points';
 import axios from 'axios';
-import React, { useEffect, useRef } from 'react';
-import { Signer } from 'neynar-next/server'
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import makeWarpcastUrl from '@/lib/makeWarpcastUrl';
+import { useSigner } from 'neynar-next';
+import { usePointContext } from '@/contexts/PointContext';
 
-interface TripleDotMenuProps {
-  isTripleDotOpen: boolean;
-  setTripleDotMenu: React.Dispatch<React.SetStateAction<boolean>>;
-  farcasterSigner: Signer | null;
-  e: Negation;
-  refreshParentThread: () => Promise<void>;
-}
-
-
-const TripleDotMenu: React.FC<TripleDotMenuProps> = ({
-    isTripleDotOpen,
-    setTripleDotMenu,
-    farcasterSigner,
-    e,
-    refreshParentThread
-  }) => {
-    
+const TripleDotMenu: React.FC= () => {
+  const {signer} = useSigner()
+  const [isOpen, setOpen] = useState(false)
   const menuRef = useRef<HTMLDivElement>(null);
+  const {point, refreshChildren, refreshParentThread} = usePointContext()
+
+  const isAuthor  = useMemo(() => (
+    signer && 'fid' in signer && point.author?.fid === signer.fid
+  ), [signer])
+
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-        setTripleDotMenu(false);
+        setOpen(false);
       }
     };
   
@@ -41,37 +33,37 @@ const TripleDotMenu: React.FC<TripleDotMenuProps> = ({
       <button 
         onClick={(e) => {
           e.stopPropagation();
-          setTripleDotMenu(prevState => !prevState)
+          setOpen(prevState => !prevState)
         }}
         className=""
       >
         ...
       </button>
-      {isTripleDotOpen && (
+      {isOpen && (
         <div className="absolute right-0 w-48 bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg">
           <button
             className="w-full px-4 py-2 text-left"
             onClick={(event) => {
               event.stopPropagation();
-              const warpcastUrl = makeWarpcastUrl(e);
+              const warpcastUrl = makeWarpcastUrl(point);
               window.open(warpcastUrl, '_blank');
             }}
           >
             Open in Warpcast
           </button>
           <button
-            className={`w-full px-4 py-2 text-left ${(!farcasterSigner || 'fid' in farcasterSigner && e?.author?.fid !== farcasterSigner.fid) ? 'opacity-50 cursor-not-allowed' : ''}`}
+            className={`w-full px-4 py-2 text-left ${!isAuthor ? 'opacity-50 cursor-not-allowed' : ''}`}
             onClick={async (event) => {
               event.stopPropagation();
-              if (farcasterSigner && 'fid' in farcasterSigner && e.author?.fid === farcasterSigner.fid) {
+              if (isAuthor) {
                 try {
-                  await axios.delete(`/api/cast/${e.id}/delete`, {
+                  await axios.delete(`/api/cast/${point.id}/delete`, {
                     data: {
-                      signerUuid: farcasterSigner.signer_uuid
+                      signerUuid: signer!.signer_uuid
                     },
                   });
                   refreshParentThread()
-                  setTripleDotMenu(false);
+                  setOpen(false);
                 } catch (error) {
                   console.error('Failed to delete cast:', error);
                 }

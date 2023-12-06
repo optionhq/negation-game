@@ -3,17 +3,12 @@ import { Signer } from "neynar-next/server";
 import config from "@/config";
 import { Cast } from 'neynar-next/server'
 
-export default async function publish({
-  text,
-  parentId,
-  signer,
-  embeds
-}: {
-  text: string;
-  signer: Signer;
-  parentId?: string | null;
-  embeds?: {url: string}[]
-}) {
+export default async function publish(
+  text: string,
+  signer: Signer,
+  parentId?: string | null,
+  embeds?: { url: string }[]
+) {
   try {
     const castResponse = await axios.post(`/api/cast`, {
       text: text,

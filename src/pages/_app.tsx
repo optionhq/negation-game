@@ -4,17 +4,17 @@ import './globals.css';
 import type { AppProps } from 'next/app';
 import { NeynarProvider } from 'neynar-next'
 import MobileBottomHeader from '@/components/header/MobileBottomHeader';
-import { FarcasterSignerContext } from '@/contexts/UserContext';
 
 function MyApp({ Component, pageProps }: AppProps) {
-
   return (
     <NeynarProvider>
-        <div className='flex flex-col h-screen max-h-screen'>
-          <Header />
+      <div className='flex flex-col min-h-screen'>
+        <Header />
+        <div className='flex-1'>
           <Component {...pageProps} />
-          <MobileBottomHeader />
         </div>
+        <MobileBottomHeader />
+      </div>
     </NeynarProvider>
   );
 }
