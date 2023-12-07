@@ -63,8 +63,8 @@ export default function ConversationPreview({ id }: { id: string }) {
       <div className='px-6 py-3 flex flex-col gap-4'>
         <h3 className='font-semibold'>{conversation.replies.count} responses</h3>
         {replies.map((reply, i) => {
-          return <PointProvider point={reply} signer={signer} refreshParentThread={async () => {return}}>
-            <div key={i} className={`border-gray-200 flex flex-row w-full py-4 gap-4 ${i !== 0 ? "border-t" : ""}`}>
+          return <PointProvider key={i} point={reply} signer={signer} refreshParentThread={async () => {return}}>
+            <div className={`border-gray-200 flex flex-row w-full py-4 gap-4 ${i !== 0 ? "border-t" : ""}`}>
               <p>{reply.title}</p>
               <Score />
               {/* <p className="text-right text-gray-800 text-xl font-bold mr-2 mb-2">{reply.points}</p> */}
