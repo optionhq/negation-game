@@ -6,7 +6,7 @@ const inter = Inter({ subsets: ['latin'] });
 
 const metadata: Metadata = {
   title: 'Negation Game',
-  description: "We're all wrong, find out faster",
+  description: "How extraterrestrials do governance.",
 };
 
 export default function RootLayout({
