@@ -35,7 +35,6 @@ export default function PointWrapper({
                 <InputNegation
                     pointBg={pointBg}
                     placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (point.kind === "relevance" ? "relevant" : "true") + " because ..."}
-                    setParentChildren={setParentChildren}
                     onPublish={async (text: string) => {
                         if (point.parentId && signer)
                             await negate(text, point.parentId, signer)
@@ -44,6 +43,7 @@ export default function PointWrapper({
                         refreshParentThread()
                     }}
                     onClose={() => {
+                        // this is an input element, remove it from the list on close
                         setParentChildren((element: { veracity: Node[], relevance: Node[] }) => {
                             let filtered = { ...element, [point.kind!]: element[point.kind!].filter((child: any) => child.type !== "input") }
                             return filtered;

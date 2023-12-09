@@ -19,10 +19,10 @@ export default function RootFeed({
 }) {
   const router = useRouter()
 
-  if (pinned && (router.query.id || router.query.conversation || !data)) return <></>
+  if (pinned && (router.query.point || router.query.conversation || !data)) return <></>
   return (
     <div className={pinned ? "mb-12" : ""}>
-      {!router.query.id && !router.query.conversation && data && data.length > 0 &&
+      {!router.query.path && !router.query.conversation && data && data.length > 0 &&
 
         <div className="flex flex-row gap-2 pb-3 items-center centered-element">
           {pinned ? <AiOutlinePushpin size={20} /> : <GoListUnordered size={20} />}

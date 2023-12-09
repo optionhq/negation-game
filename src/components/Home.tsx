@@ -16,7 +16,6 @@ export default function Home() {
 
   const [filteredItems, setFilteredItems] = useState<Node[]>([]);
   const [pinnedCasts, setPinnedCasts] = useState<Node[]>([])
-  const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
 
   const loader = useRef(null);
   const isFetching = useRef(false);
@@ -24,10 +23,6 @@ export default function Home() {
   const [topic, setTopic] = useState<string | null>(null);
 
   async function fetchPoints(castIds: string[] | string | null, cursor: string | null, existingPoints: Node[] | null = null)
-  // :
-  // Promise<{ historicalPointsIds: string[], points: Node[],
-  // nextCursor: string | null
-  // }> 
   {
     let selectedPoint = null;
     let historicalPointsIds: string[] = [];
@@ -98,7 +93,7 @@ export default function Home() {
     if (loader.current) {
       observer.observe(loader.current)
     }
-  }, [router.isReady, router.query.id]);
+  }, [router.isReady, router.query.path]);
 
   const handleObserver: IntersectionObserverCallback = (entities, observer) => {
     const target = entities[0];
@@ -130,8 +125,8 @@ export default function Home() {
     isFetching.current = true;
 
     let ids: string[] = [];
-    if (typeof router.query.id === 'string') {
-      ids = router.query.id.split(",");
+    if (typeof router.query.path === 'string') {
+      ids = router.query.path.split(",");
     }
 
     await fetchPoints(ids || null, feedCursorRef.current);
@@ -145,7 +140,7 @@ export default function Home() {
 
   useEffect(() => {
     fetchItems();
-  }, [router.query.id, router.query.conversation]);
+  }, [router.query.point, router.query.conversation]);
 
   useEffect(() => {
     if (router.pathname.includes('spaces') && typeof router.query.conversation === 'string') {
@@ -153,12 +148,12 @@ export default function Home() {
         .then(response => setTopic(response.data.text))
         .catch(error => console.error(error));
     }
-  }, [router.pathname, router.query.id, router.query.conversation]);
+  }, [router.pathname, router.query.point, router.query.conversation]);
 
   return (
     <main className="flex flex-col text-sm sm:text-base gap-4 my-8">
       {topic && <h2 className="text-lg md:text-xl font-bold text-center mx-4 md:mx-12 p-4 border border-gray-300 bg-white rounded-xl sticky top-20 z-30 shadow-sm">{topic}</h2>}
-      {router.query.id && <div
+      {router.query.point && <div
         onClick={() => {
           router.push(router.pathname.includes('spaces') ? `/spaces/${router.query.space}/${router.query.conversation}` : "/");
         }}
@@ -166,7 +161,6 @@ export default function Home() {
         <BiChevronLeft size={20} />
         <p className='px-2'>{router.pathname.includes('spaces') ? `Go back to conversation` : 'Go to Home'}</p>
       </div>}
-      {historicalPointIds && historicalPointIds?.length !== 0 && (<HistoricalPoints ids={historicalPointIds.reverse()} />)}
       <RootFeed
         pinned={true}
         key="pinned"
@@ -176,14 +170,14 @@ export default function Home() {
         refreshThread={fetchItems}
       />
       <RootFeed
-        key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
+        key={Array.isArray(router.query.point) ? router.query.point.join(',') : router.query.point || 'default'}
         data={filteredItems}
         setData={setFilteredItems}
         setHistoricalItems={setHistoricalPointIds}
         refreshThread={fetchItems}
       />
-      {!router.query.id && <CastButton conversation={router.query.conversation as string} updateFeed={fetchItems} />}
-      {!router.query.id && !router.query.conversation &&
+      {!router.query.point && <CastButton conversation={router.query.conversation as string} updateFeed={fetchItems} />}
+      {!router.query.point && !router.query.conversation &&
         <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>
           <h2 style={{ fontSize: '1.5em', color: '#333' }}>Loading...</h2>
         </div>

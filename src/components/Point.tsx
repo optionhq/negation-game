@@ -36,7 +36,7 @@ export default function Point({
 
   function newRoute() {
     const ancestry = getAncestry().split(',');
-    const current = searchParams.get("id");
+    const current = searchParams.get("point");
     const currentIds = current ? current.split(',') : [];
 
     // Find the first ancestor that is already in the path
@@ -55,12 +55,12 @@ export default function Point({
     if (router.query.space && router.query.conversation) {
       router.push({
         pathname: `/spaces/${router.query.space}/${router.query.conversation}`,
-        query: { id: route }
+        query: { point: point.id, path: route }
       });
     } else {
       router.push({
         pathname: '/',
-        query: { id: route }
+        query: { point: point.id, path: route }
       });
     }
   }
@@ -71,12 +71,12 @@ export default function Point({
   }
 
   useEffect(() => {
-    const selectedIds = typeof router.query.id === 'string' ? router.query.id.split(',') : [router.query.id];
+    const selectedIds = typeof router.query.point === 'string' ? router.query.point.split(',') : [router.query.point];
     const selectedId = selectedIds[0];
     if (selectedId === point.id) {
       unfurlDropdown()
     }
-  }, [router.query.id, point.id]);
+  }, [router.query.point, point.id]);
 
   return (
     <details

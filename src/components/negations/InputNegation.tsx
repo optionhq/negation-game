@@ -17,8 +17,6 @@ export default function InputNegation({
   placeHolder: string;
   onPublish: (text: string) => void,
   onClose: () => void
-  setParentChildren?: any;
-
 }) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
