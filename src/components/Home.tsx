@@ -30,15 +30,13 @@ export default function Home() {
   // }> 
   {
     let selectedPoint = null;
-    let historicalPointsIds: string[] = [];
     let points: Node[] = [];
     // let nextCursor: string | null = null;
 
     if (Array.isArray(castIds)) {
       // if it's a history of selected casts, get the first one
       selectedPoint = castIds[0]
-      historicalPointsIds = castIds.slice(1)
-      setHistoricalPointIds(historicalPointsIds);
+      setHistoricalPointIds(castIds.slice(1).reverse());
     } else {
       selectedPoint = castIds
     }
@@ -166,7 +164,7 @@ export default function Home() {
         <BiChevronLeft size={20} />
         <p className='px-2'>{router.pathname.includes('spaces') ? `Go back to conversation` : 'Go to Home'}</p>
       </div>}
-      {historicalPointIds && historicalPointIds?.length !== 0 && (<HistoricalPoints ids={historicalPointIds.reverse()} />)}
+      {historicalPointIds && historicalPointIds?.length !== 0 && (<HistoricalPoints ids={historicalPointIds} />)}
       <RootFeed
         pinned={true}
         key="pinned"

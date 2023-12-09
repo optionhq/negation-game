@@ -25,9 +25,6 @@ export default function PointWrapper({
 }) {
     const { signer } = useSigner()
     const pointBg = `${level % 2 ? " bg-indigo-25 hover:bg-indigo-50" : " bg-slate-50 hover:bg-gray-100"}`;
-
-    console.log(point.type)
-
     return (
         <PointProvider point={point} signer={signer} refreshParentThread={refreshParentThread}>
             {
