@@ -8,6 +8,7 @@ import { Node } from "@/types/Points";
 
 export function HistoricalPoint({ id, onClick }: { id: string, onClick: () => void }) {
   const [cast, setCast] = useState<Node | null>(null);
+  
   useEffect(() => {
     const fetchCast = async () => {
       const res = await axios.get(`/api/cast?type=hash&identifier=${id}`)
@@ -19,13 +20,13 @@ export function HistoricalPoint({ id, onClick }: { id: string, onClick: () => vo
   }, [id]);
 
   return (
-    <div className="flex cursor-pointer rounded-md border border-grey-100 hover:bg-gray-100 p-7 gap-4">
+    <div className="flex cursor-pointer rounded-md border border-grey-100 hover:bg-gray-100 p-7 gap-4" onClick={onClick}>
       {!cast && <p>Loading ...</p>}
       {
         cast && <>
           <p className='text-gray-500'>{cast.endPoint ? cast.endPoint.advocates?.length : cast.advocates?.length}</p>
           <p
-            onClick={onClick}
+            
             className="font-medium text-gray-900"
           >
             {cast.endPoint ? cast.endPoint.title : cast.title}
@@ -41,9 +42,10 @@ export default function HistoricalPoints({ ids }: { ids: string[] }) {
   const router = useRouter();
 
   function onClick(id: string) {
-    const reverseIds = ids.reverse()
-    const index = reverseIds.indexOf(id);
-    const newIds = reverseIds.slice(index);
+
+    const index = ids.indexOf(id);
+    const newIds = ids.slice(index);
+
     router.push({
       pathname: router.pathname,
       query: { ...router.query, id: newIds.join(',') },
@@ -52,7 +54,7 @@ export default function HistoricalPoints({ ids }: { ids: string[] }) {
 
 
   return (
-    <div className="flex flex-col h-fit space-y-0 gap-1 pb-1 centered-element">
+    <div className="flex h-fit space-y-0 gap-1 pb-1 centered-element flex-col-reverse">
       {ids.map((id, i) => (
         <HistoricalPoint id={id} onClick={() => onClick(id)} key={i} />
       ))}

@@ -24,10 +24,6 @@ export default function Home() {
   const [topic, setTopic] = useState<string | null>(null);
 
   async function fetchPoints(castIds: string[] | string | null, cursor: string | null, existingPoints: Node[] | null = null)
-  // :
-  // Promise<{ historicalPointsIds: string[], points: Node[],
-  // nextCursor: string | null
-  // }> 
   {
     let selectedPoint = null;
     let points: Node[] = [];
@@ -36,7 +32,7 @@ export default function Home() {
     if (Array.isArray(castIds)) {
       // if it's a history of selected casts, get the first one
       selectedPoint = castIds[0]
-      setHistoricalPointIds(castIds.slice(1).reverse());
+      setHistoricalPointIds(castIds.slice(1));
     } else {
       selectedPoint = castIds
     }
@@ -79,10 +75,6 @@ export default function Home() {
     }
 
     setFilteredItems(points);
-
-    // return { historicalPointsIds, points
-    // , nextCursor
-    // }
   }
 
   useEffect(() => {
@@ -131,8 +123,7 @@ export default function Home() {
     if (typeof router.query.id === 'string') {
       ids = router.query.id.split(",");
     }
-
-    await fetchPoints(ids || null, feedCursorRef.current);
+    await fetchPoints(ids, feedCursorRef.current);
 
     isFetching.current = false;
   };
