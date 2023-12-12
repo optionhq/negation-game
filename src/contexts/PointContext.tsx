@@ -5,6 +5,7 @@ import like from '@/lib/like';
 import { Signer } from 'neynar-next/server';
 import { getMaybeNegation } from '@/lib/useCasts';
 import axios from 'axios';
+import isNegation from '@/lib/isNegation';
 
 type PointContextType = {
     point: Node,
@@ -14,8 +15,9 @@ type PointContextType = {
     liked: undefined | { relevance: boolean | undefined; veracity: boolean };
     setDetailsOpened: React.Dispatch<React.SetStateAction<boolean>>
     detailsOpened: boolean
-    children: { relevance: any[]; veracity: any[]; }
-    setChildren: React.Dispatch<React.SetStateAction<{ relevance: any[]; veracity: any[] }>>
+    children: { relevance: any[]; veracity: any[] }
+    setChildren: React.Dispatch<React.SetStateAction<{ relevance: any[]; veracity: any[] }>>,
+    comments: Node[],
     childrenLoading: boolean,
     setChildrenLoading: React.Dispatch<React.SetStateAction<boolean>>,
     refreshChildren: () => Promise<void>,
@@ -37,6 +39,7 @@ export function usePointContext() {
 export function PointProvider({ children: _children, point, signer, refreshParentThread }: { children: React.ReactNode, point: Node, signer: Signer | null, refreshParentThread: () => Promise<void> }) {
 
     const [children, setChildren] = useState<{ relevance: Node[], veracity: Node[] }>({ relevance: [], veracity: [] })
+    const [comments, setComments] = useState<Node[]>([])
     const [likes, setLikes] = useState<undefined | { relevance: number | undefined, veracity: number | undefined }>()
     const [liked, setLiked] = useState<undefined | { relevance: boolean | undefined; veracity: boolean }>()
 
@@ -90,7 +93,7 @@ export function PointProvider({ children: _children, point, signer, refreshParen
             const hasInput = newChildren[type]?.some((neg: any) => neg.type === "input");
             // If there's no input element, add one
             if (!hasInput)
-                newChildren[type].push({ type: "input", parentId: point.id, kind: type, title: "" })
+                newChildren[type].push({ type: "input", parentId: point.id, negationType: type, title: "" })
             return newChildren;
         })
         if (!detailsOpened) unfurlDropdown()
@@ -98,12 +101,18 @@ export function PointProvider({ children: _children, point, signer, refreshParen
 
     const getNegationsForType = async (_point: Node, type: "relevance" | "veracity") => {
         const { data: { result: { casts } } } = await axios.get(`/api/cast/${_point.id}/thread`);
+        const comments: Node[] = [];
 
         const negations: Node[] = [];
         for (const cast of casts) {
             const possibleNegation = await getMaybeNegation(cast);
-            if (possibleNegation.parentId == _point.id && possibleNegation.type == "negation")
-                negations.push(possibleNegation);
+            if (possibleNegation.parentId == _point.id)
+                if (possibleNegation.type == "negation")
+                    negations.push(possibleNegation);
+                else {
+                    possibleNegation.type = "comment"
+                    comments.push(possibleNegation);
+                }
         }
 
         const inputBox = children?.[type]?.find(neg => neg?.type === "input");
@@ -117,21 +126,29 @@ export function PointProvider({ children: _children, point, signer, refreshParen
             }
         });
 
+        setComments((prev) => {
+            const newComments = comments.filter((comment) => !prev.some((prevComment) => prevComment.id === comment.id));
+            return [...prev, ...newComments];
+        });
         return inputBox ? [inputBox, ...sortedNegations] : sortedNegations;
     };
 
     const refreshChildren = useCallback(async () => {
         if (point.type == "input") return
         let newNeg: { relevance: Node[], veracity: Node[] } = { relevance: [], veracity: [] }
+        let newComments: { point: Node[], endpoint: Node[] } = { point: [], endpoint: [] }
 
         if (point.type == "negation") {
             [newNeg.relevance, newNeg.veracity] = await Promise.all([
                 getNegationsForType(point, "relevance"),
-                getNegationsForType(point.endPoint!, "veracity")
+                getNegationsForType(point.endPoint!, "veracity"),
+
             ])
         }
         else {
-            newNeg.veracity = await getNegationsForType(point, "veracity");
+            [newNeg.veracity] = await Promise.all([
+                getNegationsForType(point, "veracity"),
+            ])
         }
 
         setChildren(newNeg)
@@ -147,7 +164,7 @@ export function PointProvider({ children: _children, point, signer, refreshParen
         }
     }, [children]);
 
-    return (<PointContext.Provider value={{ point, handleLike, likes, liked, handleNegate, detailsOpened, setDetailsOpened, children, setChildren, childrenLoading, setChildrenLoading, refreshChildren, unfurlDropdown, refreshParentThread }}>
+    return (<PointContext.Provider value={{ point, handleLike, likes, liked, handleNegate, detailsOpened, setDetailsOpened, children, comments, setChildren, childrenLoading, setChildrenLoading, refreshChildren, unfurlDropdown, refreshParentThread }}>
         {_children}
     </PointContext.Provider>)
 }

@@ -5,6 +5,7 @@ import InputNegation from "./negations/InputNegation";
 import Point from "./Point";
 import { negate } from "@/lib/negate";
 import publish from "@/lib/publish";
+import Comment from "./Comment";
 
 export default function PointWrapper({
     level,
@@ -25,13 +26,14 @@ export default function PointWrapper({
 }) {
     const { signer } = useSigner()
     const pointBg = `${level % 2 ? " bg-indigo-25 hover:bg-indigo-50" : " bg-slate-50 hover:bg-gray-100"}`;
+
     return (
         <PointProvider point={point} signer={signer} refreshParentThread={refreshParentThread}>
             {
                 point.type === "input" &&
                 <InputNegation
                     pointBg={pointBg}
-                    placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (point.kind === "relevance" ? "relevant" : "true") + " because ..."}
+                    placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (point.negationType === "relevance" ? "relevant" : "true") + " because ..."}
                     setParentChildren={setParentChildren}
                     onPublish={async (text: string) => {
                         if (point.parentId && signer)
@@ -41,14 +43,17 @@ export default function PointWrapper({
                         refreshParentThread()
                     }}
                     onClose={() => {
-                        setParentChildren((element: { veracity: Node[], relevance: Node[] }) => {
-                            let filtered = { ...element, [point.kind!]: element[point.kind!].filter((child: any) => child.type !== "input") }
+                        setParentChildren((element: { veracity: Node[], relevance: Node[], comment: Node[] }) => {
+                            let filtered = { ...element, [point.type!]: element[point.negationType!].filter((child: any) => child.type !== "input") }
                             return filtered;
                         })
                     }
                     }
                 />
 
+            }
+            {
+                point.type == "comment" && <Comment level={level}/>
             }
             {
                 (point.type === "negation" || point.type === "root") &&

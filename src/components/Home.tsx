@@ -27,7 +27,6 @@ export default function Home() {
   {
     let selectedPoint = null;
     let points: Node[] = [];
-    // let nextCursor: string | null = null;
 
     if (Array.isArray(castIds)) {
       // if it's a history of selected casts, get the first one
@@ -58,9 +57,9 @@ export default function Home() {
         // here's the existing feed
         points = existingPoints ? existingPoints : []
 
-        const feed = await axios.get(`/api/feed/${encodeURIComponent(DEFAULT_CHANNELID)}`)
+        const feed = await axios.get(`/api/feed/${encodeURIComponent(DEFAULT_CHANNELID)}?cursor=${cursor}`)
 
-        // nextCursor = feed.data.next?.cursor
+        feedCursorRef.current = feed.data.next?.cursor
 
         for (const cast of feed.data.casts) {
           if (cast !== null) {
@@ -113,10 +112,8 @@ export default function Home() {
   };
 
   const fetchItems = async () => {
-    console.log("fetching")
     // A fetch operation is already in progress, so we return early
     if (!router.isReady || isFetching.current) return
-
     isFetching.current = true;
 
     let ids: string[] = [];
