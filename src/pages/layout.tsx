@@ -1,10 +1,8 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
-import Head from 'next/head'; // Import the Head component
-
 const inter = Inter({ subsets: ['latin'] });
 
-const metadata: Metadata = {
+export const metadata: Metadata = {
   title: 'Negation Game',
   description: "How extraterrestrials do governance.",
 };
