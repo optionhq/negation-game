@@ -1,5 +1,12 @@
 import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
+import type { Metadata } from 'next';
+
+export const metadata: Metadata = {
+  title: 'Negation Game',
+  description: "How extraterrestrials do governance.",
+};
+
 
 export default function RootLayout({
   children,
