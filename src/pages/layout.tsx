@@ -7,12 +7,16 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className={inter.className}>
+    <main className={inter.className}>
+      <head>
+        <title>Negation Game</title>
+        <meta name="description" content="How extraterrestrials do governance."/>
+      </head>
       {/* <Head>
         <title>{metadata.title as string}</title>
         <meta name="description" content={metadata.description as string} />
       </Head> */}
       {children}
-    </div>
+    </main>
   );
 }
