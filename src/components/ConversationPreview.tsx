@@ -1,4 +1,5 @@
 // src/components/Conversation.tsx
+"use client"
 import React, { useEffect, useState } from 'react';
 import { Cast } from 'neynar-next/server'
 import axios from 'axios';
