@@ -1,15 +1,9 @@
 import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'] });
-import type { Metadata } from 'next';
 import MobileBottomHeader from '@/components/header/MobileBottomHeader';
 import { NeynarProvider } from 'neynar-next';
 import Header from '@/components/header/Header';
-
-export const metadata: Metadata = {
-  title: 'Negation Game',
-  description: "How extraterrestrials do governance.",
-};
-
+import Head from 'next/head';
 
 export default function RootLayout({
   children,
@@ -18,10 +12,10 @@ export default function RootLayout({
 }) {
   return (
     <main className={inter.className}>
-      <head>
+      <Head>
         <title>Negation Game</title>
         <meta name="description" content="How extraterrestrials do governance." />
-      </head>
+      </Head>
       <NeynarProvider>
         <div className='flex flex-col min-h-screen'>
           <Header />
