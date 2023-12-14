@@ -1,11 +1,11 @@
 // src/pages/index.tsx
 import React, { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/router";
-import HistoricalPoints from "@/components/HistoricalPoints";
-import { Node } from "@/types/Points";
+import HistoricalPoints from "./HistoricalPoints";
+import { Node } from "../types/Points";
 import axios from "axios";
 import { Cast } from "neynar-next/server";
-import { getMaybeNegation } from "@/lib/useCasts";
+import { getMaybeNegation } from "../lib/useCasts";
 import { BiChevronLeft } from "react-icons/bi";
 import RootFeed from "./RootFeed";
 import CastButton from "./CastButton";

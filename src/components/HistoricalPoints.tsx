@@ -3,8 +3,8 @@ import { useEffect } from "react";
 import axios from "axios";
 import { Cast } from "neynar-next/server";
 import { useState } from "react";
-import { getMaybeNegation } from "@/lib/useCasts";
-import { Node } from "@/types/Points";
+import { getMaybeNegation } from "../lib/useCasts";
+import { Node } from "../types/Points";
 
 export function HistoricalPoint({ id, onClick }: { id: string, onClick: () => void }) {
   const [cast, setCast] = useState<Node | null>(null);

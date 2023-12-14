@@ -1,6 +1,6 @@
 import { HiOutlineCheckCircle, HiOutlineXCircle } from "react-icons/hi";
 import Tooltip from "../../Tooltip";
-import { usePointContext } from "@/contexts/PointContext";
+import { usePointContext } from "../../../contexts/PointContext";
 
 
 export default function NegateLikeButtons({ type }: { type: "relevance" | "veracity" }) {

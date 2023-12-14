@@ -2,8 +2,8 @@
 import React, { useState, useEffect } from "react";
 import { BiSolidPencil } from "react-icons/bi"
 import Modal from "./Modal"
-import publish from "@/lib/publish"
-import { getDeviceType } from "@/lib/getDeviceType";
+import publish from "../lib/publish"
+import { getDeviceType } from "../lib/getDeviceType";
 import { useSigner } from "neynar-next";
 import InputNegation from "./negations/InputNegation";
 

@@ -1,6 +1,6 @@
 import { GoCircleSlash, GoInfo, GoUnlink, GoComment } from "react-icons/go"
-import { Node } from "@/types/Points";
-import { usePointContext } from "@/contexts/PointContext";
+import { Node } from "../../types/Points";
+import { usePointContext } from "../../contexts/PointContext";
 import { useEffect, useState } from "react";
 import PointWrapper from "../PointWrapper";
 import { BsChevronExpand } from "react-icons/bs"

@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server'
 import { NextApiRequest, NextApiResponse } from 'next'
-import neynarClient from '@/lib/neynar'
+import neynarClient from '../../../../lib/neynar'
 import Joi from 'joi';
 
 const schema = Joi.object({

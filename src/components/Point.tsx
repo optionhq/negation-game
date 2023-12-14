@@ -1,9 +1,9 @@
 import { useSearchParams, useRouter as oldRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Node } from "@/types/Points";
+import { Node } from "../types/Points";
 import { useRouter } from "next/router";
 import TripleDotMenu from './TripleDotMenu';
-import { usePointContext } from "@/contexts/PointContext";
+import { usePointContext } from "../contexts/PointContext";
 import AccordionArrow from "./AccordionArrow";
 import NegationText from "./negations/NegationText";
 import LoadingNegations from "./negations/LoadingNegations";

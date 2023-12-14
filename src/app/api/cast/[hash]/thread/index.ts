@@ -1,4 +1,4 @@
-import neynarClient from '@/lib/neynar'
+import neynarClient from '../../../../../lib/neynar'
 import { NextApiRequest, NextApiResponse } from 'next'
 import Joi from 'joi'
 

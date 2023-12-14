@@ -1,6 +1,6 @@
 import { Cast } from "neynar-next/server";
-import { Node } from "@/types/Points";
-import { extractEndPointUrl } from "@/lib/useEndPoints";
+import { Node } from "../types/Points";
+import { extractEndPointUrl } from "./useEndPoints";
 import axios from "axios";
 import isNegation from "./isNegation";
 

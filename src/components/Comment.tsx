@@ -1,4 +1,4 @@
-import { PointProvider, usePointContext } from "@/contexts/PointContext"
+import { PointProvider, usePointContext } from "../contexts/PointContext"
 import { useEffect, useState } from "react"
 import PointWrapper from "./PointWrapper"
 import TripleDotMenu from "./TripleDotMenu"

@@ -1,4 +1,4 @@
-import { Node } from "@/types/Points";
+import { Node } from "../types/Points";
 import PointWrapper from "./PointWrapper";
 import { AiOutlinePushpin } from "react-icons/ai";
 import { GoListUnordered } from "react-icons/go";

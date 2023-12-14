@@ -1,8 +1,8 @@
 import { useMemo } from "react"
 import DesktopScore from "./desktop/DesktopScore"
 import MobileScore from "./mobile/MobileScore"
-import { getDeviceType } from "@/lib/getDeviceType"
-import { usePointContext } from "@/contexts/PointContext"
+import { getDeviceType } from "../../lib/getDeviceType"
+import { usePointContext } from "../../contexts/PointContext"
 
 export default function Score() {
     const { likes } = usePointContext()

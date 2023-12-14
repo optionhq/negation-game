@@ -1,5 +1,5 @@
 
-import { Node } from '@/types/Points'
+import { Node } from '../types/Points'
 
 export default function makeWarpcastUrl(cast: Node) {
   if (cast.id)

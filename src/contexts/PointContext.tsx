@@ -1,11 +1,11 @@
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
-import { Node } from '@/types/Points';
-import unlike from '@/lib/unlike';
-import like from '@/lib/like';
+import { Node } from '../types/Points';
+import unlike from '../lib/unlike';
+import like from '../lib/like';
 import { Signer } from 'neynar-next/server';
-import { getMaybeNegation } from '@/lib/useCasts';
+import { getMaybeNegation } from '../lib/useCasts';
 import axios from 'axios';
-import isNegation from '@/lib/isNegation';
+import isNegation from '../lib/isNegation';
 
 type PointContextType = {
     point: Node,

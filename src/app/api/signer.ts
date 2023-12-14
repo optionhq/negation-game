@@ -1,7 +1,7 @@
 // frontend/src/pages/api/signer.ts
 
 import { NextApiRequest, NextApiResponse } from 'next'
-import neynarClient from '@/lib/neynar'
+import neynarClient from '../../lib/neynar'
 
 export default async function handler(
   req: NextApiRequest,

@@ -1,9 +1,9 @@
 // frontend/src/pages/_app.tsx
-import Header from '@/components/header/Header';
+import Header from '../components/header/Header';
 import './globals.css';
 import type { AppProps } from 'next/app';
 import { NeynarProvider } from 'neynar-next'
-import MobileBottomHeader from '@/components/header/MobileBottomHeader';
+import MobileBottomHeader from '../components/header/MobileBottomHeader';
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (

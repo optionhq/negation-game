@@ -1,8 +1,8 @@
-import { usePointContext } from "@/contexts/PointContext"
+import { usePointContext } from "../../contexts/PointContext"
 import { useState } from "react"
 import { GoComment } from "react-icons/go"
 import PointWrapper from "../PointWrapper"
-import { Node } from "@/types/Points"
+import { Node } from "../../types/Points"
 
 function CommentThreadHeader({ isRelevanceVisible, setIsRelevanceVisible, nbItems }: { isRelevanceVisible: boolean, setIsRelevanceVisible: React.Dispatch<React.SetStateAction<boolean>>, nbItems: number }) {
     function handleExpand(e: React.MouseEvent<HTMLButtonElement | MouseEvent>) {

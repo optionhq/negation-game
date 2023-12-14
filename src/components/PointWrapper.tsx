@@ -1,10 +1,10 @@
-import { Node } from "@/types/Points";
+import { Node } from "../types/Points";
 import { useSigner } from "neynar-next";
-import { PointProvider } from "@/contexts/PointContext";
+import { PointProvider } from "../contexts/PointContext";
 import InputNegation from "./negations/InputNegation";
 import Point from "./Point";
-import { negate } from "@/lib/negate";
-import publish from "@/lib/publish";
+import { negate } from "../lib/negate";
+import publish from "../lib/publish";
 import Comment from "./Comment";
 
 export default function PointWrapper({

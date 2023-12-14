@@ -1,7 +1,7 @@
 // src/pages/spaces/[space].tsx
 import { useRouter } from 'next/router';
 import React from "react";
-import ConversationPreview from '@/components/ConversationPreview'
+import ConversationPreview from '../../../components/ConversationPreview'
 
 export const metadata = {
   title: 'Acme',
