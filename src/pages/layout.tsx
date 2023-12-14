@@ -16,10 +16,10 @@ export default function RootLayout({
 }) {
   return (
     <div className={inter.className}>
-      <Head>
+      {/* <Head>
         <title>{metadata.title as string}</title>
         <meta name="description" content={metadata.description as string} />
-      </Head>
+      </Head> */}
       {children}
     </div>
   );
