@@ -4,6 +4,12 @@ import './globals.css';
 import type { AppProps } from 'next/app';
 import { NeynarProvider } from 'neynar-next'
 import MobileBottomHeader from '@/components/header/MobileBottomHeader';
+import type { Metadata } from 'next';
+
+const metadata: Metadata = {
+  title: 'Negation Game',
+  description: "How extraterrestrials do governance.",
+};
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
