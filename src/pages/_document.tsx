@@ -3,7 +3,10 @@ import { Html, Head, Main, NextScript } from 'next/document'
 export default function Document() {
   return (
     <Html lang="en">
-      <Head />
+      <Head >
+        <title>Negation Game</title>
+        <meta name='description' content='How extraterrestrials do governance.'/>
+      </Head>
       <body>
         <Main />
         <NextScript />
