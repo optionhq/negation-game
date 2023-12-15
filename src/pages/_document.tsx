@@ -1,14 +1,13 @@
+import { Html, Head, Main, NextScript } from 'next/document'
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function Document() {
   return (
-    <html>
-      <body >
-        {children}
+    <Html lang="en">
+      <Head />
+      <body>
+        <Main />
+        <NextScript />
       </body>
-    </html>
-  );
+    </Html>
+  )
 }

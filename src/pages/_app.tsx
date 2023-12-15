@@ -1,14 +1,11 @@
 // frontend/src/pages/_app.tsx
 import Header from '../components/header/Header';
-import Home from '../components/Home'
-import Head from 'next/head';
-import { Inter } from 'next/font/google';
-const inter = Inter({ subsets: ['latin'] });
-
 import './globals.css';
 import type { AppProps } from 'next/app';
 import { NeynarProvider } from 'neynar-next'
 import MobileBottomHeader from '../components/header/MobileBottomHeader';
+import { Inter } from 'next/font/google';
+const inter = Inter({ subsets: ['latin'] });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
