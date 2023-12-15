@@ -1,24 +1,20 @@
 import axios from "axios";
 import { Signer } from "neynar-next/server";
-import config from "@/config";
+import { DEFAULT_CHANNELID } from "../components/constants"
+import config from "../config";
 import { Cast } from 'neynar-next/server'
 
-export default async function publish({
-  text,
-  parentId,
-  farcasterSigner,
-  embeds
-}: {
-  text: string;
-  farcasterSigner: Signer;
-  parentId?: string | null;
-  embeds?: {url: string}[]
-}) {
+export default async function publish(
+  text: string,
+  signer: Signer,
+  parentId?: string | null,
+  embeds?: { url: string }[]
+) {
   try {
     const castResponse = await axios.post(`/api/cast`, {
       text: text,
-      parent: parentId ? parentId : config.channelId,
-      signerUuid: farcasterSigner.signer_uuid,
+      parent: parentId ? parentId : DEFAULT_CHANNELID,
+      signerUuid: signer.signer_uuid,
       embeds: embeds
     });
     return castResponse

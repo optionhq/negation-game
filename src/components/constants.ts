@@ -1,8 +1,6 @@
-// constants.ts
-export const LOCAL_STORAGE_KEYS = {
-  FARCASTER_USER: 'farcasterUser',
-  // ... any other keys
-};
+export const DEFAULT_CHANNELID = "https://negationgame.com"
+
+export const NEGATION_SYMBOL = "nah"
 
 export const DEFAULT_CAST = `gm Farcaster!
 

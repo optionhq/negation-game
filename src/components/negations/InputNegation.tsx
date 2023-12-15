@@ -1,22 +1,28 @@
+import { usePointContext } from "../../contexts/PointContext";
+import { negate } from "../../lib/negate";
+import { Node } from "../../types/Points";
+import { useSigner } from "neynar-next";
 import React, { useEffect, useState, useRef } from "react";
 
 const MAX_CHAR_PER_CAST = 320;
 
-export default function InputComponent({
-  paddingLeft = "20px",
+export default function InputNegation({
   pointBg = "bg-white ",
   placeHolder,
-  onCancel,
   onPublish,
+  onClose
+
 }: {
-  paddingLeft?: string;
   pointBg?: string;
   placeHolder: string;
-  onCancel: () => void;
-  onPublish: (text: string) => Promise<void>;
+  onPublish: (text: string) => void,
+  onClose: () => void
+  setParentChildren?: any;
+
 }) {
   const [text, setText] = useState("");
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { signer } = useSigner()
 
   useEffect(() => {
     const listener = (event: KeyboardEvent) => {
@@ -31,6 +37,16 @@ export default function InputComponent({
     };
   }, [text, onPublish]);
 
+  async function handlePublish() {
+    if (!signer) {
+      window.alert("Must be logged in to publish. farcasterUser is null");
+      return;
+    }
+    onPublish(text)
+    onClose()
+  }
+
+
   useEffect(() => {
     textareaRef.current?.focus();
   }, []);
@@ -42,7 +58,7 @@ export default function InputComponent({
         "w-full flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border"
       }
       onClick={(e) => e.stopPropagation()}
-      >
+    >
       <textarea
         ref={textareaRef}
         placeholder={placeHolder}
@@ -51,16 +67,14 @@ export default function InputComponent({
         onChange={(e) => setText(e.target.value)}
       />
       <div className="w-full flex justify-between">
-        <p className={` text-sm  text-black/60`}><span className={`${text.length > MAX_CHAR_PER_CAST ? "text-red-500": ""}`}>{text.length}</span>/{MAX_CHAR_PER_CAST}</p>
+        <p className={` text-sm text-black/60`}><span className={`${text.length > MAX_CHAR_PER_CAST ? "text-red-500" : ""}`}>{text.length}</span>/{MAX_CHAR_PER_CAST}</p>
         <div className="flex gap-2">
-          <button className="secondary-button" onClick={onCancel}>
+          <button className="secondary-button" onClick={onClose}>
             Cancel
           </button>
           <button
             className={`button`}
-            onClick={() => {
-              text && onPublish(text);
-            }}
+            onClick={() => { text && handlePublish()}}
             disabled={text.length == 0 || text.length > MAX_CHAR_PER_CAST}>
             Publish
           </button>

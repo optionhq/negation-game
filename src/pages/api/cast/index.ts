@@ -1,4 +1,4 @@
-import neynarClient from '@/lib/neynar'
+import neynarClient from '../../../lib/neynar'
 import { Cast } from 'neynar-next/server'
 import { NextApiResponse } from 'next'
 import { NextApiRequest } from 'next'

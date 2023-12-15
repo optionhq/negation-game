@@ -1,5 +1,5 @@
 import { NextApiResponse, NextApiRequest } from 'next'
-import neynarClient from '@/lib/neynar'
+import neynarClient from '../../../../../lib/neynar'
 import Joi from 'joi'
 
 const schema = Joi.object({

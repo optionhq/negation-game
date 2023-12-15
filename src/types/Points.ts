@@ -1,24 +1,21 @@
 import { User } from "neynar-next/server";
 
-export type Point = {
+export type Node = {
   title: string;
-  id: string;
+  id?: string;
   author?: User;
   parentId?: string;
-  points: number;
-  replyCount: number;
-  advocates: {fid: number}[];
-  lovers: {fid: number}[];
-  children?: Negation[];
-  // used when it's an input type
-  type?: string
-  kind?: "relevance" | "veracity"
+  parentType?: "root" | "input" | "negation" | "comment"
+  points?: number;
+  replyCount?: number;
+  advocates?: { fid: number }[];
+  lovers?: { fid: number }[];
+  children?: Node[];
+  type: "root" | "input" | "negation" | "comment"
+  negationType?: "relevance" | "veracity" | "comment"
+// TODO: once we've switched to the real network, endPoint should be required
+  endPoint?: Node
+  endPointUrl?: string
+
 };
 
-export type Node = Point;
-
-// TODO: once we've switched to the real network, endPoint should be required
-export interface Negation extends Point {
-  endPoint?: Point;
-  endPointUrl?: string;
-}
