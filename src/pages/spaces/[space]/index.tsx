@@ -3,14 +3,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import React from "react";
 import ConversationPreview from '../../../components/ConversationPreview'
 
-export const metadata = {
-  title: 'Acme',
-  openGraph: {
-    title: 'Acme',
-    description: 'Acme is a...',
-  },
-}
-
 function SpacePage() {
   const router = useRouter();
   const params = useSearchParams()
