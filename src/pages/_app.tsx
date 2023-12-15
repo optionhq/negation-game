@@ -9,8 +9,9 @@ const inter = Inter({ subsets: ['latin'] });
 
 function MyApp({ Component, pageProps }: AppProps) {
   return (
-    <NeynarProvider>
-      <div className='flex flex-col min-h-screen' >
+    <div className={inter.className}>
+      <NeynarProvider>
+      <div className='flex flex-col min-h-screen'  >
         <Header />
         <div className='flex-1'>
           <Component {...pageProps} />
@@ -18,6 +19,8 @@ function MyApp({ Component, pageProps }: AppProps) {
         <MobileBottomHeader />
       </div>
     </NeynarProvider>
+
+    </div>
   );
 }
 
