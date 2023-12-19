@@ -22,10 +22,7 @@ type PointContextType = {
     setChildrenLoading: React.Dispatch<React.SetStateAction<boolean>>,
     refreshChildren: () => Promise<void>,
     unfurlDropdown: () => Promise<void>,
-    refreshParentThread: ({ onlyReload, number }: {
-        onlyReload?: boolean | undefined;
-        number?: number | undefined;
-    }) => Promise<void>
+    refreshParentThread: () => Promise<void>
 };
 
 
@@ -40,10 +37,7 @@ export function usePointContext() {
 }
 
 export function PointProvider({ children: _children, point, signer, refreshParentThread }: {
-    children: React.ReactNode, point: Node, signer: Signer | null, refreshParentThread: ({ onlyReload, number }: {
-        onlyReload?: boolean | undefined;
-        number?: number | undefined;
-    }) => Promise<void>
+    children: React.ReactNode, point: Node, signer: Signer | null, refreshParentThread: () => Promise<void>
 }) {
 
     const [children, setChildren] = useState<{ relevance: Node[], veracity: Node[] }>({ relevance: [], veracity: [] })
