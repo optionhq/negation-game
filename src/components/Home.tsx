@@ -1,6 +1,6 @@
 'use client'
 // src/pages/index.tsx
-import React, { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { useRouter } from "next/router";
 import HistoricalPoints from "./HistoricalPoints";
 import { Node } from "../types/Points";
@@ -14,88 +14,53 @@ import { DEFAULT_CHANNELID } from "./constants";
 
 export default function Home() {
   const router = useRouter();
-
-  const [filteredItems, setFilteredItems] = useState<Node[]>([]);
-  const [pinnedCasts, setPinnedCasts] = useState<Node[]>([])
+  const [points, setPoints] = useState<Node[]>([]);
+  const [pinnedPoints, setPinnedPoints] = useState<Node[]>([])
   const [historicalPointIds, setHistoricalPointIds] = useState<string[] | undefined>([]);
 
   const loader = useRef(null);
   const isFetching = useRef(false);
-  const feedCursorRef = useRef<string | null>(null);
+  const feedCursorRef = useRef<string | undefined>();
   const [topic, setTopic] = useState<string | null>(null);
+  const [observer, setObserver] = useState<IntersectionObserver>()
 
-  async function fetchPoints(castIds: string[] | string | null, cursor: string | null, existingPoints: Node[] | null = null)
-  {
-    let selectedPoint = null;
-    let points: Node[] = [];
+  async function fetchFeed({ limit, cursor }: { limit: number, existingPoints?: Node[], cursor?: string }) {
+    let points: Node[] = []
 
-    if (Array.isArray(castIds)) {
-      // if it's a history of selected casts, get the first one
-      selectedPoint = castIds[0]
-      setHistoricalPointIds(castIds.slice(1));
-    } else {
-      selectedPoint = castIds
-    }
+    const url = `/api/feed/${encodeURIComponent(DEFAULT_CHANNELID)}?limit=${limit}${cursor !== undefined ? `&cursor=${cursor}`: ""}`
+    const feed = await axios.get(url)
 
-    if (!selectedPoint) {
-      // if there's no path selected, get the feed
-
-      if (router.pathname.includes('/spaces/')) {
-        // if this is a space, fetch the direct responses to the cast of interest
-        const castId = selectedPoint ? selectedPoint : router.query.conversation as string;
-
-        const response = await axios.get(`/api/cast/${castId}/thread`);
-        for (const cast of response.data.result.casts) {
-          const point = await getMaybeNegation(cast);
-          if (point.parentId === castId) {
-            points.push(point);
-          }
-        }
-        points.sort((a, b) => b.advocates?.length! - a.advocates?.length!);
-
-      } else {
-
-        // here's the existing feed
-        points = existingPoints ? existingPoints : []
-
-        const feed = await axios.get(`/api/feed/${encodeURIComponent(DEFAULT_CHANNELID)}?cursor=${cursor}`)
-
-        feedCursorRef.current = feed.data.next?.cursor
-
-        for (const cast of feed.data.casts) {
-          if (cast !== null) {
-            points.push(await getMaybeNegation(cast))
-          }
-        }
+    if (!feed.data.casts) return
+    for (const cast of feed.data.casts) {
+      if (cast !== null) {
+        points.push(await getMaybeNegation(cast))
       }
-    } else if (selectedPoint) {
-      // if there is a selected cast get the selected cast    
-      const cast = await axios.get(`/api/cast?type=hash&identifier=${selectedPoint}`)
-      points = [await getMaybeNegation(cast.data as Cast)]
     }
-
-    setFilteredItems(points);
+    return { points, cursor: feed.data.next?.cursor }
   }
 
-  useEffect(() => {
-    var options = {
-      root: null,
-      rootMargin: "20px",
-      threshold: 1.0
-    };
+  async function fetchThread(pointId: string) {
+    let points: Node[] = [];
 
-    const observer = new IntersectionObserver(handleObserver, options);
-    if (loader.current) {
-      observer.observe(loader.current)
+    const response = await axios.get(`/api/cast/${pointId}/thread`);
+    for (const cast of response.data.result.casts) {
+      const point = await getMaybeNegation(cast);
+      if (point.parentId === pointId) {
+        points.push(point);
+      }
     }
-  }, [router.isReady, router.query.id]);
+    points.sort((a, b) => b.advocates?.length! - a.advocates?.length!);
 
-  const handleObserver: IntersectionObserverCallback = (entities, observer) => {
-    const target = entities[0];
-    if (target.isIntersecting) {
-      // Fetch the next set of casts here
-      fetchItems();
-    }
+    return points
+  }
+
+  async function fetchPoint(pointId: string) {
+    let points: Node[] = [];
+
+    const cast = await axios.get(`/api/cast?type=hash&identifier=${pointId}`)
+    points = [await getMaybeNegation(cast.data as Cast)]
+
+    return points
   }
 
   // get the pinned casts
@@ -109,38 +74,93 @@ export default function Home() {
         fetchedPinnedCasts.push(await getMaybeNegation(cast.data as Cast));
       }
     }
-    setPinnedCasts(fetchedPinnedCasts); // Set the pinned casts
+    setPinnedPoints(fetchedPinnedCasts); // Set the pinned casts
   };
 
-  const fetchItems = async () => {
+  const getSelectedPoints = () => {
+    const ids_string = router.query.id;
+    let ids;
+
+    if (!ids_string) {
+      setHistoricalPointIds(undefined);
+      return
+    }
+    if (typeof ids_string === 'string') {
+      ids = ids_string.split(",");
+    }
+    if (Array.isArray(ids)) {
+      // if it's a history of selected casts, get the first one
+      setHistoricalPointIds(ids.slice(1));
+      return ids[0]
+    }
+    return ids
+  }
+
+  const fetchItems = useCallback(async ({ onlyReload = false, number }: { onlyReload?: boolean, number?: number | undefined } = {}) => {
     // A fetch operation is already in progress, so we return early
     if (!router.isReady || isFetching.current) return
     isFetching.current = true;
 
-    let ids: string[] = [];
-    if (typeof router.query.id === 'string') {
-      ids = router.query.id.split(",");
+    let selectedPoint = getSelectedPoints()
+    let _points: Node[] = [];
+
+
+    if (selectedPoint)
+      // if there's a point selected, only get its thread
+      _points = await fetchPoint(selectedPoint)
+    else if (!selectedPoint) {
+      // if there's no path selected, get the feed
+      if (router.pathname.includes('/spaces/')) {
+        //if we're in a space, get the thread of the conversation
+        _points = await fetchThread(router.query.conversation as string)
+      } else {
+        // else get the default feed
+        const cursor = !onlyReload ? feedCursorRef.current : undefined;
+        const feedResult = await fetchFeed({ limit: number || 25, cursor: cursor });
+        if (feedResult) {
+          _points = feedResult.points;
+          if (!onlyReload)
+            feedCursorRef.current = feedResult.cursor
+        }
+      }
     }
-    await fetchPoints(ids, feedCursorRef.current);
-
+    setPoints(prev => onlyReload ? [..._points] : [...prev, ..._points]);
     isFetching.current = false;
-  };
+  }, [router.isReady, isFetching.current, points, feedCursorRef, router.query.conversation, router.query.id]);
+
+  const refreshItems = useCallback(async () => fetchItems({ onlyReload: true }), [points, setPoints, router, isFetching.current, fetchFeed, fetchThread, router.query])
+
+
+
+  const handleObserver: IntersectionObserverCallback = (entities) => {
+    const target = entities[0];
+    if (target.isIntersecting) fetchItems()
+  }
 
   useEffect(() => {
-    fetchPinnedCasts();
-  }, []);
+    setPoints([])
+    feedCursorRef.current = undefined
+    setHistoricalPointIds(undefined)
+    if (!router.query.id && !router.query.conversation) {
+      fetchPinnedCasts();
 
-  useEffect(() => {
-    fetchItems();
-  }, [router.query.id, router.query.conversation]);
-
-  useEffect(() => {
+      var options = { root: null, rootMargin: "20px", threshold: 1.0 }
+      let _observer = new IntersectionObserver(handleObserver, options);
+      setObserver(_observer)
+      if (loader.current)
+        _observer?.observe(loader.current)
+    }
     if (router.pathname.includes('spaces') && typeof router.query.conversation === 'string') {
       axios.get(`/api/cast?type=hash&identifier=${router.query.conversation}`)
         .then(response => setTopic(response.data.text))
         .catch(error => console.error(error));
     }
-  }, [router.pathname, router.query.id, router.query.conversation]);
+    else if (router.query.conversation || router.query.id) (
+      observer?.disconnect()
+    )
+    fetchItems();
+
+  }, [router.query.id, router.pathname, router.query.conversation]);
 
   return (
     <main className="flex flex-col text-sm sm:text-base gap-4 my-8">
@@ -157,19 +177,19 @@ export default function Home() {
       <RootFeed
         pinned={true}
         key="pinned"
-        data={pinnedCasts}
-        setData={setPinnedCasts}
+        data={pinnedPoints}
+        setData={setPinnedPoints}
         setHistoricalItems={setHistoricalPointIds}
-        refreshThread={fetchItems}
+        refreshThread={refreshItems}
       />
       <RootFeed
         key={Array.isArray(router.query.id) ? router.query.id.join(',') : router.query.id || 'default'}
-        data={filteredItems}
-        setData={setFilteredItems}
+        data={points}
+        setData={setPoints}
         setHistoricalItems={setHistoricalPointIds}
-        refreshThread={fetchItems}
+        refreshThread={refreshItems}
       />
-      {!router.query.id && <CastButton conversation={router.query.conversation as string} updateFeed={fetchItems} />}
+      {!router.query.id && <CastButton conversation={router.query.conversation as string} refreshThread={refreshItems} />}
       {!router.query.id && !router.query.conversation &&
         <div className="loading" ref={loader} style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '5vh' }}>
           <h2 style={{ fontSize: '1.5em', color: '#333' }}>Loading...</h2>

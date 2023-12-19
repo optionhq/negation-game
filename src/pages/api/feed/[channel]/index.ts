@@ -5,7 +5,8 @@ import Joi from 'joi';
 
 const schema = Joi.object({
   channel: Joi.string().required(),
-  cursor: Joi.string().optional()
+  cursor: Joi.string().optional(),
+  limit: Joi.string().required()
 });
 
 export default async function GET(req: NextApiRequest, res: NextApiResponse) {
@@ -15,7 +16,7 @@ export default async function GET(req: NextApiRequest, res: NextApiResponse) {
 
   const pagination = {
     cursor: value.cursor,
-    limit: 25
+    limit: value.limit
   };
 
   const feed = await neynarClient.getChannelFeed(value.channel, pagination);
