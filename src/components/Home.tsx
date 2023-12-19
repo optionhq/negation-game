@@ -130,8 +130,6 @@ export default function Home() {
 
   const refreshItems = useCallback(async () => fetchItems({ onlyReload: true }), [points, setPoints, router, isFetching.current, fetchFeed, fetchThread, router.query])
 
-
-
   const handleObserver: IntersectionObserverCallback = (entities) => {
     const target = entities[0];
     if (target.isIntersecting) fetchItems()

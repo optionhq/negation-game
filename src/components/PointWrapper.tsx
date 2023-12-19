@@ -40,20 +40,25 @@ export default function PointWrapper({
                             await negate(text, point.parentId, signer)
                         else if (!point.parentId && signer)
                             await publish(text, signer);
-                        refreshParentThread()
-                    }}
-                    onClose={() => {
                         setParentChildren((element: { veracity: Node[], relevance: Node[], comment: Node[] }) => {
                             let filtered = { ...element, [point.type!]: element[point.negationType!].filter((child: any) => child.type !== "input") }
                             return filtered;
                         })
+                        refreshParentThread()
+                    }}
+                    onClose={() => {
+                        setParentChildren((element: { veracity: Node[], relevance: Node[], comment: Node[] }) => {
+                            let filtered = { ...element, [point.negationType!]: element[point.negationType!].filter((child: any) => child.type !== "input") }
+                            return filtered;
+                        })
+                        // refreshParentThread()
                     }
                     }
                 />
 
             }
             {
-                point.type == "comment" && <Comment level={level}/>
+                point.type == "comment" && <Comment level={level} />
             }
             {
                 (point.type === "negation" || point.type === "root") &&
