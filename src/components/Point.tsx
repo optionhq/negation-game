@@ -96,7 +96,7 @@ export default function Point({
       </summary>
       <CommentsThread level={level}/>
       <ChildrenThread
-        type="relevance"
+        type="importance"
         level={level}
         setHistoricalItems={setHistoricalItems}
         getParentAncestry={getAncestry} />

@@ -15,7 +15,7 @@ export default function Score() {
     return (
         <div className="flex flex-row gap-2 text-gray-500">
             <_Score type="veracity" />
-            {likes["relevance"] !== undefined && <_Score type="relevance" />}
+            {likes["importance"] !== undefined && <_Score type="importance" />}
         </div>
     )
 }

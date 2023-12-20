@@ -12,7 +12,7 @@ export type Node = {
   lovers?: { fid: number }[];
   children?: Node[];
   type: "root" | "input" | "negation" | "comment"
-  negationType?: "relevance" | "veracity" | "comment"
+  negationType?: "importance" | "veracity" | "comment"
 // TODO: once we've switched to the real network, endPoint should be required
   endPoint?: Node
   endPointUrl?: string

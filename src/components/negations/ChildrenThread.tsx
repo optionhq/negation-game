@@ -59,7 +59,7 @@ function RelevanceThreadHeader({ isRelevanceVisible, setIsRelevanceVisible, nbIt
 
 
 export default function ChildrenThread({ type, level, setHistoricalItems, getParentAncestry }: {
-    type: "veracity" | "relevance"
+    type: "veracity" | "importance"
     level: number;
     setHistoricalItems: React.Dispatch<React.SetStateAction<string[] | undefined>>;
     getParentAncestry: undefined | (() => string);
@@ -71,7 +71,7 @@ export default function ChildrenThread({ type, level, setHistoricalItems, getPar
         <>
             {children[type] && children[type].length > 0 && detailsOpened && (
                 <div className="border-black pl-3 border-l  my-2 flex flex-col gap-2 ml-2 sm:ml-6 lg:ml-8">
-                    {type == "relevance" && <RelevanceThreadHeader isRelevanceVisible={threadVisible} setIsRelevanceVisible={setThreadVisible} nbItems={children[type].filter((child: any) => child.type !== "input").length} />}
+                    {type == "importance" && <RelevanceThreadHeader isRelevanceVisible={threadVisible} setIsRelevanceVisible={setThreadVisible} nbItems={children[type].filter((child: any) => child.type !== "input").length} />}
                     {type == "veracity" && <VeracityThreadHeader isVeracityVisible={threadVisible} setIsVeracityVisible={setThreadVisible} nbItems={children[type].filter((child: any) => child.type !== "input").length} />}
                     {threadVisible &&
                         <div className={`flex flex-col w-full gap-1`}>
