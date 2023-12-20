@@ -52,15 +52,15 @@ export function PointProvider({ children: _children, point, signer, refreshParen
         let _likes
         let _liked
         if (point.type !== "input") {
-            let likedVeracity = signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) ? signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) : undefined
-            let likedRelevance = signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) ? signer && 'fid' in signer && point.endPoint?.advocates?.some((el: { fid: number }) => el.fid === signer.fid) : undefined
+            let likedveracity = signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) ? signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) : undefined
+            let likedrelevance = signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) ? signer && 'fid' in signer && point.endPoint?.advocates?.some((el: { fid: number }) => el.fid === signer.fid) : undefined
             if (point.type == "negation") {
                 _likes = { relevance: point.points, veracity: point.endPoint?.points }
-                _liked = { relevance: likedRelevance, veracity: likedVeracity! }
+                _liked = { relevance: likedrelevance, veracity: likedveracity! }
             }
             else if (point.type == "root") {
                 _likes = { relevance: undefined, veracity: point.points }
-                _liked = { relevance: undefined, veracity: likedVeracity! }
+                _liked = { relevance: undefined, veracity: likedveracity! }
 
             }
             setLikes(_likes)

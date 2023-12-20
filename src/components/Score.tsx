@@ -121,7 +121,7 @@ function NegateLikeButtons({
         <ReactButtonWrapper>
           <div className="flex flex-col items-center w-fit gap-[2px]">
             <div className="flex flex-row items-center gap-1 text-sm font-thin">
-              {type == "relevance" ? <p>Relevance</p> : <p>Veracity</p>}
+              {type == "relevance" ? <p>relevance</p> : <p>veracity</p>}
             </div>
             <hr className="w-full h-[1.5px] bg-slate-300" />
             <NegateLikeButtons id={id} points={points} onNegate={onNegate} type={type} advocates={advocates} farcasterSigner={farcasterSigner} />
