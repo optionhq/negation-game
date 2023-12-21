@@ -101,7 +101,7 @@ export default function Point({
         setHistoricalItems={setHistoricalItems}
         getParentAncestry={getAncestry} />
       <ChildrenThread
-        type="veracity"
+        type="conviction"
         level={level}
         setHistoricalItems={setHistoricalItems}
         getParentAncestry={getAncestry} />

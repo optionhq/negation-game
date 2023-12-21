@@ -9,7 +9,7 @@ import { usePointContext } from '../../../contexts/PointContext';
 export default function DesktopScore({
   type,
 }: {
-  type: "importance" | "veracity";
+  type: "importance" | "conviction";
 
 }) {
   const { likes, liked} = usePointContext()
