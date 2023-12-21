@@ -1,10 +1,10 @@
-import { GoCircleSlash, GoInfo, GoUnlink, GoComment } from "react-icons/go"
+import { GoInfo, GoComment } from "react-icons/go"
 import { Node } from "../../types/Points";
 import { usePointContext } from "../../contexts/PointContext";
 import { useEffect, useState } from "react";
 import PointWrapper from "../PointWrapper";
-import { BsChevronExpand } from "react-icons/bs"
 import { PiExcludeDuotone } from "react-icons/pi";
+import { MdDoNotDisturbOnTotalSilence } from "react-icons/md";
 
 function VeracityThreadHeader({ isVeracityVisible, setIsVeracityVisible, nbItems }: { isVeracityVisible: boolean, setIsVeracityVisible: React.Dispatch<React.SetStateAction<boolean>>, nbItems: number }) {
 
@@ -42,7 +42,7 @@ function RelevanceThreadHeader({ isRelevanceVisible, setIsRelevanceVisible, nbIt
     return (
         <button className="flex flex-col items-start p-2 text-gray-400" onClick={(e) => handleExpand(e)} >
             <div className="flex flex-row items-center gap-2 justify-center text-purple-800">
-                {isRelevanceVisible ? <GoCircleSlash size={18} color="rgb(107, 33, 168)" /> :
+                {isRelevanceVisible ? <MdDoNotDisturbOnTotalSilence size={18} color="rgb(107, 33, 168)" /> :
                     // <BsChevronExpand size={18}/>
                     <div className="w-[18px]">{nbItems}</div>
                 }
