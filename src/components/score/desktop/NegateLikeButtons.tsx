@@ -9,7 +9,7 @@ export default function NegateLikeButtons({ type }: { type: "importance" | "conv
     
     return (
         <div className=" hidden group-hover/points:flex flex-row gap-1">
-            <Tooltip text={liked?.[type] ? (type == "conviction" ? "Unmark true" : "Unmark important") : (type == "conviction" ? "True" : "Important")} orientation="bottom">
+            <Tooltip text={liked?.[type] ? (type == "conviction" ? "Unmark accurate" : "Unmark important") : (type == "conviction" ? "Accurate" : "Important")} orientation="bottom">
                 <button className={liked?.[type] ? "text-green-500 text-xl" : "hover:text-green-500 text-xl"} onMouseDown={(e) => handleLike(e, type)}>
                     <HiOutlineCheckCircle size={24} />
                 </button>

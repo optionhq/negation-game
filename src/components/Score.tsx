@@ -62,30 +62,26 @@ function NegateLikeButtons({
       <div className="group/points w-16 flex flex-col items-center">
         <p className={`group-hover/points:hidden h-6 ${isLiked ? 'font-bold' : ''}`}>{score}</p>
         <div className="flex-row gap-1 transition-opacity hidden opacity-0 group-hover/points:flex group-hover/points:opacity-100 h-6">
-          <Tooltip text={isLiked ? (type == "conviction" ? "Undo yep" : "Undo matters") : (type == "conviction" ? "Yep" : "Matters")} orientation="bottom">
-            <span 
-              className={isLiked ? "text-green-500 text-xl" : "hover:text-green-500 text-xl"} 
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                handleLike(e);
-              }}
-            >
-              <HiOutlineCheckCircle size={24} />
-            </span>
-          </Tooltip>
-          <Tooltip text={type == "conviction" ? "Nope" : "Doesn't matter"} orientation="bottom">
-            <span 
-              className="hover:text-purple-600 text-xl" 
-              onMouseDown={(e) => {
-                e.stopPropagation();
-                e.preventDefault();
-                onNegate(e);
-              }}
-            >
-              <HiOutlineXCircle size={24} />
-            </span>
-          </Tooltip>
+          <span 
+            className={isLiked ? "text-green-500 text-xl" : "hover:text-green-500 text-xl"} 
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              handleLike(e);
+            }}
+          >
+            <HiOutlineCheckCircle size={24} />
+          </span>
+          <span 
+            className="hover:text-purple-600 text-xl" 
+            onMouseDown={(e) => {
+              e.stopPropagation();
+              e.preventDefault();
+              onNegate(e);
+            }}
+          >
+            <HiOutlineXCircle size={24} />
+          </span>
         </div>
       </div>
     </div>
