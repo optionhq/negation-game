@@ -1,7 +1,8 @@
 import { Cast } from "neynar-next/server";
-import { Node } from "@/types/Points";
-import { extractEndPointUrl } from "@/lib/useEndPoints";
+import { Node } from "../types/Points";
+import { extractEndPointUrl } from "./useEndPoints";
 import axios from "axios";
+import isNegation from "./isNegation";
 
 export async function getMaybeNegation(cast: Cast): Promise<Node> {
   const maybeNegation = castToNegation(cast)
@@ -11,9 +12,9 @@ export async function getMaybeNegation(cast: Cast): Promise<Node> {
     res.status === 200 || console.error("Failed to fetch cast", res);
     if (!res.data) return maybeNegation;
     const endPoint: Node = castToPoint(res.data)
-    
     maybeNegation.endPoint = endPoint;
-    maybeNegation.type = "negation"
+    if(isNegation(maybeNegation))
+      maybeNegation.type = "negation"
   }
 
   return maybeNegation;

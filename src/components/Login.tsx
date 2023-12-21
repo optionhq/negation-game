@@ -1,7 +1,7 @@
 // src/components/Login.tsx
 import React, { useEffect } from "react";
 import Image from "next/image";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 import { useSigner } from 'neynar-next';
 import { User, Signer } from 'neynar-next/server'
 import useSWR from 'swr';

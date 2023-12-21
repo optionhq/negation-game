@@ -1,4 +1,4 @@
-import Notification from "@/components/notifications/Notification"
+// import Notification from "../../components/notifications/Notification"
 
 export default function Notifications() {
     return (

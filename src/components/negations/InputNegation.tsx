@@ -1,6 +1,6 @@
-import { usePointContext } from "@/contexts/PointContext";
-import { negate } from "@/lib/negate";
-import { Node } from "@/types/Points";
+import { usePointContext } from "../../contexts/PointContext";
+import { negate } from "../../lib/negate";
+import { Node } from "../../types/Points";
 import { useSigner } from "neynar-next";
 import React, { useEffect, useState, useRef } from "react";
 

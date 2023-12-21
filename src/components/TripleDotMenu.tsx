@@ -1,8 +1,8 @@
 import axios from 'axios';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import makeWarpcastUrl from '@/lib/makeWarpcastUrl';
+import makeWarpcastUrl from '../lib/makeWarpcastUrl';
 import { useSigner } from 'neynar-next';
-import { usePointContext } from '@/contexts/PointContext';
+import { usePointContext } from '../contexts/PointContext';
 
 const TripleDotMenu: React.FC= () => {
   const {signer} = useSigner()

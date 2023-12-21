@@ -1,14 +1,15 @@
 import { useSearchParams, useRouter as oldRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Node } from "@/types/Points";
+import { Node } from "../types/Points";
 import { useRouter } from "next/router";
 import TripleDotMenu from './TripleDotMenu';
-import { usePointContext } from "@/contexts/PointContext";
+import { usePointContext } from "../contexts/PointContext";
 import AccordionArrow from "./AccordionArrow";
 import NegationText from "./negations/NegationText";
 import LoadingNegations from "./negations/LoadingNegations";
 import Score from "./score/Score";
 import ChildrenThread from "./negations/ChildrenThread";
+import CommentsThread from "./negations/CommentsThread";
 
 export default function Point({
   level,
@@ -39,6 +40,7 @@ export default function Point({
     const current = searchParams.get("id");
     const currentIds = current ? current.split(',') : [];
 
+    console.log(currentIds)
     // Find the first ancestor that is already in the path
     const commonAncestorIndex = ancestry.findIndex(ancestor => ancestor === currentIds[0]);
 
@@ -92,6 +94,7 @@ export default function Point({
         </div>
         <TripleDotMenu />
       </summary>
+      <CommentsThread level={level}/>
       <ChildrenThread
         type="relevance"
         level={level}

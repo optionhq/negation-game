@@ -1,4 +1,4 @@
-import { usePointContext } from "@/contexts/PointContext"
+import { usePointContext } from "../contexts/PointContext"
 import { Arrow } from "."
 
 export default function AccordionArrow() {

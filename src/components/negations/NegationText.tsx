@@ -1,7 +1,7 @@
-import { usePointContext } from "@/contexts/PointContext"
-import isNegation from "@/lib/isNegation"
+import { usePointContext } from "../../contexts/PointContext"
+import isNegation from "../../lib/isNegation"
 import RecastedComponent from "./RecastedPoint"
-import { extractLink } from "@/lib/extractLink";
+import { extractLink } from "../../lib/extractLink";
 
 export default function NegationText() {
     const { point } = usePointContext()

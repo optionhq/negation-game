@@ -1,6 +1,6 @@
 import { HiOutlineCheckCircle, HiOutlineXCircle } from "react-icons/hi";
 import Tooltip from "../../Tooltip";
-import { usePointContext } from "@/contexts/PointContext";
+import { usePointContext } from "../../../contexts/PointContext";
 
 
 export default function NegateLikeButtons({ type }: { type: "relevance" | "veracity" }) {
@@ -14,7 +14,7 @@ export default function NegateLikeButtons({ type }: { type: "relevance" | "verac
                     <HiOutlineCheckCircle size={24} />
                 </button>
             </Tooltip>
-            <Tooltip text={type == "veracity" ? "Nope" : "Doesn't matter"} orientation="bottom">
+            <Tooltip text={type == "veracity" ? "Inaccurate" : "Doesn't matter"} orientation="bottom">
                 <button
                     className="hover:text-purple-600 text-xl"
                     onMouseDown={(e) => handleNegate(e, type)}>

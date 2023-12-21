@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import { Node } from "@/types/Points";
+import { Node } from "../../types/Points";
 
 export default function RecastedPoint({ url }: { url: string }) {
   const [data, setData] = useState<Node>();

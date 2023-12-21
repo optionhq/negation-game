@@ -1,6 +1,6 @@
-import Login from "@/components/Login";
+import Login from "../Login";
 import { Signer } from "neynar-next/server";
-import NotificationButton from "@/components/notifications/NotificationButton";
+import NotificationButton from "../notifications/NotificationButton";
 import { useSigner } from "neynar-next";
 import Link from "next/link";
 import { HiHome } from "react-icons/hi";

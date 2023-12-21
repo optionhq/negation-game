@@ -1,6 +1,6 @@
-import { okUrls } from "@/lib/useEndPoints";
-import { Node } from "@/types/Points";
-import { NEGATION_SYMBOL } from '@/components/constants'
+import { okUrls } from "./useEndPoints";
+import { Node } from "../types/Points";
+import { NEGATION_SYMBOL } from '../components/constants'
 
 const validNegation = (title: string): boolean => {
   // a title is a valid negation if it starts with NEGATION_SYMBOL 

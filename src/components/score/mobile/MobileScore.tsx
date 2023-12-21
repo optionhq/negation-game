@@ -1,6 +1,6 @@
 import ReactButtonWrapper from '../../ReactButtonWrapper';
 import NegateLikeButtons from './NegateLikeButtons';
-import { usePointContext } from '@/contexts/PointContext';
+import { usePointContext } from '../../../contexts/PointContext';
 
 
 export default function MobileScore({ type }: {

@@ -1,4 +1,4 @@
-import { Node } from "@/types/Points";
+import { Node } from "../types/Points";
 import PointWrapper from "./PointWrapper";
 import { AiOutlinePushpin } from "react-icons/ai";
 import { GoListUnordered } from "react-icons/go";
@@ -23,7 +23,6 @@ export default function RootFeed({
   return (
     <div className={pinned ? "mb-12" : ""}>
       {!router.query.id && !router.query.conversation && data && data.length > 0 &&
-
         <div className="flex flex-row gap-2 pb-3 items-center centered-element">
           {pinned ? <AiOutlinePushpin size={20} /> : <GoListUnordered size={20} />}
           <h2 className="font-semibold">{`${pinned ? "Starting" : "All"}`} points</h2>

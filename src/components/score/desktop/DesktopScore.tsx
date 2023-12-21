@@ -3,8 +3,8 @@ import React from 'react';
 import ReactButtonWrapper from "../../ReactButtonWrapper";
 import { AiOutlineCheck } from "react-icons/ai";
 import NegateLikeButtons from './NegateLikeButtons';
-import {  Node } from '@/types/Points';
-import { usePointContext } from '@/contexts/PointContext';
+import {  Node } from '../../../types/Points';
+import { usePointContext } from '../../../contexts/PointContext';
 
 export default function DesktopScore({
   type,

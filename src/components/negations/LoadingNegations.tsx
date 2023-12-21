@@ -1,4 +1,4 @@
-import { usePointContext } from "@/contexts/PointContext"
+import { usePointContext } from "../../contexts/PointContext"
 
 export default function LoadingNegations() {
     const { childrenLoading } = usePointContext()

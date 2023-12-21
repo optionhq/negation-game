@@ -2,12 +2,14 @@
 import React, { useState, useEffect } from "react";
 import { BiSolidPencil } from "react-icons/bi"
 import Modal from "./Modal"
-import publish from "@/lib/publish"
-import { getDeviceType } from "@/lib/getDeviceType";
+import publish from "../lib/publish"
+import { getDeviceType } from "../lib/getDeviceType";
 import { useSigner } from "neynar-next";
 import InputNegation from "./negations/InputNegation";
 
-export default function CastButton({ conversation, updateFeed }: { conversation?: string, updateFeed: () => Promise<void> }) {
+export default function CastButton({ conversation, refreshThread }: {
+  conversation?: string, refreshThread: () => Promise<void>
+}) {
   const [castModal, setCastModal] = useState(false);
   const { signer } = useSigner()
   const [deviceType, setDeviceType] = useState("");
@@ -33,7 +35,7 @@ export default function CastButton({ conversation, updateFeed }: { conversation?
                 onPublish={async (text: string) => {
                   const resp = await publish(text, signer, conversation)
                   if (resp?.data.cast) {
-                    updateFeed()
+                    refreshThread()
                   }
                 }}
                 onClose={() => { setCastModal(false) }}

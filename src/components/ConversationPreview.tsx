@@ -1,14 +1,15 @@
 // src/components/Conversation.tsx
+"use client"
 import React, { useEffect, useState } from 'react';
 import { Cast } from 'neynar-next/server'
 import axios from 'axios';
 import Link from 'next/link';
 import Score from './score/Score';
 import PointWrapper from './PointWrapper';
-import { PointProvider } from '@/contexts/PointContext';
+import { PointProvider } from '../contexts/PointContext';
 import { useSigner } from 'neynar-next';
-import { getMaybeNegation } from '@/lib/useCasts';
-import {  Node } from '@/types/Points';
+import { getMaybeNegation } from '../lib/useCasts';
+import {  Node } from '../types/Points';
 // import Score from './score/desktop/DesktopScore';
 
 export default function ConversationPreview({ id }: { id: string }) {
