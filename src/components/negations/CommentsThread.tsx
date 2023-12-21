@@ -4,21 +4,21 @@ import { GoComment } from "react-icons/go"
 import PointWrapper from "../PointWrapper"
 import { Node } from "../../types/Points"
 
-function CommentThreadHeader({ isRelevanceVisible, setIsRelevanceVisible, nbItems }: { isRelevanceVisible: boolean, setIsRelevanceVisible: React.Dispatch<React.SetStateAction<boolean>>, nbItems: number }) {
+function CommentThreadHeader({ isrelevanceVisible, setIsrelevanceVisible, nbItems }: { isrelevanceVisible: boolean, setIsrelevanceVisible: React.Dispatch<React.SetStateAction<boolean>>, nbItems: number }) {
     function handleExpand(e: React.MouseEvent<HTMLButtonElement | MouseEvent>) {
         e.preventDefault()
         e.stopPropagation()
-        setIsRelevanceVisible(!isRelevanceVisible)
+        setIsrelevanceVisible(!isrelevanceVisible)
     }
 
     return (
         <button className="flex flex-col items-start p-2 text-gray-400" onClick={(e) => handleExpand(e)} >
             <div className="flex flex-row items-center gap-2 justify-center text-rose-800">
-                {isRelevanceVisible ? <GoComment size={18} color="rgb(168, 33, 105)" /> :
+                {isrelevanceVisible ? <GoComment size={18} color="rgb(168, 33, 105)" /> :
                     <div className="w-[18px]">{nbItems}</div>
                 }
-                <p className="font-semibold">{`Comment${nbItems > 1 || isRelevanceVisible ? "s" : ""}`}</p>
-                <p className="font-normal text-gray-400">{`tap to ${isRelevanceVisible ? "hide" : "show"}`}</p>
+                <p className="font-semibold">{`Comment${nbItems > 1 || isrelevanceVisible ? "s" : ""}`}</p>
+                <p className="font-normal text-gray-400">{`tap to ${isrelevanceVisible ? "hide" : "show"}`}</p>
             </div>
         </button>
     )
@@ -33,7 +33,7 @@ export default function CommentsThread({ level }: { level: number }) {
             {
                 comments.length > 0 && comments && detailsOpened && (
                     <div className="border-black pl-3 border-l  my-2 flex flex-col gap-2 ml-2 sm:ml-6 lg:ml-8">
-                        <CommentThreadHeader isRelevanceVisible={threadVisible} setIsRelevanceVisible={setThreadVisible} nbItems={comments.length} />
+                        <CommentThreadHeader isrelevanceVisible={threadVisible} setIsrelevanceVisible={setThreadVisible} nbItems={comments.length} />
                         {threadVisible &&
                             <div className={`flex flex-col w-full gap-1`}>
                                 {comments.map((el: Node, i: number) => {
