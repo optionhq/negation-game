@@ -5,7 +5,7 @@ import { usePointContext } from "../../../contexts/PointContext";
 export default function NegateLikeButtons({
     type,
 }: {
-    type: "importance" | "veracity";
+    type: "importance" | "conviction";
 }) {
     const { handleLike, liked, handleNegate } = usePointContext()
 
