@@ -33,7 +33,7 @@ export default function PointWrapper({
                 point.type === "input" &&
                 <InputNegation
                     pointBg={pointBg}
-                    placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (point.negationType === "relevance" ? "relevant" : "true") + " because ..."}
+                    placeHolder={point.negationType === "relevance" ? "This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` isn't impactful because..." : "An alternative to `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is..."}
                     setParentChildren={setParentChildren}
                     onPublish={async (text: string) => {
                         if (point.parentId && signer)
