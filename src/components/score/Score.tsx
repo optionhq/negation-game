@@ -15,7 +15,7 @@ export default function Score() {
     return (
         <div className="flex flex-row gap-2 text-gray-500">
             <_Score type="conviction" />
-            {likes["importance"] !== undefined && <_Score type="importance" />}
+            {likes["relevance"] !== undefined && <_Score type="relevance" />}
         </div>
     )
 }

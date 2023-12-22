@@ -4,7 +4,7 @@ import { usePointContext } from '../../../contexts/PointContext';
 
 
 export default function MobileScore({ type }: {
-    type: "importance" | "conviction";
+    type: "relevance" | "conviction";
 }) {
     const { likes } = usePointContext()
   
