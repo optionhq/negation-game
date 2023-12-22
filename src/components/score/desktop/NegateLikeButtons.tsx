@@ -3,7 +3,7 @@ import Tooltip from "../../Tooltip";
 import { usePointContext } from "../../../contexts/PointContext";
 
 
-export default function NegateLikeButtons({ type }: { type: "importance" | "conviction" }) {
+export default function NegateLikeButtons({ type }: { type: "relevance" | "conviction" }) {
     const { handleLike, liked, handleNegate } = usePointContext()
 
     

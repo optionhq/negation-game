@@ -9,14 +9,14 @@ import isNegation from '../lib/isNegation';
 
 type PointContextType = {
     point: Node,
-    handleLike: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>, type: "importance" | "conviction") => void
-    handleNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>, type: 'importance' | 'conviction') => void
-    likes: undefined | { importance: number | undefined, conviction: number | undefined }
-    liked: undefined | { importance: boolean | undefined; conviction: boolean };
+    handleLike: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>, type: "relevance" | "conviction") => void
+    handleNegate: (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>, type: 'relevance' | 'conviction') => void
+    likes: undefined | { relevance: number | undefined, conviction: number | undefined }
+    liked: undefined | { relevance: boolean | undefined; conviction: boolean };
     setDetailsOpened: React.Dispatch<React.SetStateAction<boolean>>
     detailsOpened: boolean
-    children: { importance: any[]; conviction: any[] }
-    setChildren: React.Dispatch<React.SetStateAction<{ importance: any[]; conviction: any[] }>>,
+    children: { relevance: any[]; conviction: any[] }
+    setChildren: React.Dispatch<React.SetStateAction<{ relevance: any[]; conviction: any[] }>>,
     comments: Node[],
     childrenLoading: boolean,
     setChildrenLoading: React.Dispatch<React.SetStateAction<boolean>>,
@@ -40,10 +40,10 @@ export function PointProvider({ children: _children, point, signer, refreshParen
     children: React.ReactNode, point: Node, signer: Signer | null, refreshParentThread: () => Promise<void>
 }) {
 
-    const [children, setChildren] = useState<{ importance: Node[], conviction: Node[] }>({ importance: [], conviction: [] })
+    const [children, setChildren] = useState<{ relevance: Node[], conviction: Node[] }>({ relevance: [], conviction: [] })
     const [comments, setComments] = useState<Node[]>([])
-    const [likes, setLikes] = useState<undefined | { importance: number | undefined, conviction: number | undefined }>()
-    const [liked, setLiked] = useState<undefined | { importance: boolean | undefined; conviction: boolean }>()
+    const [likes, setLikes] = useState<undefined | { relevance: number | undefined, conviction: number | undefined }>()
+    const [liked, setLiked] = useState<undefined | { relevance: boolean | undefined; conviction: boolean }>()
 
     const [childrenLoading, setChildrenLoading] = useState(false)
     const [detailsOpened, setDetailsOpened] = useState(false)
@@ -55,12 +55,12 @@ export function PointProvider({ children: _children, point, signer, refreshParen
             let likedveracity = signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) ? signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) : undefined
             let likedrelevance = signer && 'fid' in signer && point.advocates?.some((el: { fid: number }) => el.fid === signer.fid) ? signer && 'fid' in signer && point.endPoint?.advocates?.some((el: { fid: number }) => el.fid === signer.fid) : undefined
             if (point.type == "negation") {
-                _likes = { importance: point.points, conviction: point.endPoint?.points }
-                _liked = { importance: likedrelevance, conviction: likedveracity! }
+                _likes = { relevance: point.points, conviction: point.endPoint?.points }
+                _liked = { relevance: likedrelevance, conviction: likedveracity! }
             }
             else if (point.type == "root") {
-                _likes = { importance: undefined, conviction: point.points }
-                _liked = { importance: undefined, conviction: likedveracity! }
+                _likes = { relevance: undefined, conviction: point.points }
+                _liked = { relevance: undefined, conviction: likedveracity! }
 
             }
             setLikes(_likes)
@@ -68,24 +68,24 @@ export function PointProvider({ children: _children, point, signer, refreshParen
         }
     }, [])
 
-    const handleLike = useCallback(async (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>, type: "importance" | "conviction") => {
+    const handleLike = useCallback(async (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>, type: "relevance" | "conviction") => {
         e.stopPropagation();
         e.preventDefault();
         if (!likes || !liked || !point.id || !signer) return
         if (liked[type])
             await unlike(point.id, signer).catch((e) => console.log("ERROR - unlike", e)).then(() => {
-                setLikes(prev => ({ ...prev, [type]: prev?.[type]! - 1 } as { importance: number | undefined; conviction: number | undefined }))
-                setLiked(prev => ({ ...prev, [type]: false } as { importance: boolean | undefined; conviction: boolean }))
+                setLikes(prev => ({ ...prev, [type]: prev?.[type]! - 1 } as { relevance: number | undefined; conviction: number | undefined }))
+                setLiked(prev => ({ ...prev, [type]: false } as { relevance: boolean | undefined; conviction: boolean }))
             })
         else
             await like(point.id, signer).catch((e) => console.log("ERROR - like", e)).then(() => {
-                setLikes(prev => ({ ...prev, [type]: prev?.[type]! + 1 } as { importance: number | undefined; conviction: number | undefined }))
-                setLiked(prev => ({ ...prev, [type]: true } as { importance: boolean | undefined; conviction: boolean }))
+                setLikes(prev => ({ ...prev, [type]: prev?.[type]! + 1 } as { relevance: number | undefined; conviction: number | undefined }))
+                setLiked(prev => ({ ...prev, [type]: true } as { relevance: boolean | undefined; conviction: boolean }))
             })
     }, [liked]);
 
 
-    const handleNegate = useCallback(async (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>, type: 'importance' | 'conviction') => {
+    const handleNegate = useCallback(async (e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>, type: 'relevance' | 'conviction') => {
         e.stopPropagation();
         e.preventDefault();
 
@@ -101,7 +101,7 @@ export function PointProvider({ children: _children, point, signer, refreshParen
         if (!detailsOpened) unfurlDropdown()
     }, [detailsOpened])
 
-    const getNegationsForType = async (_point: Node, type: "importance" | "conviction") => {
+    const getNegationsForType = async (_point: Node, type: "relevance" | "conviction") => {
         const { data: { result: { casts } } } = await axios.get(`/api/cast/${_point.id}/thread`);
         const comments: Node[] = [];
 
@@ -137,12 +137,12 @@ export function PointProvider({ children: _children, point, signer, refreshParen
 
     const refreshChildren = useCallback(async () => {
         if (point.type == "input") return
-        let newNeg: { importance: Node[], conviction: Node[] } = { importance: [], conviction: [] }
+        let newNeg: { relevance: Node[], conviction: Node[] } = { relevance: [], conviction: [] }
         let newComments: { point: Node[], endpoint: Node[] } = { point: [], endpoint: [] }
 
         if (point.type == "negation") {
-            [newNeg.importance, newNeg.conviction] = await Promise.all([
-                getNegationsForType(point, "importance"),
+            [newNeg.relevance, newNeg.conviction] = await Promise.all([
+                getNegationsForType(point, "relevance"),
                 getNegationsForType(point.endPoint!, "conviction"),
 
             ])
