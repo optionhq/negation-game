@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Signer } from "neynar-next/server";
-import { DEFAULT_CHANNELID } from "../components/constants"
-import config from "../config";
+import { DEFAULT_CHANNELID } from "../constants"
 import { Cast } from 'neynar-next/server'
 
 export default async function publish(
