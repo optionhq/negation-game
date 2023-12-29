@@ -14,7 +14,7 @@ export default function Score() {
     if(!likes) return
     return (
         <div className="flex flex-row gap-2 text-gray-500">
-            <_Score type="veracity" />
+            <_Score type="conviction" />
             {likes["relevance"] !== undefined && <_Score type="relevance" />}
         </div>
     )

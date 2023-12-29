@@ -33,21 +33,21 @@ export default function PointWrapper({
                 point.type === "input" &&
                 <InputNegation
                     pointBg={pointBg}
-                    placeHolder={"This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not " + (point.negationType === "relevance" ? "relevant" : "true") + " because ..."}
+                    placeHolder={point.negationType === "relevance" ? "This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` isn't impactful because..." : "An alternative to `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is..."}
                     setParentChildren={setParentChildren}
                     onPublish={async (text: string) => {
                         if (point.parentId && signer)
                             await negate(text, point.parentId, signer)
                         else if (!point.parentId && signer)
                             await publish(text, signer);
-                        setParentChildren((element: { veracity: Node[], relevance: Node[], comment: Node[] }) => {
+                        setParentChildren((element: { conviction: Node[], relevance: Node[], comment: Node[] }) => {
                             let filtered = { ...element, [point.type!]: element[point.negationType!].filter((child: any) => child.type !== "input") }
                             return filtered;
                         })
                         refreshParentThread()
                     }}
                     onClose={() => {
-                        setParentChildren((element: { veracity: Node[], relevance: Node[], comment: Node[] }) => {
+                        setParentChildren((element: { conviction: Node[], relevance: Node[], comment: Node[] }) => {
                             let filtered = { ...element, [point.negationType!]: element[point.negationType!].filter((child: any) => child.type !== "input") }
                             return filtered;
                         })
