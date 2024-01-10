@@ -8,7 +8,9 @@ export default function Page() {
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <Graph elements={data} style={{ width: "100%", height: "100%" }} />
+      {data && (
+        <Graph elements={data} style={{ width: "100%", height: "100%" }} />
+      )}
     </div>
   );
 }

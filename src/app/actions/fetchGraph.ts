@@ -32,6 +32,7 @@ export const fetchGraph = async (
     {
       method: "POST",
       headers: { Authorization: `Key ${process.env.NEYNAR_REDASH_API_KEY}` },
+      cache: "no-store",
       body: JSON.stringify({ max_age: 65 }),
     }
   ).then((res) => res.json())) as {
