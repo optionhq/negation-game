@@ -1,30 +1,34 @@
 "use client";
 
-import cytoscape, { LayoutOptions } from "cytoscape";
+import Cytoscape, { ElementsDefinition, LayoutOptions } from "cytoscape";
 
-import React, { HTMLAttributes, useEffect, useRef } from "react";
+import { FC, HTMLAttributes, useEffect, useRef } from "react";
 import { cytoscapeStyle } from "./Graph.style";
 
 interface GraphProps extends HTMLAttributes<HTMLDivElement> {
-  elements?: cytoscape.ElementsDefinition;
+  elements?: ElementsDefinition;
 }
 
-export const Graph: React.FC<GraphProps> = ({ elements, ...props }) => {
+export const Graph: FC<GraphProps> = ({ elements, ...props }) => {
   const cyContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (!elements) return;
 
-    const instance = cytoscape({
+    const cytoscape = Cytoscape({
       elements,
       container: cyContainer.current,
       style: cytoscapeStyle,
     });
 
-    updateLayout(instance, { fit: true, padding: 100, animate: false });
+    cytoscape.on("tap", "node", (event) => {
+      console.log(event.target.id());
+    });
+
+    updateLayout(cytoscape, { fit: true, padding: 100, animate: false });
 
     return () => {
-      instance.destroy();
+      cytoscape.destroy();
     };
   }, [elements]);
 

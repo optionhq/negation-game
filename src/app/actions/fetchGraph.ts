@@ -123,6 +123,10 @@ export const fetchGraph = async (
     } catch (error) {}
   }
 
-  // @ts-expect-error
-  return cy.json().elements;
+  const elements = pointId
+    ? //@ts-expect-error
+      cy.getElementById(pointId).component()
+    : cy.elements();
+
+  return elements.jsons();
 };
