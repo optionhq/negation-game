@@ -25,7 +25,6 @@ export const cytoscapeStyle: cytoscape.Stylesheet[] = [
       label: "data(text)",
       "text-wrap": "wrap",
       "text-justification": "left",
-      "text-overflow-wrap": "anywhere",
       "text-max-width": "360px",
       "text-valign": "center",
     },
