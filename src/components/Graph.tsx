@@ -22,9 +22,10 @@ export const Graph: FC<GraphProps> = ({ elements, ...props }) => {
       elements,
       container: cyContainer.current,
       style: cytoscapeStyle,
+      minZoom: 0.05,
     });
 
-    cytoscape.on("tap", "node", (event) => {
+    cytoscape.on("tap", (event) => {
       console.log(event.target.id());
     });
 

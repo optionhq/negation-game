@@ -12,7 +12,10 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
 
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <Graph elements={data} style={{ width: "100%", height: "100%" }} />
+      <Graph
+        elements={data}
+        style={{ width: "100%", height: "100%", background: "#eee" }}
+      />
     </div>
   );
 }

@@ -26,12 +26,12 @@ const findCast = (
   return null;
 };
 
-// TODO: use SQL query directly
 export const fetchGraph = async (
   pointId?: string
 ): Promise<ElementsDefinition> => {
   const farcasterDb = await getFarcasterDb();
 
+  // TODO: filter query using pointId
   const allNegationGameCasts = (await farcasterDb
     .query(
       `
@@ -73,28 +73,28 @@ ORDER BY c.created_at ASC;`
     }
 
     if (!isValidNegation(allNegationGameCasts[i].text)) {
-      try {
-        cy.add([
-          {
-            group: "nodes",
-            data: {
-              id: allNegationGameCasts[i].hash,
-              likes: allNegationGameCasts[i].likes,
-              text: allNegationGameCasts[i].text,
-            },
-            classes: "comment",
-          },
-          {
-            group: "edges",
-            data: {
-              id: `comment-${allNegationGameCasts[i].hash}`,
-              source: allNegationGameCasts[i].hash,
-              target: allNegationGameCasts[i].parent_hash,
-            },
-            classes: "commenting",
-          },
-        ]);
-      } catch (_) {}
+      // try {
+      //   cy.add([
+      //     {
+      //       group: "nodes",
+      //       data: {
+      //         id: allNegationGameCasts[i].hash,
+      //         likes: allNegationGameCasts[i].likes,
+      //         text: allNegationGameCasts[i].text,
+      //       },
+      //       classes: "comment",
+      //     },
+      //     {
+      //       group: "edges",
+      //       data: {
+      //         id: `comment-${allNegationGameCasts[i].hash}`,
+      //         source: allNegationGameCasts[i].hash,
+      //         target: allNegationGameCasts[i].parent_hash,
+      //       },
+      //       classes: "commenting",
+      //     },
+      //   ]);
+      // } catch (_) {}
 
       continue;
     }
