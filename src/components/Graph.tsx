@@ -2,8 +2,11 @@
 
 import Cytoscape, { ElementsDefinition, LayoutOptions } from "cytoscape";
 
+import dagre from "cytoscape-dagre";
 import { FC, HTMLAttributes, useEffect, useRef } from "react";
 import { cytoscapeStyle } from "./Graph.style";
+
+Cytoscape.use(dagre);
 
 interface GraphProps extends HTMLAttributes<HTMLDivElement> {
   elements?: ElementsDefinition;
@@ -37,9 +40,9 @@ export const Graph: FC<GraphProps> = ({ elements, ...props }) => {
 
 const updateLayout = (cy: cytoscape.Core, options?: Partial<LayoutOptions>) => {
   cy.layout({
-    name: "cose",
+    name: "dagre",
     // @ts-expect-error
-    numIter: 100,
+    rankDir: "RL",
     nodeDimensionsIncludeLabels: true,
     fit: false,
     ...options,

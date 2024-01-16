@@ -1,8 +1,10 @@
 "use server";
 
+import { DEFAULT_CHANNELID } from "@/constants";
 import { extractTruncatedHash } from "@/lib/extractTruncatedHash";
 import { isValidNegation } from "@/lib/isValidNegation";
 import cytoscape, { ElementsDefinition } from "cytoscape";
+import { getFarcasterDb } from "../getFarcasterDb";
 
 interface Cast {
   hash: string;
@@ -24,58 +26,70 @@ const findCast = (
   return null;
 };
 
+// TODO: use SQL query directly
 export const fetchGraph = async (
   pointId?: string
 ): Promise<ElementsDefinition> => {
-  const allNegationGameCasts = (await fetch(
-    "https://data.hubs.neynar.com/api/queries/243/results",
-    {
-      method: "POST",
-      headers: { Authorization: `Key ${process.env.NEYNAR_REDASH_API_KEY}` },
-      cache: "no-store",
-      body: JSON.stringify({ max_age: 65 }),
-    }
-  ).then((res) => res.json())) as {
-    query_result: {
-      data: {
-        rows: Cast[];
-      };
-    };
-  };
+  const farcasterDb = await getFarcasterDb();
 
-  const casts = allNegationGameCasts.query_result.data.rows;
+  const allNegationGameCasts = (await farcasterDb
+    .query(
+      `
+  SELECT
+    -- c.created_at,
+    encode(c.hash, 'hex') AS hash,
+    c.text,
+    encode(c.parent_hash, 'hex') AS parent_hash,
+    -- c.embeds,
+    COUNT(r.target_hash)::int AS likes
+FROM
+    casts c
+LEFT JOIN
+    reactions r ON r.deleted_at IS NULL AND c.hash = r.target_hash AND c.fid = r.target_fid AND r.reaction_type = 1 AND r.fid IN (${process.env.NEXT_PUBLIC_PLAYLIST})
+WHERE
+    c.fid IN (${process.env.NEXT_PUBLIC_PLAYLIST}) AND
+    (c.parent_url = '${DEFAULT_CHANNELID}' OR c.root_parent_url = '${DEFAULT_CHANNELID}')
+GROUP BY
+    c.created_at, c.fid, c.hash, c.text, c.embeds, c.parent_hash, c.embeds
+ORDER BY c.created_at ASC;`
+    )
+    .then((res) => res.rows)) as Cast[];
 
   const cy = cytoscape({ headless: true });
 
-  for (let i = 0; i < casts.length; i++) {
-    if (casts[i].parent_hash === null) {
+  for (let i = 0; i < allNegationGameCasts.length; i++) {
+    if (allNegationGameCasts[i].parent_hash === null) {
       cy.add({
         group: "nodes",
-        data: { id: casts[i].hash, text: casts[i].text, likes: casts[i].likes },
+        data: {
+          id: allNegationGameCasts[i].hash,
+          text: allNegationGameCasts[i].text,
+          likes: allNegationGameCasts[i].likes,
+        },
         classes: "point",
       });
 
       continue;
     }
 
-    if (!isValidNegation(casts[i].text)) {
+    if (!isValidNegation(allNegationGameCasts[i].text)) {
       try {
         cy.add([
           {
             group: "nodes",
             data: {
-              id: casts[i].hash,
-              likes: casts[i].likes,
-              text: casts[i].text,
+              id: allNegationGameCasts[i].hash,
+              likes: allNegationGameCasts[i].likes,
+              text: allNegationGameCasts[i].text,
             },
             classes: "comment",
           },
           {
             group: "edges",
             data: {
-              id: `comment-${casts[i].hash}`,
-              source: casts[i].hash,
-              target: casts[i].parent_hash,
+              id: `comment-${allNegationGameCasts[i].hash}`,
+              source: allNegationGameCasts[i].hash,
+              target: allNegationGameCasts[i].parent_hash,
             },
             classes: "commenting",
           },
@@ -85,12 +99,14 @@ export const fetchGraph = async (
       continue;
     }
 
-    const truncatedFromHash = extractTruncatedHash(casts[i].text);
+    const truncatedFromHash = extractTruncatedHash(
+      allNegationGameCasts[i].text
+    );
     if (truncatedFromHash === null) {
       continue;
     }
 
-    const negatingCast = findCast(truncatedFromHash, casts, i);
+    const negatingCast = findCast(truncatedFromHash, allNegationGameCasts, i);
     if (negatingCast === null) {
       continue;
     }
@@ -99,24 +115,27 @@ export const fetchGraph = async (
       cy.add([
         {
           group: "nodes",
-          data: { id: casts[i].hash, likes: casts[i].likes },
+          data: {
+            id: allNegationGameCasts[i].hash,
+            likes: allNegationGameCasts[i].likes,
+          },
           classes: "negation",
         },
         {
           group: "edges",
           data: {
-            id: `has-${casts[i].hash}`,
+            id: `has-${allNegationGameCasts[i].hash}`,
             source: negatingCast.hash,
-            target: casts[i].hash,
+            target: allNegationGameCasts[i].hash,
           },
           classes: "has",
         },
         {
           group: "edges",
           data: {
-            id: `negating-${casts[i].hash}`,
-            source: casts[i].hash,
-            target: casts[i].parent_hash,
+            id: `negating-${allNegationGameCasts[i].hash}`,
+            source: allNegationGameCasts[i].hash,
+            target: allNegationGameCasts[i].parent_hash,
           },
           classes: "negating",
         },
