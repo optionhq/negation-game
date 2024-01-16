@@ -17,6 +17,12 @@ const nextConfig = {
         hostname: "i.seadn.io",
         port: "",
       },
+      
+      {
+        protocol: "https",
+        hostname: "lh3.googleusercontent.com",
+        port: "",
+      },
     ],
   },
 };
