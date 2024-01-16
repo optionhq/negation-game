@@ -1,11 +1,24 @@
 import { MdNotifications } from "react-icons/md";
 import Tooltip from "../Tooltip";
 import NotificationsPanel from "./NotificationsPanel";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Signer } from 'neynar-next/server'
 
-export default function NotificationButton() {
+type VerifiedSigner = Signer & { fid?: string };
+
+export default function NotificationButton({ farcasterSigner }: { farcasterSigner: VerifiedSigner | null }) {
   const [panelOpened, setPanelOpened] = useState(false);
   const [nbNotif, setNbNotif] = useState(100);
+  const [notifications, setNotifications] = useState([]);
+
+  useEffect(() => {
+    if (panelOpened && farcasterSigner?.fid) {
+      fetch(`/api/users/${(farcasterSigner as any).fid}/notifications`)
+        .then(response => response.json())
+        .then(data => setNotifications(data))
+        .catch(error => console.error('Error:', error));
+    }
+  }, [panelOpened, farcasterSigner]);
 
   function onOpenPanel() {
     setPanelOpened(!panelOpened);
@@ -24,7 +37,7 @@ export default function NotificationButton() {
           )}
         </button>
       </Tooltip>
-      {panelOpened && <NotificationsPanel />}
+      {panelOpened && <NotificationsPanel notifications={notifications} />}
     </div>
   );
 }

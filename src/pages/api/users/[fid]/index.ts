@@ -1,4 +1,3 @@
-// pages/api/users/[fid].ts
 import { NextApiRequest, NextApiResponse } from 'next'
 import neynarClient from '../../../lib/neynar'
 
