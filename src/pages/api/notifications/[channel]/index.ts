@@ -19,7 +19,6 @@ export default async function GET(req: NextApiRequest, res: NextApiResponse) {
     };
     // value.user = 2588
     const url = `https://api.neynar.com/v2/farcaster/notifications/parent_url?fid=${value.user}&parent_urls=${value.channel}&limit=${value.limit}${value.cursor ? `&cursor=${value.cursor}` : ""}`
-    console.log(url)
     
     const resp = fetch(url, options)
         // const resp = fetch(`https://api.neynar.com/v2/farcaster/notifications/channel?fid=${value.user}&channel_ids=${value.channel}&limit=${value.limit}`, options)

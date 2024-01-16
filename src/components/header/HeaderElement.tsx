@@ -4,7 +4,6 @@ import { IconType } from "react-icons";
 
 export default function HeaderElement({ name, Icon, path, currentPath, nbNotifs }: { name: string, Icon: IconType, path: string, currentPath: boolean, nbNotifs?: number}) {
   
-  console.log(nbNotifs)
   return (
     <button>
       <Link href={path} className="flex flex-row items-center  sm:gap-2 px-2 sm:px-4 py-2 w-20 sm:w-28 md:w-40 hover:bg-black/5 justify-center rounded-md">

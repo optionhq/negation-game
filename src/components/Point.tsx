@@ -40,7 +40,6 @@ export default function Point({
     const current = searchParams.get("id");
     const currentIds = current ? current.split(',') : [];
 
-    console.log(currentIds)
     // Find the first ancestor that is already in the path
     const commonAncestorIndex = ancestry.findIndex(ancestor => ancestor === currentIds[0]);
 
@@ -80,7 +79,6 @@ export default function Point({
     }
   }, [router.query.id, point.id]);
 
-  console.log(point.id)
   return (
     <details
       open={detailsOpened}

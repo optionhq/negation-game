@@ -8,7 +8,7 @@ import { User } from "neynar-next/server";
 import Image from "next/image";
 import isNegation, { validNegation } from "@/lib/isNegation";
 import { castToNegation, getMaybeNegation } from "@/lib/useCasts";
-import getNotifications, { getNegationGameNotifications } from "@/lib/notifications/getNotifications";
+import getNotifications from "@/lib/notifications/getNotifications";
 import { Node } from "@/types/Points";
 import AccuracyIcon from "@/components/icons/Accuracy";
 import ImportanceIcon from "@/components/icons/Importance";
@@ -167,7 +167,6 @@ function Notification({ notification, previousNotif }: { notification: any, prev
 
     if (notification.type == "recasts") return <></>
     const replyHistoric = notification.type == "reply" ? `%2C0x${node?.parentId}` : ""
-    if (notification.type !== "follows" && notification.type !== "mention" && notification.type !== "likes" && notification.type !== "reply") console.log(notification)
     return (
         <div className={`border p-4 w-full md:w-[500px] rounded-md hover:bg-slate-50 cursor-pointer ${isNew ? "bg-indigo-600/10" : ""}`} onClick={() => node && router.push(`/?id=${node.id}${replyHistoric}`)}>
             {notification.type == "follows" && <FollowNotification notification={notification} />}
@@ -223,7 +222,6 @@ export default function Notifications() {
             _observer.observe(loader.current)
     }, [signer])
 
-    console.log(notifications)
     return (
         <div className="flex-1 py-6 sm:py-12 flex justify-center mx-4 md:mx-12 ">
             <div className="flex flex-col items-center gap-2">
