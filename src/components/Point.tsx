@@ -80,6 +80,7 @@ export default function Point({
     }
   }, [router.query.id, point.id]);
 
+  console.log(point.id)
   return (
     <details
       open={detailsOpened}
