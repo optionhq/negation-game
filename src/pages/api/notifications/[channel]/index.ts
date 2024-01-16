@@ -17,10 +17,7 @@ export default async function GET(req: NextApiRequest, res: NextApiResponse) {
         method: 'GET',
         headers: { accept: 'application/json', api_key: process.env.NEYNAR_API_KEY }
     };
-    value.user = 2588
-    // https://api.neynar.com/v2/farcaster/notifications/parent_url?fid=20586&parent_urls=negationgame&limit=15
-    // https://api.neynar.com/v2/farcaster/notifications/parent_url?fid=2588&parent_urls=https%3A%2F%2Fnegationgame.com&limit=25
-    // https://api.neynar.com/v2/farcaster/notifications/parent_url?fid=20586&parent_urls=https://negationgame.com&limit=15
+    // value.user = 2588
     const url = `https://api.neynar.com/v2/farcaster/notifications/parent_url?fid=${value.user}&parent_urls=${value.channel}&limit=${value.limit}${value.cursor ? `&cursor=${value.cursor}` : ""}`
     console.log(url)
     
