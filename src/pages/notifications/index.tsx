@@ -199,8 +199,9 @@ export default function Notifications() {
         localStorage.setItem("old_most_recent_notification", old_most_recent)
         const result: any[] | undefined = await getNotifications(signer, NB_NOTIF)
         if (!result || !result[0].length) return
-
+        
         const [_notifications, nextCursor] = result
+        localStorage.setItem("most_recent_notification", _notifications[0].most_recent_timestamp)
         cursor.current = nextCursor
         setNotifications(_notifications)
     }
