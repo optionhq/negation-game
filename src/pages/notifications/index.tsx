@@ -90,7 +90,7 @@ function MentionNotification({ notification }: { notification: any }) {
 
 function LikersTooltip({ reactions }: { reactions: any }) {
     return (
-        <span className="absolute flex flex-col top-0 bg-slate-50 border rounded-md p-2 w-44 left-0" style={{ transform: "translateY(-100%)", marginTop: "-4px"}}>
+        <span className="absolute flex flex-col top-0 bg-slate-50 border rounded-md p-2 w-44 left-0" style={{ transform: "translateY(-100%)"}}>
             {reactions.slice(1).map((reaction: any) => (
                 <span key={reaction.user.username}>
                     <a href={"https://warpcast.com/" + reaction.user.username} className="font-semibold hover:underline" target="_blank">{reaction.user.username}</a>
