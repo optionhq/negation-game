@@ -7,13 +7,8 @@ export default function Page() {
   const { data } = useSWR(`graph`, () => fetchGraph());
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      {data && (
-        <Graph
-          elements={data}
-          style={{ width: "100%", height: "100%", background: "#eee" }}
-        />
-      )}
+    <div className="w-screen h-screen">
+      {data && <Graph className="w-full h-full bg-gray-100" elements={data} />}
     </div>
   );
 }

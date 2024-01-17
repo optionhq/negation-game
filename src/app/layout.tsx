@@ -1,3 +1,5 @@
+import "@/pages/globals.css";
+
 export const metadata = {
   title: "Negation Game",
   description: "The way extraterrestrials do governance.",

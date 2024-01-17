@@ -11,11 +11,8 @@ export default function Page({ params: { id } }: { params: { id: string } }) {
   const { data } = useSWR(`graph/${id}`, () => fetchGraph(id));
 
   return (
-    <div style={{ width: "100vw", height: "100vh" }}>
-      <Graph
-        elements={data}
-        style={{ width: "100%", height: "100%", background: "#eee" }}
-      />
+    <div className="w-screen h-screen p-0">
+      <Graph elements={data} className="w-full h-full bg-gray-100" />
     </div>
   );
 }
