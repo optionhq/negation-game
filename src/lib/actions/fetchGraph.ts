@@ -4,7 +4,7 @@ import { DEFAULT_CHANNELID } from "@/constants";
 import { extractTruncatedHash } from "@/lib/extractTruncatedHash";
 import { isValidNegation } from "@/lib/isValidNegation";
 import cytoscape, { ElementsDefinition } from "cytoscape";
-import { getFarcasterDb } from "../getFarcasterDb";
+import { getFarcasterDb } from "../../app/getFarcasterDb";
 
 interface Cast {
   hash: string;

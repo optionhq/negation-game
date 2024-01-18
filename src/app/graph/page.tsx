@@ -1,6 +1,6 @@
 "use client";
-import { fetchGraph } from "@/app/actions/fetchGraph";
 import { Graph } from "@/components/Graph";
+import { fetchGraph } from "@/lib/actions/fetchGraph";
 import useSWR from "swr";
 
 export default function Page() {
