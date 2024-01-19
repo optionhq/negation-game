@@ -58,7 +58,7 @@ function ReplyNotification({ notification }: { notification: any }) {
 
             <div className="flex flex-col gap-3">
                 <p className="inline-block">
-                    <a className=" font-semibold hover:underline" href={"https://warpcast.com/" + node?.author?.username} target="_blank" >{node?.author?.username}</a>
+                    <a className=" font-semibold hover:underline" href={"https://warpcast.com/" + node?.author?.username} target="_blank" onClick={(e) => e.stopPropagation()} >{node?.author?.username}</a>
                     {node?.type == "negation" ? ` negated ${parent?.type == "negation" ? "the importance" : "the accuracy"} of your point.` : " replied to your point."}
                 </p>
                 <div className="table table-fixed w-full overflow-hidden">
@@ -90,9 +90,9 @@ function MentionNotification({ notification }: { notification: any }) {
 
 function LikersTooltip({ reactions }: { reactions: any }) {
     return (
-        <span className="absolute flex flex-col top-0 bg-slate-50 border rounded-md p-2 w-44 left-0" style={{ transform: "translateY(-100%)"}}>
+        <span className="absolute flex flex-col top-0 bg-slate-50 border rounded-md p-2 px-4 w-44 left-0 gap-2" style={{ transform: "translateY(-100%)"}}>
             {reactions.slice(1).map((reaction: any) => (
-                <span key={reaction.user.username}>
+                <span key={reaction.user.username} onClick={(e) => e.stopPropagation()}>
                     <a href={"https://warpcast.com/" + reaction.user.username} className="font-semibold hover:underline" target="_blank">{reaction.user.username}</a>
                 </span>
             ))}
@@ -125,7 +125,7 @@ function LikeNotification({ notification }: { notification: any }) {
             <LikeIcon color={node?.type == "negation" ? "#6b21a8" : "#1e40af"} />
             <div >
                 <p className="">
-                    <span className="font-semibold hover:underline">
+                    <span className="font-semibold hover:underline" onClick={(e) => e.stopPropagation()}>
                         <a href={"https://warpcast.com/" + notification.reactions[0].user.username} target="_blank">{notification.reactions[0].user.username}</a>
                     </span>
                     {likersLen > 1 &&
