@@ -3,7 +3,10 @@
 import { DEFAULT_CHANNELID } from "@/constants";
 import { extractTruncatedHash } from "@/lib/extractTruncatedHash";
 import { isValidNegation } from "@/lib/isValidNegation";
-import cytoscape, { ElementsDefinition } from "cytoscape";
+import cytoscape, {
+  CollectionReturnValue,
+  ElementsDefinition,
+} from "cytoscape";
 import { getFarcasterDb } from "../../app/getFarcasterDb";
 
 interface Cast {
@@ -55,9 +58,13 @@ ORDER BY c.created_at ASC;`
     )
     .then((res) => res.rows)) as Cast[];
 
+  // TODO: encapsulate this in a queryFarcasterDb function
+  farcasterDb.end();
+
   const cy = cytoscape({ headless: true });
 
   for (let i = 0; i < allNegationGameCasts.length; i++) {
+    const isCurrentPoint = allNegationGameCasts[i].hash === pointId;
     if (allNegationGameCasts[i].parent_hash === null) {
       cy.add({
         group: "nodes",
@@ -66,38 +73,13 @@ ORDER BY c.created_at ASC;`
           text: allNegationGameCasts[i].text,
           likes: allNegationGameCasts[i].likes,
         },
-        classes: "point",
+        classes: ["point", ...(isCurrentPoint ? ["current-point"] : [])],
       });
 
       continue;
     }
 
-    if (!isValidNegation(allNegationGameCasts[i].text)) {
-      // try {
-      //   cy.add([
-      //     {
-      //       group: "nodes",
-      //       data: {
-      //         id: allNegationGameCasts[i].hash,
-      //         likes: allNegationGameCasts[i].likes,
-      //         text: allNegationGameCasts[i].text,
-      //       },
-      //       classes: "comment",
-      //     },
-      //     {
-      //       group: "edges",
-      //       data: {
-      //         id: `comment-${allNegationGameCasts[i].hash}`,
-      //         source: allNegationGameCasts[i].hash,
-      //         target: allNegationGameCasts[i].parent_hash,
-      //       },
-      //       classes: "commenting",
-      //     },
-      //   ]);
-      // } catch (_) {}
-
-      continue;
-    }
+    if (!isValidNegation(allNegationGameCasts[i].text)) continue;
 
     const truncatedFromHash = extractTruncatedHash(
       allNegationGameCasts[i].text
@@ -115,6 +97,7 @@ ORDER BY c.created_at ASC;`
       cy.add([
         {
           group: "nodes",
+
           data: {
             id: allNegationGameCasts[i].hash,
             likes: allNegationGameCasts[i].likes,
@@ -124,29 +107,39 @@ ORDER BY c.created_at ASC;`
         {
           group: "edges",
           data: {
-            id: `has-${allNegationGameCasts[i].hash}`,
+            id: `negation-${allNegationGameCasts[i].hash}`,
             source: negatingCast.hash,
-            target: allNegationGameCasts[i].hash,
+            target: allNegationGameCasts[i].parent_hash,
           },
-          classes: "has",
+          classes: "negation",
         },
         {
           group: "edges",
           data: {
-            id: `negating-${allNegationGameCasts[i].hash}`,
+            id: `to-source-${allNegationGameCasts[i].hash}`,
+            source: allNegationGameCasts[i].hash,
+            target: negatingCast.hash,
+            aux: true,
+          },
+          classes: "aux",
+        },
+        {
+          group: "edges",
+          data: {
+            id: `to-target-${allNegationGameCasts[i].hash}`,
             source: allNegationGameCasts[i].hash,
             target: allNegationGameCasts[i].parent_hash,
+            aux: true,
           },
-          classes: "negating",
         },
       ]);
     } catch (error) {}
   }
 
-  const elements = pointId
+  const elements: CollectionReturnValue = pointId
     ? //@ts-expect-error
       cy.getElementById(pointId).component()
     : cy.elements();
 
-  return elements.jsons();
+  return elements.filter("[!aux]").jsons() as unknown as ElementsDefinition;
 };

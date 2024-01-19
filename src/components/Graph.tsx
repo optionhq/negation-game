@@ -1,8 +1,14 @@
 "use client";
 
-import Cytoscape, { ElementsDefinition, LayoutOptions } from "cytoscape";
+import Cytoscape, {
+  ElementsDefinition,
+  LayoutOptions,
+  NodeSingular,
+} from "cytoscape";
 
+import cytoscape from "cytoscape";
 import dagre from "cytoscape-dagre";
+import { useRouter } from "next/navigation";
 import { FC, HTMLAttributes, useEffect, useRef } from "react";
 import { cytoscapeStyle } from "./Graph.style";
 
@@ -13,6 +19,7 @@ interface GraphProps extends HTMLAttributes<HTMLDivElement> {
 }
 
 export const Graph: FC<GraphProps> = ({ elements, ...props }) => {
+  const { push } = useRouter();
   const cyContainer = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -25,8 +32,24 @@ export const Graph: FC<GraphProps> = ({ elements, ...props }) => {
       minZoom: 0.05,
     });
 
-    cytoscape.on("tap", (event) => {
+    cytoscape.on("tap", "node, edge", (event) => {
       console.log(event.target.id());
+    });
+
+    cytoscape.on("tap", "node.point", (event) => {
+      push(`/point/${event.target.id()}`);
+    });
+
+    cytoscape.on("position", "node.point", (e) => {
+      const point = e.target as NodeSingular;
+      point.connectedEdges().forEach((edge) => {
+        const negationNode = cytoscape.getElementById(
+          edge.id().replace("negation-", "")
+        ) as NodeSingular;
+        negationNode.unlock();
+        negationNode.position(edge.midpoint());
+        negationNode.lock();
+      });
     });
 
     updateLayout(cytoscape, { fit: true, padding: 100, animate: false });
@@ -34,18 +57,28 @@ export const Graph: FC<GraphProps> = ({ elements, ...props }) => {
     return () => {
       cytoscape.destroy();
     };
-  }, [elements]);
+  }, [elements, props]);
 
   return <div ref={cyContainer} {...props} />;
 };
 
 const updateLayout = (cy: cytoscape.Core, options?: Partial<LayoutOptions>) => {
+  const negationNodes = cy.$("node.negation");
+  negationNodes.unlock();
+  cy.one("layoutstop", () => negationNodes.lock());
   cy.layout({
     name: "dagre",
     // @ts-expect-error
+    rankSep: 500,
     rankDir: "RL",
     nodeDimensionsIncludeLabels: true,
     fit: false,
+    // transform(node, position) {
+    //   if (node.hasClass("point")) return position;
+
+    //   const edge = cy.$(`#negation-${node.id()}`) as EdgeSingular;
+    //   return edge.midpoint();
+    // },
     ...options,
   }).run();
 };
