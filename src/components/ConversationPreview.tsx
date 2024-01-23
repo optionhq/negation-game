@@ -7,9 +7,9 @@ import Link from 'next/link';
 import Score from './score/Score';
 import PointWrapper from './PointWrapper';
 import { PointProvider } from '../contexts/PointContext';
-import { useSigner } from 'neynar-next';
 import { getMaybeNegation } from '../lib/useCasts';
 import {  Node } from '../types/Points';
+import { useSigner } from '@/contexts/SignerContext';
 // import Score from './score/desktop/DesktopScore';
 
 export default function ConversationPreview({ id }: { id: string }) {

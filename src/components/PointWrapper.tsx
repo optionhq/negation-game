@@ -1,11 +1,11 @@
 import { Node } from "../types/Points";
-import { useSigner } from "neynar-next";
 import { PointProvider } from "../contexts/PointContext";
 import InputNegation from "./negations/InputNegation";
 import Point from "./Point";
 import { negate } from "../lib/negate";
 import publish from "../lib/publish";
 import Comment from "./Comment";
+import { useSigner } from "@/contexts/SignerContext";
 
 export default function PointWrapper({
     level,

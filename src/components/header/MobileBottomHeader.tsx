@@ -1,9 +1,9 @@
-import { useSigner } from "neynar-next"
 import HeaderElement from "./HeaderElement"
 import { usePathname } from "next/navigation"
 import { HiHome } from "react-icons/hi";
 import { MdNotifications } from "react-icons/md";
 import { BiSolidGroup } from "react-icons/bi";
+import { useSigner } from "@/contexts/SignerContext";
 
 export default function MobileBottomHeader(){
   const { signer } = useSigner()

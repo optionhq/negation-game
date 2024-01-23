@@ -3,7 +3,7 @@ import HeaderElement from "./HeaderElement";
 import getNbNewNotifications from "@/lib/notifications/getNbNewNotifications";
 import { MdNotifications } from "react-icons/md";
 import { usePathname } from "next/navigation";
-import { useSigner } from "neynar-next";
+import { useSigner } from "@/contexts/SignerContext";
 
 export default function NotificationElement() {
 

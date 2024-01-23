@@ -1,14 +1,10 @@
 import Login from "../Login";
-import { Signer } from "neynar-next/server";
-import NotificationButton from "../notifications/NotificationButton";
-import { useSigner } from "neynar-next";
-import Link from "next/link";
 import { HiHome } from "react-icons/hi";
-import { MdNotifications } from "react-icons/md";
 import { BiSolidGroup } from "react-icons/bi";
 import { usePathname, useRouter } from "next/navigation";
 import HeaderElement from "./HeaderElement";
 import NotificationElement from "./NotificationElement";
+import { useSigner } from "@/contexts/SignerContext";
 
 export default function Header() {
   const pathName = usePathname()

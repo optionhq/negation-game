@@ -1,21 +1,15 @@
-// import Notification from "../../components/notifications/Notification"
 import axios from "axios";
 import { useEffect, useRef, useState } from "react"
-import { DEFAULT_CHANNELID } from "@/constants";
-import { useFarcasterSigner } from "@/contexts/UserContext";
-import { useSigner } from "neynar-next";
-import { User } from "neynar-next/server";
 import Image from "next/image";
-import isNegation, { validNegation } from "@/lib/isNegation";
-import { castToNegation, getMaybeNegation } from "@/lib/useCasts";
+import { validNegation } from "@/lib/isNegation";
+import { getMaybeNegation } from "@/lib/useCasts";
 import getNotifications from "@/lib/notifications/getNotifications";
 import { Node } from "@/types/Points";
-import AccuracyIcon from "@/components/icons/Accuracy";
-import ImportanceIcon from "@/components/icons/Importance";
 import CommentIcon from "@/components/icons/Comment";
 import LikeIcon from "@/components/icons/Like";
 import NegateIcon from "@/components/icons/Negate";
 import { useRouter } from "next/navigation";
+import { useSigner } from "@/contexts/SignerContext";
 
 function FollowNotification({ notification }: { notification: any }) {
     const followersLen = notification.follows.length
@@ -180,7 +174,7 @@ function Notification({ notification, previousNotif }: { notification: any, prev
 const NB_NOTIF = 320
 export default function Notifications() {
     const [notifications, setNotifications] = useState<any[]>([])
-    const { signer } = useSigner()
+    const {signer} = useSigner()
     const [previousNotif, setPreviousNotif] = useState<string>("")
     const cursor = useRef(undefined)
     const loader = useRef(null)
