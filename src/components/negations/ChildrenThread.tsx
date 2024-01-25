@@ -1,7 +1,6 @@
 import { useState } from "react";
+import { BsFillSlashCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { GoInfo } from "react-icons/go";
-import { MdDoNotDisturbOnTotalSilence } from "react-icons/md";
-import { PiExcludeDuotone } from "react-icons/pi";
 import { usePointContext } from "../../contexts/PointContext";
 import { Node } from "../../types/Points";
 import PointWrapper from "../PointWrapper";
@@ -17,7 +16,7 @@ function VeracityThreadHeader({ isVeracityVisible, setIsVeracityVisible, nbItems
     return (
         <button className="flex flex-col items-start p-2 text-blue-800" onClick={(e) => handleExpand(e)} >
             <div className="flex flex-row items-center gap-2 justify-start">
-                {isVeracityVisible ? <PiExcludeDuotone size={18} color="rgb(30,64,175)"  /> :
+                {isVeracityVisible ? <BsFillXCircleFill size={18} color="rgb(30,64,175)"  /> :
                     // <BsChevronExpand size={18}/>
                     <div className="w-[18px]">{nbItems}</div>
                 }
@@ -42,7 +41,7 @@ function RelevanceThreadHeader({ isRelevanceVisible, setIsRelevanceVisible, nbIt
     return (
         <button className="flex flex-col items-start p-2 text-gray-400" onClick={(e) => handleExpand(e)} >
             <div className="flex flex-row items-center gap-2 justify-center text-purple-800">
-                {isRelevanceVisible ? <MdDoNotDisturbOnTotalSilence size={18} color="rgb(107, 33, 168)" /> :
+                {isRelevanceVisible ? <BsFillSlashCircleFill size={18} color="rgb(107, 33, 168)" /> :
                     // <BsChevronExpand size={18}/>
                     <div className="w-[18px]">{nbItems}</div>
                 }
