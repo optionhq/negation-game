@@ -2,7 +2,7 @@
 import React, { useEffect } from 'react';
 import QRCode from 'qrcode.react';
 import { useRouter } from 'next/router';
-import { useSigner } from 'neynar-next';
+import { useSigner } from '@/contexts/SignerContext';
 
 function QRCodePage() {
   const { signer } = useSigner();

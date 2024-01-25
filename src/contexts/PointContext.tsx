@@ -73,12 +73,12 @@ export function PointProvider({ children: _children, point, signer, refreshParen
         e.preventDefault();
         if (!likes || !liked || !point.id || !signer) return
         if (liked[type])
-            await unlike(point.id, signer).catch((e) => console.log("ERROR - unlike", e)).then(() => {
+            await unlike(point.id, signer).catch((e) => console.error("ERROR - unlike", e)).then(() => {
                 setLikes(prev => ({ ...prev, [type]: prev?.[type]! - 1 } as { relevance: number | undefined; conviction: number | undefined }))
                 setLiked(prev => ({ ...prev, [type]: false } as { relevance: boolean | undefined; conviction: boolean }))
             })
         else
-            await like(point.id, signer).catch((e) => console.log("ERROR - like", e)).then(() => {
+            await like(point.id, signer).catch((e) => console.error("ERROR - like", e)).then(() => {
                 setLikes(prev => ({ ...prev, [type]: prev?.[type]! + 1 } as { relevance: number | undefined; conviction: number | undefined }))
                 setLiked(prev => ({ ...prev, [type]: true } as { relevance: boolean | undefined; conviction: boolean }))
             })

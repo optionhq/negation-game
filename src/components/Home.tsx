@@ -10,7 +10,7 @@ import { getMaybeNegation } from "../lib/useCasts";
 import { BiChevronLeft } from "react-icons/bi";
 import RootFeed from "./RootFeed";
 import CastButton from "./CastButton";
-import { DEFAULT_CHANNELID } from "./constants";
+import { DEFAULT_CHANNELID } from "../constants";
 
 export default function Home() {
   const router = useRouter();
