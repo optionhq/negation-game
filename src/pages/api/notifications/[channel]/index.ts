@@ -1,8 +1,5 @@
-import { NextResponse } from 'next/server'
-import { NextApiRequest, NextApiResponse } from 'next'
-import neynarClient from '../../../../lib/neynar'
 import Joi from 'joi';
-import { DEFAULT_CHANNELID } from '@/constants';
+import { NextApiRequest, NextApiResponse } from 'next';
 const schema = Joi.object({
     user: Joi.string().required(),
     channel: Joi.string().required(),
@@ -17,7 +14,7 @@ export default async function GET(req: NextApiRequest, res: NextApiResponse) {
         method: 'GET',
         headers: { accept: 'application/json', api_key: process.env.NEYNAR_API_KEY }
     };
-    value.user = 2588
+    // value.user = 2588
     const url = `https://api.neynar.com/v2/farcaster/notifications/parent_url?fid=${value.user}&parent_urls=${value.channel}&limit=${value.limit}${value.cursor ? `&cursor=${value.cursor}` : ""}`
     
     const resp = fetch(url, options)
