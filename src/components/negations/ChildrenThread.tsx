@@ -1,10 +1,10 @@
-import { GoInfo, GoComment } from "react-icons/go"
-import { Node } from "../../types/Points";
-import { usePointContext } from "../../contexts/PointContext";
-import { useEffect, useState } from "react";
-import PointWrapper from "../PointWrapper";
-import { PiExcludeDuotone } from "react-icons/pi";
+import { useState } from "react";
+import { GoInfo } from "react-icons/go";
 import { MdDoNotDisturbOnTotalSilence } from "react-icons/md";
+import { PiExcludeDuotone } from "react-icons/pi";
+import { usePointContext } from "../../contexts/PointContext";
+import { Node } from "../../types/Points";
+import PointWrapper from "../PointWrapper";
 
 function VeracityThreadHeader({ isVeracityVisible, setIsVeracityVisible, nbItems }: { isVeracityVisible: boolean, setIsVeracityVisible: React.Dispatch<React.SetStateAction<boolean>>, nbItems: number }) {
 
@@ -21,14 +21,14 @@ function VeracityThreadHeader({ isVeracityVisible, setIsVeracityVisible, nbItems
                     // <BsChevronExpand size={18}/>
                     <div className="w-[18px]">{nbItems}</div>
                 }
-                <p className="font-semibold">Alternatives</p>
+                <p className="font-semibold">Counterpoints</p>
                 <p className="font-normal text-gray-400">{`tap to ${isVeracityVisible ? "hide" : "show"}`}</p>
 
                 <a href="https://responses.negationgame.com/" target="_blank" className="flex flex-row gap-1 items-center hover:text-black">
                     <GoInfo size={18} color="#AAAAAA" />
                 </a>
             </div>
-            {isVeracityVisible && <p className="text-gray-400/80 font-light">these points ↓ are alternative options to the parent point ↑</p>}
+            {isVeracityVisible && <p className="text-gray-400/80 font-light">these points ↓ are refuting the parent point ↑</p>}
         </button>)
 }
 
@@ -46,13 +46,13 @@ function RelevanceThreadHeader({ isRelevanceVisible, setIsRelevanceVisible, nbIt
                     // <BsChevronExpand size={18}/>
                     <div className="w-[18px]">{nbItems}</div>
                 }
-                <p className="font-semibold">Counterpoints</p>
+                <p className="font-semibold">Objections</p>
                 <p className="font-normal text-gray-400">{`tap to ${isRelevanceVisible ? "hide" : "show"}`}</p>
                 <a href="https://responses.negationgame.com/" target="_blank" className="flex flex-row gap-1 items-center hover:text-black">
                     <GoInfo size={18} color="#AAAAAA" />
                 </a>
             </div>
-            {isRelevanceVisible && <p className="text-gray-400/80 font-light">these points ↓ are evidence against the parent point ↑ in this context</p>}
+            {isRelevanceVisible && <p className="text-gray-400/80 font-light">these points ↓ reject the validity of the parent point ↑ in this context</p>}
         </button>
     )
 }

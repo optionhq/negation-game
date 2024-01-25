@@ -1,11 +1,11 @@
-import { Node } from "../types/Points";
+import { useSigner } from "@/contexts/SignerContext";
 import { PointProvider } from "../contexts/PointContext";
-import InputNegation from "./negations/InputNegation";
-import Point from "./Point";
 import { negate } from "../lib/negate";
 import publish from "../lib/publish";
+import { Node } from "../types/Points";
 import Comment from "./Comment";
-import { useSigner } from "@/contexts/SignerContext";
+import Point from "./Point";
+import InputNegation from "./negations/InputNegation";
 
 export default function PointWrapper({
     level,
@@ -33,7 +33,7 @@ export default function PointWrapper({
                 point.type === "input" &&
                 <InputNegation
                     pointBg={pointBg}
-                    placeHolder={point.negationType === "relevance" ? "This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` isn't impactful because..." : "An alternative to `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is..."}
+                    placeHolder={point.negationType === "relevance" ? "This point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is not valid in this context because..." : "The point `" + (parent?.endPoint ? parent?.endPoint.title : parent?.title) + "` is wrong, because..."}
                     setParentChildren={setParentChildren}
                     onPublish={async (text: string) => {
                         if (point.parentId && signer)
