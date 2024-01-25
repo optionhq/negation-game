@@ -1,7 +1,4 @@
-import { usePointContext } from "../../contexts/PointContext";
-import { negate } from "../../lib/negate";
-import { Node } from "../../types/Points";
-import { useSigner } from "neynar-next";
+import { useSigner } from "@/contexts/SignerContext";
 import React, { useEffect, useState, useRef } from "react";
 
 const MAX_CHAR_PER_CAST = 320;

@@ -47,7 +47,6 @@ export default function Point({
     const current = searchParams?.get("id");
     const currentIds = current ? current.split(",") : [];
 
-    console.log(currentIds);
     // Find the first ancestor that is already in the path
     const commonAncestorIndex = ancestry.findIndex(
       (ancestor) => ancestor === currentIds[0]
