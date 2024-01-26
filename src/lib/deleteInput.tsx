@@ -1,3 +1,1 @@
-export function deleteFunction(){
-    
-}
+export function deleteFunction() {}
