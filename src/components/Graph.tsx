@@ -42,16 +42,32 @@ export const Graph: FC<GraphProps> = ({ elements, ...props }) => {
 			push(`/?id=0x${event.target.id()}`);
 		});
 
+		cytoscape.on("zoom", () => {
+			const currentZoomLevel = cytoscape.zoom();
+			currentZoomLevel > 0.2
+				? cytoscape
+						.nodes()
+						.grabify()
+						// @ts-expect-error
+						.unpanify()
+				: cytoscape
+						.nodes()
+						.ungrabify()
+						// @ts-expect-error
+						.panify();
+		});
+
 		cytoscape.on("position", "node.point", (e) => {
 			const point = e.target as NodeSingular;
-			point.connectedEdges().forEach((edge) => {
+
+			for (const edge of point.connectedEdges()) {
 				const negationNode = cytoscape.getElementById(
 					edge.id().replace("negation-", ""),
 				) as NodeSingular;
 				negationNode.unlock();
 				negationNode.position(edge.midpoint());
 				negationNode.lock();
-			});
+			}
 		});
 
 		updateLayout(cytoscape, { fit: true, padding: 100, animate: false });
@@ -59,7 +75,7 @@ export const Graph: FC<GraphProps> = ({ elements, ...props }) => {
 		return () => {
 			cytoscape.destroy();
 		};
-	}, [elements, props, push]);
+	}, [elements, push]);
 
 	return <div ref={cyContainer} {...props} />;
 };
