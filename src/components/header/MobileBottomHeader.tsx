@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { BiSolidGroup } from "react-icons/bi";
 import { HiHome } from "react-icons/hi";
 import { MdNotifications } from "react-icons/md";
+import { PiGraphBold } from "react-icons/pi";
 import HeaderElement from "./HeaderElement";
 
 export default function MobileBottomHeader() {
@@ -17,23 +18,28 @@ export default function MobileBottomHeader() {
 				Icon={HiHome}
 				name="Home"
 				path="/"
-				currentPath={pathName == "/"}
+				currentPath={pathName === "/"}
 			/>
 			<HeaderElement
 				Icon={BiSolidGroup}
 				name="Spaces"
 				path="/spaces"
-				currentPath={pathName == "/spaces"}
+				currentPath={pathName === "/spaces"}
+			/>
+			<HeaderElement
+				Icon={PiGraphBold}
+				name="Graph"
+				path="/graph"
+				currentPath={pathName === "/graph"}
 			/>
 			{signer && (
 				<HeaderElement
 					Icon={MdNotifications}
 					name="Notifications"
 					path="/notifications"
-					currentPath={pathName == "/notifications"}
+					currentPath={pathName === "/notifications"}
 				/>
 			)}
 		</ul>
 	);
 }
-
