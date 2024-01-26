@@ -11,7 +11,7 @@ export const style: cytoscape.Stylesheet[] = [
       width: "400px",
       height: "160px",
       label: (node: NodeSingular) =>
-        `[${node.data("likes")}] ${node.data("text")}`,
+        `[${node.data("likes")}] ${breakLongWords(node.data("text"))}`,
       "text-wrap": "wrap",
       "text-justification": "left",
       "text-max-width": "360px",
@@ -55,3 +55,8 @@ export const style: cytoscape.Stylesheet[] = [
     },
   },
 ];
+
+const breakLongWords = (text: string) =>
+  text.replace(/[^\s]{46,}/g, (word) =>
+    (word.match(/.{1,46}/g) ?? []).join("\n")
+  );
