@@ -1,6 +1,6 @@
 import { EdgeSingular, NodeSingular } from "cytoscape";
 
-export const cytoscapeStyle: cytoscape.Stylesheet[] = [
+export const style: cytoscape.Stylesheet[] = [
   {
     selector: "node.point",
     style: {
@@ -19,18 +19,11 @@ export const cytoscapeStyle: cytoscape.Stylesheet[] = [
     },
   },
   {
-    selector: "node.current-point",
-    style: {
-      "background-color": "#ffd",
-      "border-color": "#d93",
-    },
-  },
-  {
     selector: "node.negation",
 
     style: {
-      display: (node: NodeSingular) =>
-        node.degree(false) === 0 ? "none" : "element",
+      visibility: (node: NodeSingular) =>
+        node.connectedEdges("[!aux]").length === 0 ? "hidden" : "visible",
 
       "border-color": "#000",
       "border-width": 2,
@@ -45,15 +38,20 @@ export const cytoscapeStyle: cytoscape.Stylesheet[] = [
   {
     selector: "edge",
     style: {
+      visibility: "visible",
       width: (edge: EdgeSingular) => Math.max(1, edge.source().data("likes")),
       "target-arrow-shape": "triangle",
       "arrow-scale": 1,
       "curve-style": "unbundled-bezier",
-      "source-endpoint": "-200 0",
-      // "target-endpoint": "90deg",
       "line-color": "#000",
       "source-arrow-color": "#000",
       "target-arrow-color": "#000",
+    },
+  },
+  {
+    selector: "edge.aux",
+    style: {
+      visibility: "hidden",
     },
   },
 ];

@@ -1,6 +1,7 @@
+"use client";
+
 import { useSigner } from "@/contexts/SignerContext";
-import { Signer } from "@/types/Signer";
-import React, { useEffect, useState } from "react";
+import { useEffect } from "react";
 
 export interface ISuccessMessage {
     fid: string;

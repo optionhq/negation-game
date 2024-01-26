@@ -131,15 +131,47 @@ ORDER BY c.created_at ASC;`
             target: allNegationGameCasts[i].parent_hash,
             aux: true,
           },
+          classes: "aux",
         },
       ]);
     } catch (error) {}
   }
 
   const elements: CollectionReturnValue = pointId
-    ? //@ts-expect-error
+    ? // @ts-expect-error
       cy.getElementById(pointId).component()
-    : cy.elements();
+    : // ? extendedClosedNeighborhood(pointId, cy.elements(), 2)
+      cy.elements();
 
-  return elements.filter("[!aux]").jsons() as unknown as ElementsDefinition;
+  return (
+    elements
+      // .filter("[!aux]")
+      .jsons() as unknown as ElementsDefinition
+  );
+};
+
+const extendedClosedNeighborhood = (
+  rootId: string,
+  allNodes: CollectionReturnValue,
+  maxDepth: number
+) => {
+  let extendedClosedNeighborhood = allNodes
+    .cy()
+    .collection([allNodes.getElementById(rootId)]);
+
+  allNodes.breadthFirstSearch({
+    roots: allNodes.getElementById(rootId),
+    visit: (current, sourceEdge, previous, index, depth) => {
+      if (depth > maxDepth) {
+        return false;
+      }
+      current.data("depth", depth);
+      extendedClosedNeighborhood = extendedClosedNeighborhood.add(current);
+      if (sourceEdge)
+        extendedClosedNeighborhood = extendedClosedNeighborhood.add(sourceEdge);
+    },
+    directed: false,
+  });
+
+  return extendedClosedNeighborhood;
 };

@@ -1,26 +1,34 @@
-import { useEffect, useState } from "react";
-import HeaderElement from "./HeaderElement";
-import getNbNewNotifications from "@/lib/notifications/getNbNewNotifications";
-import { MdNotifications } from "react-icons/md";
-import { usePathname } from "next/navigation";
+"use client";
+
 import { useSigner } from "@/contexts/SignerContext";
+import getNbNewNotifications from "@/lib/notifications/getNbNewNotifications";
+import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
+import { MdNotifications } from "react-icons/md";
+import HeaderElement from "./HeaderElement";
 
 export default function NotificationElement() {
+	const [nbNotifs, setNbNotifs] = useState(0);
+	const pathName = usePathname();
+	const { signer } = useSigner();
 
-    const [nbNotifs, setNbNotifs] = useState(0)
-    const pathName = usePathname()
-    const { signer } = useSigner()
+	async function fetchNotifications() {
+		setNbNotifs(await getNbNewNotifications(signer));
+	}
 
-    async function fetchNotifications() {
-        setNbNotifs(await getNbNewNotifications(signer))
-    }
+	useEffect(() => {
+		fetchNotifications();
+	}, [signer]);
 
-    useEffect(() => {
-        fetchNotifications()
-    }, [signer])
-
-    return (
-        <div onClick={() => setNbNotifs(0)}>
-            <HeaderElement Icon={MdNotifications} name="Notifications" path="/notifications" currentPath={pathName == "/notifications"} nbNotifs={nbNotifs} />
-        </div>)
+	return (
+		<div onClick={() => setNbNotifs(0)}>
+			<HeaderElement
+				Icon={MdNotifications}
+				name="Notifications"
+				path="/notifications"
+				currentPath={pathName == "/notifications"}
+				nbNotifs={nbNotifs}
+			/>
+		</div>
+	);
 }

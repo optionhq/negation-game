@@ -1,3 +1,5 @@
+"use client";
+
 import { Signer } from '@/types/Signer';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 
