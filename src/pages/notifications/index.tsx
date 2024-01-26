@@ -171,7 +171,7 @@ function Notification({ notification, previousNotif }: { notification: any, prev
     )
 }
 
-const NB_NOTIF = 320
+const NB_NOTIF = 50
 export default function Notifications() {
     const [notifications, setNotifications] = useState<any[]>([])
     const {signer} = useSigner()
