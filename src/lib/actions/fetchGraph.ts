@@ -138,8 +138,10 @@ ORDER BY c.created_at ASC;`
   }
 
   const elements: CollectionReturnValue = pointId
-    ? // @ts-expect-error
-      cy.getElementById(pointId).component()
+    ? cy
+        .getElementById(pointId)
+        // @ts-expect-error
+        .component()
     : // ? extendedClosedNeighborhood(pointId, cy.elements(), 2)
       cy.elements();
 

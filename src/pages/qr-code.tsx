@@ -1,5 +1,5 @@
-import QRCodePage from '../components/QRCodePage';
+import QRCodePage from "../components/QRCodePage";
 
 export default function QRCodeRoute() {
-  return <QRCodePage />;
+	return <QRCodePage />;
 }
