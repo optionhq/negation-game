@@ -1,11 +1,11 @@
 // src/pages/spaces/[space].tsx
-import { useRouter, useSearchParams } from "next/navigation";
+
+import { useRouter } from "next/router";
 import ConversationPreview from "../../../components/ConversationPreview";
 
 function SpacePage() {
-	const router = useRouter();
-	const params = useSearchParams();
-	const space = params?.get("space");
+	const { query } = useRouter();
+	const space = query.space;
 
 	// Parse the NEXT_PUBLIC_SPACES environment variable into a JSON object
 	const spaces = JSON.parse(process.env.NEXT_PUBLIC_SPACES || "{}");
