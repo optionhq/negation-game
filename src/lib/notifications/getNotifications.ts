@@ -1,13 +1,14 @@
 import axios from "axios";
 import { Signer } from "neynar-next/server";
 import { DEFAULT_CHANNELID } from "@/constants";
+import { Notification } from "@/types/Notification";
 
 export default async function getNotifications(
   signer: Signer | null,
   amount?: number,
   cursor?: string
-) {
-  if (!signer) return;
+): Promise<[Notification[], string] | null> {
+  if (!signer) return null;
 
   try {
     // localStorage.removeItem("old_most_recent_notification")
@@ -15,11 +16,12 @@ export default async function getNotifications(
     const url = `/api/notifications/${"https%3A%2F%2Fnegationgame.com"}?user=${
       //@ts-ignore
       signer?.fid
-    }&limit=${amount ?? 25}${cursor ? `&cursor=${cursor}` : ""}`;
+      }&limit=${amount ?? 25}${cursor ? `&cursor=${cursor}` : ""}`;
     const feed = await axios.get(url);
-    let nextCursor = feed.data.next.cursor;
+    const nextCursor: string = feed.data.next.cursor;
     return [feed.data.notifications, nextCursor];
   } catch (e) {
     console.error(e);
+    return null
   }
 }
