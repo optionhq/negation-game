@@ -1,7 +1,7 @@
 // these are the only URLs that can used to fetch a cast
 export const okUrls = [
-  // warpcast.com/usr/0x...
-  /.*warpcast\.com\/[^/]+\/0x[a-fA-F0-9]+$/
+	// warpcast.com/usr/0x...
+	/.*warpcast\.com\/[^/]+\/0x[a-fA-F0-9]+$/,
 ];
 
 /**
@@ -11,15 +11,18 @@ export const okUrls = [
  * @param {Regex[]} permissibleUrls - An array of permissible URLs.
  * @returns {string|null} - The extracted URL if it exists and is permissible, or null otherwise.
  */
-export function extractEndPointUrl(cast: any, urlCheck: RegExp[] = okUrls): string | null {
-  if (cast.embeds) {
-    const embed = cast.embeds.find((embed: any) => {
-      if (embed.url) {
-        return urlCheck.some(urlRegex => urlRegex.test(embed.url));
-      }
-      return false;
-    });
-    return embed?.url || null;
-  }
-  return null;
+export function extractEndPointUrl(
+	cast: any,
+	urlCheck: RegExp[] = okUrls,
+): string | null {
+	if (cast.embeds) {
+		const embed = cast.embeds.find((embed: any) => {
+			if (embed.url) {
+				return urlCheck.some((urlRegex) => urlRegex.test(embed.url));
+			}
+			return false;
+		});
+		return embed?.url || null;
+	}
+	return null;
 }

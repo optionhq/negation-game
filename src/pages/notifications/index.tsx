@@ -1,23 +1,32 @@
-import axios from "axios";
-import { useEffect, useRef, useState } from "react"
-import Image from "next/image";
-import { validNegation } from "@/lib/isNegation";
-import { getMaybeNegation } from "@/lib/useCasts";
-import getNotifications from "@/lib/notifications/getNotifications";
-import { Node } from "@/types/Points";
 import CommentIcon from "@/components/icons/Comment";
 import LikeIcon from "@/components/icons/Like";
 import NegateIcon from "@/components/icons/Negate";
-import { useRouter } from "next/navigation";
 import { useSigner } from "@/contexts/SignerContext";
+import { isValidNegation } from "@/lib/isValidNegation";
+import getNotifications from "@/lib/notifications/getNotifications";
+import { getMaybeNegation } from "@/lib/useCasts";
+import { Node } from "@/types/Points";
+import axios from "axios";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 
 function FollowNotification({ notification }: { notification: any }) {
-    const followersLen = notification.follows.length
-    return (
-        <p>
-            <span className="font-bold">{notification.follows?.[0].user.username}</span> {followersLen > 1 && "and"} {followersLen > 1 && <span className="font-bold">{notification.follows.length - 1} others</span>} followed you
-        </p>
-    )
+	const followersLen = notification.follows.length;
+	return (
+		<p>
+			<span className="font-bold">
+				{notification.follows?.[0].user.username}
+			</span>{" "}
+			{followersLen > 1 && "and"}{" "}
+			{followersLen > 1 && (
+				<span className="font-bold">
+					{notification.follows.length - 1} others
+				</span>
+			)}{" "}
+			followed you
+		</p>
+	);
 }
 
 function ReplyNotification({ notification }: { notification: any }) {
@@ -27,21 +36,24 @@ function ReplyNotification({ notification }: { notification: any }) {
     async function getCast() {
         try {
             const _node = await getMaybeNegation(notification.cast);
-            setIsLinkingPoint(validNegation(_node?.title));
+            setIsLinkingPoint(isValidNegation(_node?.title));
             setNode(_node);
 
-            axios.get(`/api/cast?type=hash&identifier=${"0x" + _node.parentId}`)
-                .then(async response => {
-                    const _parent = await getMaybeNegation(response.data)
-                    setParent(_parent)
-                })
-                .catch(error => console.error('Error fetching conversation:', error));
-        } catch (error) { console.error('Error fetching cast:', error) }
-    }
+			axios
+				.get(`/api/cast?type=hash&identifier=${"0x" + _node.parentId}`)
+				.then(async (response) => {
+					const _parent = await getMaybeNegation(response.data);
+					setParent(_parent);
+				})
+				.catch((error) => console.error("Error fetching conversation:", error));
+		} catch (error) {
+			console.error("Error fetching cast:", error);
+		}
+	}
 
-    useEffect(() => {
-        getCast()
-    }, [])
+	useEffect(() => {
+		getCast();
+	}, []);
 
     return (
         <div className="flex flex-row gap-3">
@@ -93,24 +105,24 @@ function LikersTooltip({ reactions }: { reactions: any }) {
 }
 
 function LikeNotification({ notification }: { notification: any }) {
-    const [node, setNode] = useState<Node>();
-    const [isLinkingPoint, setIsLinkingPoint] = useState<boolean>(false)
-    const [showTooltip, setShowTooltip] = useState(false)
-    const likersLen = notification.reactions.length
+	const [node, setNode] = useState<Node>();
+	const [isLinkingPoint, setIsLinkingPoint] = useState<boolean>(false);
+	const [showTooltip, setShowTooltip] = useState(false);
+	const likersLen = notification.reactions.length;
 
-    const thirdPerson = likersLen > 1 ? '' : 's'
+	const thirdPerson = likersLen > 1 ? "" : "s";
 
     async function getCast() {
         try {
             const _node = await getMaybeNegation(notification.cast);
-            setIsLinkingPoint(validNegation(_node?.title));
+            setIsLinkingPoint(isValidNegation(_node?.title));
             setNode(_node);
         } catch (error) { console.error('Error fetching cast:', error) }
     }
 
-    useEffect(() => {
-        getCast()
-    }, [])
+	useEffect(() => {
+		getCast();
+	}, []);
 
     return (
         <div className="flex flex-row gap-3 ">
@@ -153,9 +165,9 @@ function Notification({ notification, previousNotif }: { notification: any, prev
         } catch (error) { console.error('Error fetching cast:', error) }
     }
 
-    useEffect(() => {
-        getCast()
-    }, [])
+	useEffect(() => {
+		getCast();
+	}, []);
 
     if (notification.type == "recasts") return <></>
     const replyHistoric = notification.type == "reply" ? `%2C0x${node?.parentId}` : ""
@@ -169,7 +181,7 @@ function Notification({ notification, previousNotif }: { notification: any, prev
     )
 }
 
-const NB_NOTIF = 50
+const NB_NOTIF = 50;
 export default function Notifications() {
     const [notifications, setNotifications] = useState<any[]>([])
     const { signer } = useSigner()
@@ -177,49 +189,61 @@ export default function Notifications() {
     const cursor = useRef(undefined)
     const loader = useRef(null)
 
-    async function loadMoreNotifications() {
-        if (cursor.current == null) return
-        const result: any[] | undefined = await getNotifications(signer, NB_NOTIF, cursor.current)
-        if (!result) return
-        const [_notifications, nextCursor] = result
-        cursor.current = nextCursor
-        setNotifications((prev) => prev.concat(_notifications));
-    }
+	async function loadMoreNotifications() {
+		if (cursor.current == null) return;
+		const result: any[] | undefined = await getNotifications(
+			signer,
+			NB_NOTIF,
+			cursor.current,
+		);
+		if (!result) return;
+		const [_notifications, nextCursor] = result;
+		cursor.current = nextCursor;
+		setNotifications((prev) => prev.concat(_notifications));
+	}
 
-    async function fetchNotifications() {
-        let old_most_recent = localStorage.getItem("most_recent_notification") || ""
-        setPreviousNotif(old_most_recent)
-        localStorage.setItem("old_most_recent_notification", old_most_recent)
-        const result: any[] | undefined = await getNotifications(signer, NB_NOTIF)
-        if (!result || !result[0].length) return
+	async function fetchNotifications() {
+		let old_most_recent =
+			localStorage.getItem("most_recent_notification") || "";
+		setPreviousNotif(old_most_recent);
+		localStorage.setItem("old_most_recent_notification", old_most_recent);
+		const result: any[] | undefined = await getNotifications(signer, NB_NOTIF);
+		if (!result || !result[0].length) return;
 
-        const [_notifications, nextCursor] = result
-        localStorage.setItem("most_recent_notification", _notifications[0].most_recent_timestamp)
-        cursor.current = nextCursor
-        setNotifications(_notifications)
-    }
+		const [_notifications, nextCursor] = result;
+		localStorage.setItem(
+			"most_recent_notification",
+			_notifications[0].most_recent_timestamp,
+		);
+		cursor.current = nextCursor;
+		setNotifications(_notifications);
+	}
 
-    const handleObserver: IntersectionObserverCallback = (entities) => {
-        const target = entities[0];
-        if (target.isIntersecting) loadMoreNotifications()
-    }
+	const handleObserver: IntersectionObserverCallback = (entities) => {
+		const target = entities[0];
+		if (target.isIntersecting) loadMoreNotifications();
+	};
 
-    useEffect(() => {
-        setNotifications([])
-        if (signer)
-            fetchNotifications()
-        var options = { root: null, rootMargin: "20px", threshold: 1.0 }
-        let _observer = new IntersectionObserver(handleObserver, options);
-        if (loader.current)
-            _observer.observe(loader.current)
-    }, [signer])
+	useEffect(() => {
+		setNotifications([]);
+		if (signer) fetchNotifications();
+		var options = { root: null, rootMargin: "20px", threshold: 1.0 };
+		let _observer = new IntersectionObserver(handleObserver, options);
+		if (loader.current) _observer.observe(loader.current);
+	}, [signer]);
 
-    return (
-        <div className="flex-1 py-6 sm:py-12 flex justify-center mx-4 md:mx-12 ">
-            <div className="flex flex-col items-center gap-2">
-                {notifications.map((notif, i) => <Notification notification={notif} key={i} previousNotif={previousNotif} />)}
-                <div className="loader" ref={loader}></div>
-            </div>
-        </div>
-    )
+	return (
+		<div className="flex-1 py-6 sm:py-12 flex justify-center mx-4 md:mx-12 ">
+			<div className="flex flex-col items-center gap-2">
+				{notifications.map((notif, i) => (
+					<Notification
+						notification={notif}
+						key={i}
+						previousNotif={previousNotif}
+					/>
+				))}
+				<div className="loader" ref={loader}></div>
+			</div>
+		</div>
+	);
 }

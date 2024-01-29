@@ -1,0 +1,10 @@
+{
+	"explorer.fileNesting.patterns": {
+		"*.tsx": "${capture}.ts, ${capture}.*.ts"
+	},
+	"editor.formatOnSave": true,
+	"editor.defaultFormatter": "biomejs.biome",
+	"[typescriptreact]": {
+		"editor.defaultFormatter": "biomejs.biome"
+	}
+}
