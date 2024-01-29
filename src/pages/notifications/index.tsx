@@ -27,7 +27,7 @@ function ReplyNotification({ notification }: { notification: any }) {
     async function getCast() {
         try {
             const _node = await getMaybeNegation(notification.cast);
-            setIsLinkingPoint(validNegation(_node.title));
+            setIsLinkingPoint(validNegation(_node?.title));
             setNode(_node);
 
             axios.get(`/api/cast?type=hash&identifier=${"0x" + _node.parentId}`)
@@ -48,7 +48,6 @@ function ReplyNotification({ notification }: { notification: any }) {
             {node?.type == "root" ? <CommentIcon /> :
                 <NegateIcon color={parent?.type == "negation" ? "#6b21a8" : "#1e40af"} />
             }
-            {/* {parent?.type == "root" && node?.type == "negation"  && } */}
 
             <div className="flex flex-col gap-3">
                 <p className="inline-block">
@@ -57,8 +56,8 @@ function ReplyNotification({ notification }: { notification: any }) {
                 </p>
                 <div className="table table-fixed w-full overflow-hidden">
                     <div className="flex flex-col gap-2 ">
-                        <p className="text-sm text-black/50">{parent?.type == "negation" ? parent.endPoint!.title : parent?.title}</p>
-                        <p className="">{node?.type == "negation" ? node?.endPoint?.title : node?.title}</p>
+                        {parent ? <p className="text-sm text-black/50">{parent.type == "negation" ? parent.endPoint!.title : parent.title}</p> : <p className="text-black/50 text-sm">Deleted point</p>}
+                        {node ? <p className="">{node.type == "negation" ? node.endPoint?.title : node.title}</p> : <p className="">Deleted point</p>}
                     </div>
 
                 </div>
@@ -71,12 +70,11 @@ function MentionNotification({ notification }: { notification: any }) {
     return (
         <div>
             <div className="flex flex-row items-center gap-2">
-                <Image src={notification.cast.author.pfp_url} alt="cast author" width={30} height={30} className="rounded-full" />
-                <p className="font-bold">{notification.cast.author.display_name}</p>
+                <Image src={notification.cast?.author.pfp_url} alt="cast author" width={30} height={30} className="rounded-full" />
+                <p className="font-bold">{notification.cast?.author.display_name}</p>
             </div>
             <div className="table table-fixed w-full overflow-hidden">
-
-                <p>{notification.cast.text}</p>
+                <p>{notification.cast?.text}</p>
             </div>
         </div>
     )
@@ -84,7 +82,7 @@ function MentionNotification({ notification }: { notification: any }) {
 
 function LikersTooltip({ reactions }: { reactions: any }) {
     return (
-        <span className="absolute flex flex-col top-0 bg-slate-50 border rounded-md p-2 px-4 w-44 left-0 gap-2" style={{ transform: "translateY(-100%)"}}>
+        <span className="absolute flex flex-col top-0 bg-slate-50 border rounded-md p-2 px-4 w-44 left-0 gap-2" style={{ transform: "translateY(-100%)" }}>
             {reactions.slice(1).map((reaction: any) => (
                 <span key={reaction.user.username} onClick={(e) => e.stopPropagation()}>
                     <a href={"https://warpcast.com/" + reaction.user.username} className="font-semibold hover:underline" target="_blank">{reaction.user.username}</a>
@@ -105,7 +103,7 @@ function LikeNotification({ notification }: { notification: any }) {
     async function getCast() {
         try {
             const _node = await getMaybeNegation(notification.cast);
-            setIsLinkingPoint(validNegation(_node.title));
+            setIsLinkingPoint(validNegation(_node?.title));
             setNode(_node);
         } catch (error) { console.error('Error fetching cast:', error) }
     }
@@ -134,7 +132,7 @@ function LikeNotification({ notification }: { notification: any }) {
                     <span> think{thirdPerson} your point is {isLinkingPoint ? 'important' : 'accurate'}.</span>
                 </p>
                 <div className="table table-fixed w-full overflow-hidden">
-                    <p className=" text-black/50 text-sm ">{isLinkingPoint ? node?.endPoint!.title : node?.title}</p>
+                    {node && (isLinkingPoint && node.endPoint?.title) ? <p className=" text-black/50 text-sm ">{isLinkingPoint ? node.endPoint?.title : node.title}</p> : <p className="text-black/50 text-sm">Deleted point.</p>}
                 </div>
             </div>
         </div>
@@ -145,6 +143,7 @@ function Notification({ notification, previousNotif }: { notification: any, prev
     const [isNew, setIsNew] = useState(new Date(notification.most_recent_timestamp).getTime() > new Date(previousNotif).getTime() || previousNotif === "")
     const [node, setNode] = useState<Node>();
     const router = useRouter()
+
     async function getCast() {
         try {
             if (notification.cast) {
@@ -157,7 +156,6 @@ function Notification({ notification, previousNotif }: { notification: any, prev
     useEffect(() => {
         getCast()
     }, [])
-
 
     if (notification.type == "recasts") return <></>
     const replyHistoric = notification.type == "reply" ? `%2C0x${node?.parentId}` : ""
@@ -174,7 +172,7 @@ function Notification({ notification, previousNotif }: { notification: any, prev
 const NB_NOTIF = 50
 export default function Notifications() {
     const [notifications, setNotifications] = useState<any[]>([])
-    const {signer} = useSigner()
+    const { signer } = useSigner()
     const [previousNotif, setPreviousNotif] = useState<string>("")
     const cursor = useRef(undefined)
     const loader = useRef(null)
