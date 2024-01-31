@@ -2,7 +2,4 @@ export const DEFAULT_CHANNELID = "https://negationgame.com";
 
 export const NEGATION_SYMBOL = "nah";
 
-export const DEFAULT_CAST = `gm Farcaster!
-
-              
-- Sent from my Neynar App`;
+export const GRAPH_INTERACTIVE_MIN_ZOOM = 0.2;

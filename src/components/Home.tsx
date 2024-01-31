@@ -1,16 +1,16 @@
 "use client";
-// src/pages/index.tsx
-import React, { useEffect, useState, useRef, useCallback } from "react";
-import { useRouter } from "next/router";
-import HistoricalPoints from "./HistoricalPoints";
-import { Node } from "../types/Points";
 import axios from "axios";
+import { useRouter } from "next/router";
 import { Cast } from "neynar-next/server";
-import { getMaybeNegation } from "../lib/useCasts";
+// src/pages/index.tsx
+import { useCallback, useEffect, useRef, useState } from "react";
 import { BiChevronLeft } from "react-icons/bi";
-import RootFeed from "./RootFeed";
+import { DEFAULT_CHANNELID } from "../config";
+import { getMaybeNegation } from "../lib/useCasts";
+import { Node } from "../types/Points";
 import CastButton from "./CastButton";
-import { DEFAULT_CHANNELID } from "../constants";
+import HistoricalPoints from "./HistoricalPoints";
+import RootFeed from "./RootFeed";
 
 export default function Home() {
 	const router = useRouter();
