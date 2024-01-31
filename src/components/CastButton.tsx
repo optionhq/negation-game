@@ -4,7 +4,7 @@ import { BiSolidPencil } from "react-icons/bi";
 import Modal from "./Modal";
 import publish from "../lib/publish";
 import { getDeviceType } from "../lib/getDeviceType";
-import InputNegation from "./negations/InputNegation";
+import InputNegation from "./points/InputNegation";
 import { useSigner } from "@/contexts/SignerContext";
 
 export default function CastButton({
@@ -33,7 +33,7 @@ export default function CastButton({
 						onClick={() => setCastModal(true)}
 					>
 						<BiSolidPencil size={18} />
-						{deviceType == "desktop" && <p>Make a point</p>}
+						{deviceType === "desktop" && <p>Make a point</p>}
 					</button>
 					{castModal && (
 						<Modal setSelected={setCastModal}>

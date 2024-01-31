@@ -1,7 +1,7 @@
 "use client";
 
 import { useSigner } from "@/contexts/SignerContext";
-import { useEffect } from "react";
+import { useCallback, useEffect } from "react";
 
 export interface ISuccessMessage {
 	fid: string;
@@ -28,12 +28,16 @@ enum ButtonText {
 
 export const NeynarSigninButton = () => {
 	const { setSigner } = useSigner();
+
 	// Define the onSignInSuccess callback function
-	const onSignInSuccess = async (data: any) => {
-		localStorage.setItem("farcaster-signer", JSON.stringify(data));
-		data.fid = Number(data.fid);
-		setSigner(data);
-	};
+	const onSignInSuccess = useCallback(
+		async (data: any) => {
+			localStorage.setItem("farcaster-signer", JSON.stringify(data));
+			data.fid = Number(data.fid);
+			setSigner(data);
+		},
+		[setSigner],
+	);
 
 	useEffect(() => {
 		// Load Neynar script
@@ -52,7 +56,7 @@ export const NeynarSigninButton = () => {
 			//@ts-ignore
 			delete window.onSignInSuccess;
 		};
-	}, []); // Empty dependency array ensures the useEffect runs only once
+	}, [onSignInSuccess]); // Empty dependency array ensures the useEffect runs only once
 
 	return (
 		<div

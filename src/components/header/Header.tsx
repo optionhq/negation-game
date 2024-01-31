@@ -21,19 +21,19 @@ export default function Header() {
 					Icon={HiHome}
 					name="Home"
 					path="/"
-					currentPath={pathName == "/"}
+					currentPath={pathName === "/"}
 				/>
 				<HeaderElement
 					Icon={BiSolidGroup}
 					name="Spaces"
 					path="/spaces"
-					currentPath={pathName?.split("/")[1] == "spaces"}
+					currentPath={pathName?.split("/")[1] === "spaces"}
 				/>
 				<HeaderElement
 					Icon={PiGraphBold}
 					name="Graph"
 					path="/graph"
-					currentPath={pathName?.split("/")[1] == "graph"}
+					currentPath={pathName?.split("/")[1] === "graph"}
 				/>
 				{signer && <NotificationElement />}
 			</ul>

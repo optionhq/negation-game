@@ -1,5 +1,12 @@
 import { useSigner } from "@/contexts/SignerContext";
-import React, { useEffect, useState, useRef } from "react";
+import { Node } from "@/types/Points";
+import React, {
+	useEffect,
+	useState,
+	useRef,
+	Dispatch,
+	SetStateAction,
+} from "react";
 
 const MAX_CHAR_PER_CAST = 320;
 
@@ -13,7 +20,13 @@ export default function InputNegation({
 	placeHolder: string;
 	onPublish: (text: string) => void;
 	onClose: () => void;
-	setParentChildren?: any;
+	setParentChildren?: Dispatch<
+		SetStateAction<{
+			relevance: Node[];
+			conviction: Node[];
+			comment: Node[];
+		}>
+	>;
 }) {
 	const [text, setText] = useState("");
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -50,10 +63,7 @@ export default function InputNegation({
 
 	return (
 		<div
-			className={
-				pointBg +
-				"w-full flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border"
-			}
+			className={`${pointBg} w-full flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border`}
 			onClick={(e) => e.stopPropagation()}
 		>
 			<textarea
@@ -64,7 +74,7 @@ export default function InputNegation({
 				onChange={(e) => setText(e.target.value)}
 			/>
 			<div className="w-full flex justify-between">
-				<p className={` text-sm text-black/60`}>
+				<p className="text-sm text-black/60">
 					<span
 						className={`${
 							text.length > MAX_CHAR_PER_CAST ? "text-red-500" : ""
@@ -75,15 +85,16 @@ export default function InputNegation({
 					/{MAX_CHAR_PER_CAST}
 				</p>
 				<div className="flex gap-2">
-					<button className="secondary-button" onClick={onClose}>
+					<button type="button" className="secondary-button" onClick={onClose}>
 						Cancel
 					</button>
 					<button
-						className={`button`}
+						type="submit"
+						className="button"
 						onClick={() => {
 							text && handlePublish();
 						}}
-						disabled={text.length == 0 || text.length > MAX_CHAR_PER_CAST}
+						disabled={text.length === 0 || text.length > MAX_CHAR_PER_CAST}
 					>
 						Publish
 					</button>

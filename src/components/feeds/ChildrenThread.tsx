@@ -1,9 +1,10 @@
-import { useState } from "react";
-import { BsFillSlashCircleFill, BsFillXCircleFill } from "react-icons/bs";
 import { GoInfo } from "react-icons/go";
-import { usePointContext } from "../../contexts/PointContext";
 import { Node } from "../../types/Points";
-import PointWrapper from "../PointWrapper";
+import { usePointContext } from "../../contexts/PointContext";
+import { useState } from "react";
+import PointWrapper from "../points/PointWrapper";
+import { PiExcludeDuotone } from "react-icons/pi";
+import { MdDoNotDisturbOnTotalSilence } from "react-icons/md";
 
 function VeracityThreadHeader({
 	isVeracityVisible,
@@ -22,17 +23,18 @@ function VeracityThreadHeader({
 
 	return (
 		<button
+			type="button"
 			className="flex flex-col items-start p-2 text-blue-800"
 			onClick={(e) => handleExpand(e)}
 		>
 			<div className="flex flex-row items-center gap-2 justify-start">
 				{isVeracityVisible ? (
-					<BsFillXCircleFill size={18} color="rgb(30,64,175)" />
+					<PiExcludeDuotone size={18} color="rgb(30,64,175)" />
 				) : (
 					// <BsChevronExpand size={18}/>
 					<div className="w-[18px]">{nbItems}</div>
 				)}
-				<p className="font-semibold">Counterpoints</p>
+				<p className="font-semibold">Alternatives</p>
 				<p className="font-normal text-gray-400">{`tap to ${
 					isVeracityVisible ? "hide" : "show"
 				}`}</p>
@@ -40,6 +42,7 @@ function VeracityThreadHeader({
 				<a
 					href="https://responses.negationgame.com/"
 					target="_blank"
+					rel="noreferrer"
 					className="flex flex-row gap-1 items-center hover:text-black"
 				>
 					<GoInfo size={18} color="#AAAAAA" />
@@ -47,7 +50,7 @@ function VeracityThreadHeader({
 			</div>
 			{isVeracityVisible && (
 				<p className="text-gray-400/80 font-light">
-					these points ↓ are refuting the parent point ↑
+					these points ↓ are alternative options to the parent point ↑
 				</p>
 			)}
 		</button>
@@ -71,23 +74,25 @@ function RelevanceThreadHeader({
 
 	return (
 		<button
+			type="button"
 			className="flex flex-col items-start p-2 text-gray-400"
 			onClick={(e) => handleExpand(e)}
 		>
 			<div className="flex flex-row items-center gap-2 justify-center text-purple-800">
 				{isRelevanceVisible ? (
-					<BsFillSlashCircleFill size={18} color="rgb(107, 33, 168)" />
+					<MdDoNotDisturbOnTotalSilence size={18} color="rgb(107, 33, 168)" />
 				) : (
 					// <BsChevronExpand size={18}/>
 					<div className="w-[18px]">{nbItems}</div>
 				)}
-				<p className="font-semibold">Objections</p>
+				<p className="font-semibold">Counterpoints</p>
 				<p className="font-normal text-gray-400">{`tap to ${
 					isRelevanceVisible ? "hide" : "show"
 				}`}</p>
 				<a
 					href="https://responses.negationgame.com/"
 					target="_blank"
+					rel="noreferrer"
 					className="flex flex-row gap-1 items-center hover:text-black"
 				>
 					<GoInfo size={18} color="#AAAAAA" />
@@ -95,8 +100,7 @@ function RelevanceThreadHeader({
 			</div>
 			{isRelevanceVisible && (
 				<p className="text-gray-400/80 font-light">
-					these points ↓ reject the validity of the parent point ↑ in this
-					context
+					these points ↓ are evidence against the parent point ↑ in this context
 				</p>
 			)}
 		</button>
@@ -114,7 +118,7 @@ export default function ChildrenThread({
 	setHistoricalItems: React.Dispatch<
 		React.SetStateAction<string[] | undefined>
 	>;
-	getParentAncestry: undefined | (() => string);
+	getParentAncestry: undefined | (() => string | undefined);
 }) {
 	const { point, children, setChildren, detailsOpened, refreshChildren } =
 		usePointContext();
@@ -124,32 +128,32 @@ export default function ChildrenThread({
 		<>
 			{children[type] && children[type].length > 0 && detailsOpened && (
 				<div className="border-black pl-3 border-l  my-2 flex flex-col gap-2 ml-2 sm:ml-6 lg:ml-8">
-					{type == "relevance" && (
+					{type === "relevance" && (
 						<RelevanceThreadHeader
 							isRelevanceVisible={threadVisible}
 							setIsRelevanceVisible={setThreadVisible}
 							nbItems={
-								children[type].filter((child: any) => child.type !== "input")
+								children[type].filter((child: Node) => child.type !== "input")
 									.length
 							}
 						/>
 					)}
-					{type == "conviction" && (
+					{type === "conviction" && (
 						<VeracityThreadHeader
 							isVeracityVisible={threadVisible}
 							setIsVeracityVisible={setThreadVisible}
 							nbItems={
-								children[type].filter((child: any) => child.type !== "input")
+								children[type].filter((child: Node) => child.type !== "input")
 									.length
 							}
 						/>
 					)}
 					{threadVisible && (
-						<div className={`flex flex-col w-full gap-1`}>
+						<div className="flex flex-col w-full gap-1">
 							{children[type].map((el: Node, i: number) => {
 								return (
 									<PointWrapper
-										key={el.id! + i}
+										key={el.id}
 										level={level + 1}
 										point={el}
 										parent={point}
