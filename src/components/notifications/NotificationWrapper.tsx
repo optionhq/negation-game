@@ -4,6 +4,9 @@ import { Node } from "@/types/Points";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import MentionNotification from "./MentionNotification";
+import LikeNotification from "./LikeNotification";
+import ReplyNotification from "./ReplyNotification";
 
 export default function NotificationWrapper({
 	notification,
@@ -31,7 +34,6 @@ export default function NotificationWrapper({
 		getCast();
 	}, []);
 
-	console.log(notification);
 	if (notification.type === "recasts") return <></>;
 	const replyHistoric =
 		notification.type === "reply" ? `%2C0x${node?.parentId}` : "";
