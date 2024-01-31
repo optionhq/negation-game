@@ -1,7 +1,7 @@
 import { usePointContext } from "../../contexts/PointContext";
 import { useState } from "react";
 import { GoComment } from "react-icons/go";
-import PointWrapper from "../PointWrapper";
+import PointWrapper from "../points/PointWrapper";
 import { Node } from "../../types/Points";
 
 function CommentThreadHeader({
@@ -21,6 +21,7 @@ function CommentThreadHeader({
 
 	return (
 		<button
+			type="button"
 			className="flex flex-col items-start p-2 text-gray-400"
 			onClick={(e) => handleExpand(e)}
 		>
@@ -42,31 +43,25 @@ function CommentThreadHeader({
 }
 
 export default function CommentsThread({ level }: { level: number }) {
-	const {
-		point,
-		children,
-		setChildren,
-		detailsOpened,
-		refreshChildren,
-		comments,
-	} = usePointContext();
+	const { point, children, setChildren, detailsOpened, refreshChildren } =
+		usePointContext();
 	const [threadVisible, setThreadVisible] = useState(false);
 
 	return (
 		<>
-			{comments.length > 0 && comments && detailsOpened && (
+			{children.comment.length > 0 && children.comment && detailsOpened && (
 				<div className="border-black pl-3 border-l  my-2 flex flex-col gap-2 ml-2 sm:ml-6 lg:ml-8">
 					<CommentThreadHeader
 						isrelevanceVisible={threadVisible}
 						setIsrelevanceVisible={setThreadVisible}
-						nbItems={comments.length}
+						nbItems={children.comment.length}
 					/>
 					{threadVisible && (
-						<div className={`flex flex-col w-full gap-1`}>
-							{comments.map((el: Node, i: number) => {
+						<div className="flex flex-col w-full gap-1">
+							{children.comment.map((el: Node, i: number) => {
 								return (
 									<PointWrapper
-										key={el.id! + i}
+										key={el.id}
 										level={level + 1}
 										point={el}
 										parent={point}

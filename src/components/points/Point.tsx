@@ -1,15 +1,15 @@
-import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/router";
+import { useSearchParams, useRouter as oldRouter } from "next/navigation";
 import { useEffect } from "react";
-import { usePointContext } from "../contexts/PointContext";
-import { Node } from "../types/Points";
-import AccordionArrow from "./AccordionArrow";
-import TripleDotMenu from "./TripleDotMenu";
-import ChildrenThread from "./negations/ChildrenThread";
-import CommentsThread from "./negations/CommentsThread";
-import LoadingNegations from "./negations/LoadingNegations";
-import NegationText from "./negations/NegationText";
-import Score from "./score/Score";
+import { Node } from "../../types/Points";
+import { useRouter } from "next/router";
+import TripleDotMenu from "../TripleDotMenu";
+import { usePointContext } from "../../contexts/PointContext";
+import AccordionArrow from "../AccordionArrow";
+import NegationText from "./NegationText";
+import LoadingNegations from "./LoadingNegations";
+import Score from "../score/Score";
+import ChildrenThread from "../feeds/ChildrenThread";
+import CommentsThread from "../feeds/CommentsThread";
 
 export default function Point({
 	level,
@@ -22,7 +22,7 @@ export default function Point({
 	setHistoricalItems: React.Dispatch<
 		React.SetStateAction<string[] | undefined>
 	>;
-	getParentAncestry: undefined | (() => string);
+	getParentAncestry: undefined | (() => string | undefined);
 }) {
 	const { point, detailsOpened, unfurlDropdown } = usePointContext();
 	const router = useRouter();
@@ -33,22 +33,23 @@ export default function Point({
 			: " bg-slate-50 hover:bg-gray-100"
 	}`;
 
-	function getAncestry(): string {
+	function getAncestry(): string | undefined {
 		// Call the parent's getAncestry function if it exists
 		const parentAncestry =
 			parent && getParentAncestry ? getParentAncestry() : "";
 
 		// Return the current component's ID followed by the parent's ancestry
-		return parentAncestry ? `${point.id},${parentAncestry}` : point.id!;
+		return parentAncestry ? `${point.id},${parentAncestry}` : point.id;
 	}
 
 	function newRoute() {
-		const ancestry = getAncestry().split(",");
 		const current = searchParams?.get("id");
 		const currentIds = current ? current.split(",") : [];
+		const ancestry = getAncestry()?.split(",");
+		if (!ancestry) return;
 
 		// Find the first ancestor that is already in the path
-		const commonAncestorIndex = ancestry.findIndex(
+		const commonAncestorIndex = ancestry?.findIndex(
 			(ancestor) => ancestor === currentIds[0],
 		);
 
@@ -92,15 +93,15 @@ export default function Point({
 		if (selectedId === point.id) {
 			unfurlDropdown();
 		}
-	}, [router.query.id, point.id]);
+	}, [router, point, unfurlDropdown]);
 
 	return (
 		<details
 			open={detailsOpened}
-			className="flex flex-col gap-1"
+			className="flex flex-col gap-1 w-full"
 			onClick={handleClick}
 		>
-			<summary className={pointBg + ` claim relative border cursor-pointer`}>
+			<summary className={`${pointBg} claim relative border cursor-pointer`}>
 				<AccordionArrow />
 				<div className="flex flex-col gap-3 items-start justify-center w-full">
 					<NegationText />

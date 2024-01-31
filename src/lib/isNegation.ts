@@ -4,9 +4,8 @@ import { isValidNegation } from "./isValidNegation";
 const isNegation = (entry: Node): boolean => {
 	if (entry.endPoint && isValidNegation(entry.title)) {
 		return true;
-	} else {
-		return false;
 	}
+	return false;
 };
 
 export default isNegation;

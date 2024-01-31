@@ -8,11 +8,11 @@ const TripleDotMenu: React.FC = () => {
 	const { signer } = useSigner();
 	const [isOpen, setOpen] = useState(false);
 	const menuRef = useRef<HTMLDivElement>(null);
-	const { point, refreshChildren, refreshParentThread } = usePointContext();
+	const { point, refreshParentThread } = usePointContext();
 
 	const isAuthor = useMemo(
 		() => signer && "fid" in signer && point.author?.fid === signer.fid,
-		[signer],
+		[signer, point],
 	);
 
 	useEffect(() => {
@@ -31,6 +31,7 @@ const TripleDotMenu: React.FC = () => {
 	return (
 		<div className="relative" ref={menuRef}>
 			<button
+				type="button"
 				onClick={(e) => {
 					e.stopPropagation();
 					setOpen((prevState) => !prevState);
@@ -42,6 +43,7 @@ const TripleDotMenu: React.FC = () => {
 			{isOpen && (
 				<div className="absolute right-0 w-48 bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg">
 					<button
+						type="button"
 						className="w-full px-4 py-2 text-left"
 						onClick={(event) => {
 							event.stopPropagation();
@@ -52,17 +54,16 @@ const TripleDotMenu: React.FC = () => {
 						Open in Warpcast
 					</button>
 					<button
+						type="button"
 						className={`w-full px-4 py-2 text-left ${
 							!isAuthor ? "opacity-50 cursor-not-allowed" : ""
 						}`}
 						onClick={async (event) => {
 							event.stopPropagation();
-							if (isAuthor) {
+							if (signer && isAuthor) {
 								try {
 									await axios.delete(`/api/cast/${point.id}/delete`, {
-										data: {
-											signerUuid: signer!.signer_uuid,
-										},
+										data: { signerUuid: signer.signer_uuid },
 									});
 									refreshParentThread();
 									setOpen(false);

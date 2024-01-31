@@ -13,7 +13,7 @@ export default function RecastedPoint({ url }: { url: string }) {
 			}
 		};
 		fetchPointData();
-	}, []);
+	}, [url]);
 
 	return (
 		<div className="m-2 p-2 border border-slate-300 rounded-md w-full max-h-36">

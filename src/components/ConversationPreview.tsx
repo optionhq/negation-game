@@ -1,16 +1,14 @@
-// src/components/Conversation.tsx
+// src/components/ConversationPreview.tsx
 "use client";
 import React, { useEffect, useState } from "react";
 import { Cast } from "neynar-next/server";
 import axios from "axios";
 import Link from "next/link";
 import Score from "./score/Score";
-import PointWrapper from "./PointWrapper";
 import { PointProvider } from "../contexts/PointContext";
 import { getMaybeNegation } from "../lib/useCasts";
 import { Node } from "../types/Points";
 import { useSigner } from "@/contexts/SignerContext";
-// import Score from './score/desktop/DesktopScore';
 
 export default function ConversationPreview({ id }: { id: string }) {
 	const [conversation, setConversation] = useState<Cast | null>(null);
@@ -34,18 +32,20 @@ export default function ConversationPreview({ id }: { id: string }) {
 				const filteredReplies = response.data.result.casts.filter(
 					(cast: Cast) => cast.parent_hash === id,
 				);
-				// Sort the replies by votes and take the top 3
-				let topReplies: any[] = filteredReplies
+				const nodes: Node[] = [];
+				filteredReplies
+					// Sort the replies by votes and take the top 3
 					.sort(
 						(a: Cast, b: Cast) =>
 							b.reactions.likes.length - a.reactions.likes.length,
 					)
-					.slice(0, 3);
-
-				topReplies.forEach(
-					async (reply, i) => (topReplies[i] = await getMaybeNegation(reply)),
-				);
-				setReplies(topReplies);
+					// take the top 3
+					.slice(0, 3)
+					// convert to Node, then update state
+					.map(async (reply: Cast, i: number) => {
+						nodes[i] = await getMaybeNegation(reply);
+						if (i === 2) setReplies(nodes);
+					});
 			})
 			.catch((error) => console.error("Error fetching replies:", error));
 	}, [id]);
@@ -82,7 +82,7 @@ export default function ConversationPreview({ id }: { id: string }) {
 				{replies.map((reply, i) => {
 					return (
 						<PointProvider
-							key={i}
+							key={reply.id}
 							point={reply}
 							signer={signer}
 							refreshParentThread={async () => {

@@ -1,10 +1,7 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import axios from "axios";
-import { FiCheck, FiHeart, FiLink2, FiXCircle } from "react-icons/fi";
 import ReactButtonWrapper from "./ReactButtonWrapper";
-import { AiOutlineCheckCircle, AiOutlineCiCircle } from "react-icons/ai";
 import { HiOutlineCheckCircle, HiOutlineXCircle } from "react-icons/hi";
-import Tooltip from "./Tooltip";
 import { Signer } from "neynar-next/server";
 
 function NegateLikeButtons({
@@ -28,10 +25,6 @@ function NegateLikeButtons({
 			advocates.some((advocate) => advocate.fid === farcasterSigner.fid),
 	);
 	const [score, setScore] = useState(points);
-
-	useEffect(() => {
-		// This will run every time `isLiked` or `score` changes
-	}, [isLiked, score]);
 
 	const handleLike = useCallback(
 		(e: React.MouseEvent<HTMLSpanElement | React.MouseEvent>) => {
@@ -65,7 +58,7 @@ function NegateLikeButtons({
 
 			toggleLike();
 		},
-		[isLiked, farcasterSigner, id, setScore, setIsLiked],
+		[isLiked, farcasterSigner, id],
 	);
 
 	return (
@@ -137,7 +130,7 @@ export default function Score({
 			<ReactButtonWrapper>
 				<div className="flex flex-col items-center w-fit gap-[2px]">
 					<div className="flex flex-row items-center gap-1 text-sm font-thin">
-						{type == "relevance" ? <p>relevance</p> : <p>conviction</p>}
+						{type === "relevance" ? <p>relevance</p> : <p>conviction</p>}
 					</div>
 					<hr className="w-full h-[1.5px] bg-slate-300" />
 					<NegateLikeButtons

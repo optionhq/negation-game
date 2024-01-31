@@ -1,9 +1,9 @@
-import Home from "@/components/Home";
+import HomeFeed from "@/components/feeds/HomeFeed";
+import PointFeed from "@/components/feeds/PointFeed";
+import { useRouter } from "next/router";
 
 export default function HomePage() {
-	return (
-		<div>
-			<Home />
-		</div>
-	);
+	const router = useRouter();
+	if (!router.query.id) return <HomeFeed />;
+	return <PointFeed fromPage="home" />;
 }

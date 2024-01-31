@@ -38,7 +38,7 @@ export default function Tooltip({
 									  ? "-right-1 translate-y-[2.5px]"
 									  : ""
 					}`}
-				></div>
+				/>
 			</div>
 		</div>
 	);

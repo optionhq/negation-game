@@ -17,7 +17,7 @@ export default async function GET(req: NextApiRequest, res: NextApiResponse) {
             api_key: process.env.NEYNAR_API_KEY,
         },
     };
-    value.user = 2588
+    // value.user = 2588
     const url = `https://api.neynar.com/v2/farcaster/notifications/parent_url?fid=${value.user
         }&parent_urls=${value.channel}&limit=${value.limit}${value.cursor ? `&cursor=${value.cursor}` : ""
         }`;

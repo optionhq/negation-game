@@ -3,7 +3,6 @@ export function getDeviceType() {
 
 	if (/Mobi|Android/i.test(userAgent) || /Tablet|iPad/i.test(userAgent)) {
 		return "mobile";
-	} else {
-		return "desktop";
 	}
+	return "desktop";
 }

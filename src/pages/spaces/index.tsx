@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-const infos: any = {
+const infos: { [key: string]: { description: string } } = {
 	purple: {
 		description:
 			"Purple is a DAO whose goal is to proliferate and expand the Farcaster protocol and ecosystem. We will fund small grants via Prop House and larger on-chain proposals which proliferate Farcaster and/or build on top of the protocol.",
@@ -18,6 +18,7 @@ export default function Spaces() {
 					<a
 						href="https://warpcast.com/nor"
 						target="_blank"
+						rel="noreferrer"
 						className="font-medium underline"
 					>
 						{" "}
@@ -29,7 +30,8 @@ export default function Spaces() {
 				{Object.keys(spaces).map((space, i) => {
 					return (
 						<button
-							key={i}
+							type="button"
+							key={space}
 							className=" border rounded-md p-4 w-80 items-start shadow-lg hover:shadow-xl transition-shadow duration-200 ease-in-out"
 						>
 							<Link
@@ -40,7 +42,7 @@ export default function Spaces() {
 									<div
 										className="rounded-full w-10 h-10"
 										style={{ backgroundColor: "#8A63D2" }}
-									></div>
+									/>
 									<h3 className="font-medium text-xl">
 										{space.charAt(0).toUpperCase() + space.slice(1)}
 									</h3>

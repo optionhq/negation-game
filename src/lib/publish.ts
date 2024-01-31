@@ -10,7 +10,7 @@ export default async function publish(
 	embeds?: { url: string }[],
 ) {
 	try {
-		const castResponse = await axios.post(`/api/cast`, {
+		const castResponse = await axios.post("/api/cast", {
 			text: text,
 			parent: parentId ? parentId : DEFAULT_CHANNELID,
 			signerUuid: signer.signer_uuid,
