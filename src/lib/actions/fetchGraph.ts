@@ -84,7 +84,7 @@ ORDER BY c.created_at ASC;`,
 		try {
 			addNegationEdge(cy, allNegationGameCasts[i], negatingCast.hash);
 		} catch (error) {
-			console.error("error adding", allNegationGameCasts[i].hash);
+			// console.error("error adding", allNegationGameCasts[i].hash);
 		}
 	}
 

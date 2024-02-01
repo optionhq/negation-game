@@ -1,13 +1,12 @@
-import { GoListUnordered } from "react-icons/go";
-import { AiOutlinePushpin } from "react-icons/ai";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import CastButton from "../CastButton";
-import { useRouter } from "next/router";
-import axios from "axios";
+import { DEFAULT_CHANNELID } from "@/config";
 import { getMaybeNegation } from "@/lib/useCasts";
 import { Node } from "@/types/Points";
+import axios from "axios";
 import { Cast } from "neynar-next/server";
-import { DEFAULT_CHANNELID } from "@/config";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { AiOutlinePushpin } from "react-icons/ai";
+import { GoListUnordered } from "react-icons/go";
+import CastButton from "../CastButton";
 import PointWrapper from "../points/PointWrapper";
 
 const fetchPinnedCasts = async () => {
@@ -51,7 +50,6 @@ export default function HomeFeed() {
 	const [points, setPoints] = useState<Node[]>([]);
 	const isFetching = useRef(false);
 
-	const router = useRouter();
 	const loader = useRef(null);
 	const [observer, setObserver] = useState<IntersectionObserver>();
 	const feedCursor = useRef<string | undefined>();
@@ -61,7 +59,7 @@ export default function HomeFeed() {
 			onlyReload = false,
 			number,
 		}: { onlyReload?: boolean; number?: number | undefined } = {}) => {
-			if (!router.isReady || isFetching.current) return;
+			if (isFetching.current) return;
 			isFetching.current = true;
 
 			let _points: Node[] = [];
@@ -78,7 +76,7 @@ export default function HomeFeed() {
 			setPoints((prev) => (onlyReload ? [..._points] : [...prev, ..._points]));
 			isFetching.current = false;
 		},
-		[router],
+		[],
 	);
 
 	const refreshCasts = useCallback(
@@ -165,10 +163,7 @@ export default function HomeFeed() {
 			</div>
 			<div className="loading h-10" ref={loader} />
 
-			<CastButton
-				conversation={router.query.conversation as string}
-				refreshThread={async () => {}}
-			/>
+			<CastButton refreshThread={async () => {}} />
 		</div>
 	);
 }

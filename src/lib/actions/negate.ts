@@ -35,14 +35,16 @@ export const negate = async (
 
 	const warpcastUrl = `https://warpcast.com/${negatingCast.author.username}/${negatingCast.hash}`;
 
-	return await neynarApi
-		.publishCast(signerUuid, `${NEGATION_SYMBOL}\n${warpcastUrl}`, {
+	return await neynarApi.publishCast(
+		signerUuid,
+		`${NEGATION_SYMBOL}\n${warpcastUrl}`,
+		{
 			replyTo: negatedCast.hash,
 			embeds: [
 				{
 					url: warpcastUrl,
 				},
 			],
-		})
-		.catch(console.error);
+		},
+	);
 };

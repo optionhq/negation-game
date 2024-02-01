@@ -1,13 +1,13 @@
-import { BiChevronLeft } from "react-icons/bi";
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useState } from "react";
-import HistoricalPoints from "../points/HistoricalPoints";
+import { usePointIds } from "@/lib/hooks/usePointIds";
 import { getMaybeNegation } from "@/lib/useCasts";
-import axios from "axios";
 import { Node } from "@/types/Points";
+import axios from "axios";
+import { useRouter } from "next/navigation";
 import { Cast } from "neynar-next/server";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { BiChevronLeft } from "react-icons/bi";
+import HistoricalPoints from "../points/HistoricalPoints";
 import PointWrapper from "../points/PointWrapper";
-import { usePointContext } from "@/contexts/PointContext";
 
 export default function PointFeed({
 	fromPage,
@@ -15,28 +15,23 @@ export default function PointFeed({
 	const [historicalPointIds, setHistoricalPointIds] = useState<
 		string[] | undefined
 	>([]);
-	const router = useRouter();
+	const [ids, setIds] = usePointIds();
+	const pointIds = useMemo(() => ids?.split(",") ?? [], [ids]);
+	const selectedPointId = pointIds?.[0];
+	const { back } = useRouter();
 	const [point, setPoint] = useState<Node>();
 
 	const init = useCallback(async () => {
-		const ids_string = router.query.id as string;
-		if (!ids_string) {
-			setHistoricalPointIds(undefined);
-			return;
-		}
-		const ids = ids_string.split(",");
-
 		// // if it's a history of selected casts, get the first one
-		if (ids.length > 1) setHistoricalPointIds(ids.slice(1));
+		if (pointIds.length > 1) setHistoricalPointIds(pointIds.slice(1));
 		else setHistoricalPointIds(undefined);
 
-		const selectedPoint = ids[0];
 		const cast = await axios.get(
-			`/api/cast?type=hash&identifier=${selectedPoint}`,
+			`/api/cast?type=hash&identifier=${selectedPointId}`,
 		);
 
 		setPoint(await getMaybeNegation(cast.data as Cast));
-	}, [router]);
+	}, [pointIds, selectedPointId]);
 
 	useEffect(() => {
 		init();
@@ -47,11 +42,7 @@ export default function PointFeed({
 		<div className=" flex flex-col centered-element gap-2 items-start justify-start py-4 w-auto">
 			<div
 				onClick={() => {
-					router.push(
-						fromPage === "space"
-							? `/spaces/${router.query.space}/${router.query.conversation}`
-							: "/",
-					);
+					setIds(null);
 				}}
 				className="flex flex-row py-2 mb-4 font-medium cursor-pointer hover:bg-slate-100 rounded-md text-gray-500"
 			>

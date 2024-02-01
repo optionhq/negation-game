@@ -50,12 +50,18 @@ dependencies:
   jotai:
     specifier: ^2.6.3
     version: 2.6.3(@types/react@18.2.47)(react@18.2.0)
+  jotai-location:
+    specifier: ^0.5.2
+    version: 0.5.2(jotai@2.6.3)
   next:
     specifier: 14.0.4
     version: 14.0.4(react-dom@18.2.0)(react@18.2.0)
   neynar-next:
     specifier: ^0.3.1
     version: 0.3.1(next@14.0.4)(react-dom@18.2.0)(react@18.2.0)(viem@1.19.9)
+  nuqs:
+    specifier: ^1.16.1
+    version: 1.16.1(next@14.0.4)
   pg:
     specifier: ^8.11.3
     version: 8.11.3
@@ -2616,6 +2622,14 @@ packages:
       '@sideway/pinpoint': 2.0.0
     dev: false
 
+  /jotai-location@0.5.2(jotai@2.6.3):
+    resolution: {integrity: sha512-4S9hDh1wYp4SG4Laq3+Xd0GdW7jwnWlbEuL8U22kv3wUZW892n6gXlNhwU0LaoXnWoGG0gtjSLBuFm5iodFKLg==}
+    peerDependencies:
+      jotai: '>=1.11.0'
+    dependencies:
+      jotai: 2.6.3(@types/react@18.2.47)(react@18.2.0)
+    dev: false
+
   /jotai@2.6.3(@types/react@18.2.47)(react@18.2.0):
     resolution: {integrity: sha512-0htSJ2d6426ZdSEYHncJHXY6Lkgde1Hc2HE/ADIRi9d2L3hQL+jLKY1LkWBMeCNyOSlKH8+1u/Gc33Ox0uq21Q==}
     engines: {node: '>=12.20.0'}
@@ -2835,6 +2849,10 @@ packages:
     resolution: {integrity: sha512-2yyAR8qBkN3YuheJanUpWC5U3bb5osDywNB8RzDVlDwDHbocAJveqqj1u8+SVD7jkWT4yvsHCpWqqWqAxb0zCA==}
     dev: false
 
+  /mitt@3.0.1:
+    resolution: {integrity: sha512-vKivATfr97l2/QBCYAkXYDbrIWPM2IIKEl7YPhjCvKlG3kE2gm+uBo6nEXK3M5/Ffh/FLpKExzOQ3JJoJGFKBw==}
+    dev: false
+
   /ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
     dev: false
@@ -2951,6 +2969,15 @@ packages:
   /normalize-range@0.1.2:
     resolution: {integrity: sha512-bdok/XvKII3nUpklnV6P2hxtMNrCboOjAcyBuQnWEhO665FwrSNRxU+AqpsyvO6LgGYPspN+lu5CLtw4jPRKNA==}
     engines: {node: '>=0.10.0'}
+    dev: false
+
+  /nuqs@1.16.1(next@14.0.4):
+    resolution: {integrity: sha512-R3muf8sXJTj/Lu56Cd+qBmzfZUxSiIvpoytf58/0+8xEtCBCENJn3a6aHokHCWop3q3c/DyVx7blDTX5Pu1hyA==}
+    peerDependencies:
+      next: '>=13.4 <14.0.2 || ^14.0.3'
+    dependencies:
+      mitt: 3.0.1
+      next: 14.0.4(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
   /object-assign@4.1.1:

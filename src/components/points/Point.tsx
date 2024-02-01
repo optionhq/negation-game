@@ -1,15 +1,14 @@
-import { useSearchParams, useRouter as oldRouter } from "next/navigation";
+import { usePointIds } from "@/lib/hooks/usePointIds";
 import { useEffect } from "react";
-import { Node } from "../../types/Points";
-import { useRouter } from "next/router";
-import TripleDotMenu from "../TripleDotMenu";
 import { usePointContext } from "../../contexts/PointContext";
+import { Node } from "../../types/Points";
 import AccordionArrow from "../AccordionArrow";
-import NegationText from "./NegationText";
-import LoadingNegations from "./LoadingNegations";
-import Score from "../score/Score";
+import TripleDotMenu from "../TripleDotMenu";
 import ChildrenThread from "../feeds/ChildrenThread";
 import CommentsThread from "../feeds/CommentsThread";
+import Score from "../score/Score";
+import LoadingNegations from "./LoadingNegations";
+import NegationText from "./NegationText";
 
 export default function Point({
 	level,
@@ -25,8 +24,8 @@ export default function Point({
 	getParentAncestry: undefined | (() => string | undefined);
 }) {
 	const { point, detailsOpened, unfurlDropdown } = usePointContext();
-	const router = useRouter();
-	const searchParams = useSearchParams();
+	const [ids, setIds] = usePointIds();
+
 	const pointBg = `${
 		level % 2
 			? " bg-indigo-25 hover:bg-indigo-50"
@@ -43,7 +42,7 @@ export default function Point({
 	}
 
 	function newRoute() {
-		const current = searchParams?.get("id");
+		const current = ids;
 		const currentIds = current ? current.split(",") : [];
 		const ancestry = getAncestry()?.split(",");
 		if (!ancestry) return;
@@ -65,18 +64,7 @@ export default function Point({
 				: ancestry.join(",");
 		const route = current ? `${missingAncestors},${current}` : missingAncestors;
 
-		// Check if space and conversation parameters exist
-		if (router.query.space && router.query.conversation) {
-			router.push({
-				pathname: `/spaces/${router.query.space}/${router.query.conversation}`,
-				query: { id: route },
-			});
-		} else {
-			router.push({
-				pathname: "/",
-				query: { id: route },
-			});
-		}
+		setIds(route);
 	}
 
 	function handleClick(e: React.MouseEvent) {
@@ -85,15 +73,12 @@ export default function Point({
 	}
 
 	useEffect(() => {
-		const selectedIds =
-			typeof router.query.id === "string"
-				? router.query.id.split(",")
-				: [router.query.id];
+		const selectedIds = (ids ?? "").split(",");
 		const selectedId = selectedIds[0];
 		if (selectedId === point.id) {
 			unfurlDropdown();
 		}
-	}, [router, point, unfurlDropdown]);
+	}, [ids, point, unfurlDropdown]);
 
 	return (
 		<details
