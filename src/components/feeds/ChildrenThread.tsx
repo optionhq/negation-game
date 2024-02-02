@@ -34,7 +34,7 @@ function VeracityThreadHeader({
 					// <BsChevronExpand size={18}/>
 					<div className="w-[18px]">{nbItems}</div>
 				)}
-				<p className="font-semibold">Alternatives</p>
+				<p className="font-semibold">Counterpoints</p>
 				<p className="font-normal text-gray-400">{`tap to ${
 					isVeracityVisible ? "hide" : "show"
 				}`}</p>
@@ -85,7 +85,7 @@ function RelevanceThreadHeader({
 					// <BsChevronExpand size={18}/>
 					<div className="w-[18px]">{nbItems}</div>
 				)}
-				<p className="font-semibold">Counterpoints</p>
+				<p className="font-semibold">Objections</p>
 				<p className="font-normal text-gray-400">{`tap to ${
 					isRelevanceVisible ? "hide" : "show"
 				}`}</p>
