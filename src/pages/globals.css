@@ -2,19 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --foreground-rgb: 0, 0, 0;
-  --background-start-rgb: 214, 219, 220;
-  --background-end-rgb: 255, 255, 255;
-}
-
-/* @media (prefers-color-scheme: dark) {
+@layer base {
   :root {
-    --foreground-rgb: 255, 255, 255;
-    --background-start-rgb: 0, 0, 0;
-    --background-end-rgb: 0, 0, 0;
+    --foreground-rgb: 0, 0, 0;
+    --background-start-rgb: 214, 219, 220;
+    --background-end-rgb: 255, 255, 255;
   }
-} */
 
 html, body {
   height: 100%;
@@ -22,12 +15,6 @@ html, body {
 
 body {
   color: rgb(var(--foreground-rgb));
-  /* background: linear-gradient(
-      to bottom,
-      transparent,
-      rgb(var(--background-end-rgb))
-    )
-    rgb(var(--background-start-rgb)); */
   background-color: rgb(var(--background-end-rgb));
 }
 
@@ -35,26 +22,32 @@ textarea {
   @apply bg-white text-gray-900 border text-sm rounded-lg focus:ring-inset focus:border-0 block w-full p-4 py-3 resize-none;
 }
 
-.claim {
-  @apply relative flex flex-row items-start gap-1 lg:gap-3 font-medium list-none px-2 sm:px-3 md:px-5 py-2 sm:py-3 md:py-3 rounded-md z-0 min-w-[16rem] ;
-}
-
 p {
-@apply text-ellipsis;
-}
-.button {
-  @apply bg-purple-900 px-3 py-2 text-white rounded-md cursor-pointer flex flex-row gap-2 items-center hover:bg-purple-800 disabled:bg-slate-500 disabled:cursor-default;
-}
+  @apply text-ellipsis;
+  }
 
-.secondary-button {
-  @apply border text-black/80 px-3 py-2 rounded-md flex items-center justify-center hover:border-black/20 bg-slate-100/80 hover:bg-white hover:text-black;
+  summary::-webkit-details-marker {
+    display: none;
+  }
 }
 
-.centered-element {
-  @apply mx-3 sm:mx-4 md:mx-8 lg:mx-24 xl:mx-40;
+@layer components {
+  .claim {
+    @apply relative flex flex-row items-start gap-1 lg:gap-3 font-medium list-none px-2 sm:px-3 md:px-5 py-2 sm:py-3 md:py-3 rounded-md z-0 min-w-[16rem] ;
+  }
 
+  .button {
+    @apply bg-purple-900 px-3 py-2 text-white rounded-md cursor-pointer flex flex-row gap-2 items-center hover:bg-purple-800 disabled:bg-slate-500 disabled:cursor-default;
+  }
+  
+  .secondary-button {
+    @apply border text-black/80 px-3 py-2 rounded-md flex items-center justify-center hover:border-black/20 bg-slate-100/80 hover:bg-white hover:text-black;
+  }
 }
 
-summary::-webkit-details-marker {
-  display: none;
+@layer utilities {
+  .centered-element {
+    @apply mx-3 sm:mx-4 md:mx-8 lg:mx-24 xl:mx-40;
+  
+  }
 }
