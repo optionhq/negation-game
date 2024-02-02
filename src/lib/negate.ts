@@ -1,6 +1,6 @@
 import { Signer } from "neynar-next/server";
+import { NEGATION_SYMBOL } from "../config";
 import publish from "./publish";
-import { NEGATION_SYMBOL } from "../constants";
 
 type PostCastResponse = {
 	hash: string;
@@ -23,13 +23,10 @@ export const negate = async (
 
 		const newCast: PostCastResponse = castResponse.data.cast;
 
-		const warpcastUrl =
-			"https://warpcast.com/" +
-			newCast.author.username +
-			"/" +
-			newCast.hash.slice(0, 8).toString();
+		const warpcastUrl = `https://warpcast.com/${newCast.author.username}/${newCast.hash.slice(0, 8).toString()}`
+
 		const embeds = [{ url: warpcastUrl }];
-		const negation = NEGATION_SYMBOL + "\n" + warpcastUrl;
+		const negation = `${NEGATION_SYMBOL}\n${warpcastUrl}`;
 		const negationResponse = await publish(negation, signer, parentId, embeds);
 		if (!negationResponse) throw Error;
 

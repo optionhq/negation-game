@@ -1,7 +1,6 @@
 // src/components/Login.tsx
-import React, { useEffect } from "react";
+import React from "react";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { User } from "neynar-next/server";
 import useSWR from "swr";
 import axios from "axios";
@@ -11,9 +10,7 @@ import { useSigner } from "@/contexts/SignerContext";
 // Define the fetcher function
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);
 
-interface LoginProps {}
-
-const Login: React.FC<LoginProps> = () => {
+const Login: React.FC = () => {
 	const { signer, isLoading } = useSigner();
 	//check if the signer is connected via farcaster (previous sign in) or via neynar (current sign in)
 	const goodSigner = signer?.status === "approved" || signer?.is_authenticated;
@@ -30,6 +27,7 @@ const Login: React.FC<LoginProps> = () => {
 			{(!signer || !goodSigner) && <NeynarSigninButton />}
 			{signer && "fid" in signer && !playlist?.includes(signer.fid) && (
 				<button
+					type="button"
 					className="button"
 					style={{
 						cursor: "not-allowed",

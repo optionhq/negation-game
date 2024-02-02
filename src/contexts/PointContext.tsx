@@ -1,4 +1,6 @@
 import {
+	Dispatch,
+	SetStateAction,
 	createContext,
 	useCallback,
 	useContext,
@@ -11,7 +13,6 @@ import like from "../lib/like";
 import { Signer } from "neynar-next/server";
 import { getMaybeNegation } from "../lib/useCasts";
 import axios from "axios";
-import isNegation from "../lib/isNegation";
 
 type PointContextType = {
 	point: Node;
@@ -26,16 +27,21 @@ type PointContextType = {
 	likes:
 		| undefined
 		| { relevance: number | undefined; conviction: number | undefined };
-	liked: undefined | { relevance: boolean | undefined; conviction: boolean };
-	setDetailsOpened: React.Dispatch<React.SetStateAction<boolean>>;
+	liked:
+		| undefined
+		| { relevance: boolean | undefined; conviction: boolean | undefined };
+	setDetailsOpened: Dispatch<SetStateAction<boolean>>;
 	detailsOpened: boolean;
-	children: { relevance: any[]; conviction: any[] };
-	setChildren: React.Dispatch<
-		React.SetStateAction<{ relevance: any[]; conviction: any[] }>
+	children: { relevance: Node[]; conviction: Node[]; comment: Node[] };
+	setChildren: Dispatch<
+		SetStateAction<{
+			relevance: Node[];
+			conviction: Node[];
+			comment: Node[];
+		}>
 	>;
-	comments: Node[];
 	childrenLoading: boolean;
-	setChildrenLoading: React.Dispatch<React.SetStateAction<boolean>>;
+	setChildrenLoading: Dispatch<SetStateAction<boolean>>;
 	refreshChildren: () => Promise<void>;
 	unfurlDropdown: () => Promise<void>;
 	refreshParentThread: () => Promise<void>;
@@ -69,24 +75,29 @@ export function PointProvider({
 	const [children, setChildren] = useState<{
 		relevance: Node[];
 		conviction: Node[];
-	}>({ relevance: [], conviction: [] });
-	const [comments, setComments] = useState<Node[]>([]);
+		comment: Node[];
+	}>({ relevance: [], conviction: [], comment: [] });
 	const [likes, setLikes] = useState<
 		| undefined
 		| { relevance: number | undefined; conviction: number | undefined }
 	>();
 	const [liked, setLiked] = useState<
-		undefined | { relevance: boolean | undefined; conviction: boolean }
+		| undefined
+		| { relevance: boolean | undefined; conviction: boolean | undefined }
 	>();
 
 	const [childrenLoading, setChildrenLoading] = useState(false);
 	const [detailsOpened, setDetailsOpened] = useState(false);
 
 	useEffect(() => {
-		let _likes;
-		let _liked;
+		let _likes:
+			| undefined
+			| { relevance: number | undefined; conviction: number | undefined };
+		let _liked:
+			| undefined
+			| { relevance: boolean | undefined; conviction: boolean | undefined };
 		if (point.type !== "input") {
-			let likedveracity =
+			const likedveracity =
 				signer &&
 				"fid" in signer &&
 				point.advocates?.some((el: { fid: number }) => el.fid === signer.fid)
@@ -96,7 +107,7 @@ export function PointProvider({
 							(el: { fid: number }) => el.fid === signer.fid,
 					  )
 					: undefined;
-			let likedrelevance =
+			const likedrelevance =
 				signer &&
 				"fid" in signer &&
 				point.advocates?.some((el: { fid: number }) => el.fid === signer.fid)
@@ -106,20 +117,20 @@ export function PointProvider({
 							(el: { fid: number }) => el.fid === signer.fid,
 					  )
 					: undefined;
-			if (point.type == "negation") {
+			if (point.type === "negation") {
 				_likes = {
 					relevance: point.points,
 					conviction: point.endPoint?.points,
 				};
-				_liked = { relevance: likedrelevance, conviction: likedveracity! };
-			} else if (point.type == "root") {
+				_liked = { relevance: likedrelevance, conviction: likedveracity };
+			} else if (point.type === "root") {
 				_likes = { relevance: undefined, conviction: point.points };
-				_liked = { relevance: undefined, conviction: likedveracity! };
+				_liked = { relevance: undefined, conviction: likedveracity };
 			}
 			setLikes(_likes);
 			setLiked(_liked);
 		}
-	}, []);
+	}, [point, signer]);
 
 	const handleLike = useCallback(
 		async (
@@ -135,7 +146,14 @@ export function PointProvider({
 					.then(() => {
 						setLikes(
 							(prev) =>
-								({ ...prev, [type]: prev?.[type]! - 1 }) as {
+								({
+									...prev,
+									[type]: prev
+										? (prev?.[type] ?? 0) > 0
+											? (prev[type] as number) - 1
+											: 0
+										: 0,
+								}) as {
 									relevance: number | undefined;
 									conviction: number | undefined;
 								},
@@ -154,7 +172,14 @@ export function PointProvider({
 					.then(() => {
 						setLikes(
 							(prev) =>
-								({ ...prev, [type]: prev?.[type]! + 1 }) as {
+								({
+									...prev,
+									[type]: prev
+										? (prev?.[type] ?? 0) > 0
+											? (prev[type] as number) + 1
+											: 0
+										: 0,
+								}) as {
 									relevance: number | undefined;
 									conviction: number | undefined;
 								},
@@ -168,7 +193,7 @@ export function PointProvider({
 						);
 					});
 		},
-		[liked],
+		[liked, likes],
 	);
 
 	const handleNegate = useCallback(
@@ -178,12 +203,11 @@ export function PointProvider({
 		) => {
 			e.stopPropagation();
 			e.preventDefault();
-
 			setChildren((prev) => {
-				let newChildren = { ...prev };
+				const newChildren = { ...prev };
 				// Check if there's already an input element in the array
 				const hasInput = newChildren[type]?.some(
-					(neg: any) => neg.type === "input",
+					(neg: Node) => neg.type === "input",
 				);
 				// If there's no input element, add one
 				if (!hasInput)
@@ -197,85 +221,93 @@ export function PointProvider({
 			});
 			if (!detailsOpened) unfurlDropdown();
 		},
-		[detailsOpened],
+		[detailsOpened, point.id],
 	);
 
-	const getNegationsForType = async (
-		_point: Node,
-		type: "relevance" | "conviction",
-	) => {
-		const {
-			data: {
-				result: { casts },
-			},
-		} = await axios.get(`/api/cast/${_point.id}/thread`);
-		const comments: Node[] = [];
+	const getNegationsForType = useCallback(
+		async (_point: Node, type: "relevance" | "conviction") => {
+			const {
+				data: {
+					result: { casts },
+				},
+			} = await axios.get(`/api/cast/${_point.id}/thread`);
 
-		const negations: Node[] = [];
-		for (const cast of casts) {
-			const possibleNegation = await getMaybeNegation(cast);
-			if (possibleNegation.parentId == _point.id)
-				if (possibleNegation.type == "negation")
-					negations.push(possibleNegation);
-				else {
-					possibleNegation.type = "comment";
-					comments.push(possibleNegation);
-				}
-		}
+			const comments: Node[] = [];
+			const negations: Node[] = [];
 
-		const inputBox = children?.[type]?.find((neg) => neg?.type === "input");
-		let sortedNegations = negations.sort((a, b) => {
-			if (b.points !== a.points) {
-				return b.points! - a.points!;
-			} else if (a.endPoint && b.endPoint) {
-				return b.endPoint.points! - a.endPoint.points!;
-			} else {
-				return 0;
+			for (const cast of casts) {
+				const possibleNegation = await getMaybeNegation(cast);
+				if (possibleNegation.parentId === _point.id)
+					if (possibleNegation.type === "negation")
+						negations.push(possibleNegation);
+					else {
+						possibleNegation.type = "comment";
+						comments.push(possibleNegation);
+					}
 			}
-		});
+			const inputBox = children?.[type]?.find((neg) => neg?.type === "input");
+			const sortedNegations = negations.sort((a, b) => {
+				if (b.points && a.points && b.points !== a.points) {
+					return b.points - a.points;
+				}
+				if (
+					a.endPoint &&
+					b.endPoint &&
+					b?.endPoint?.points &&
+					a?.endPoint?.points
+				) {
+					return b.endPoint.points - a.endPoint.points;
+				}
+				return 0;
+			});
 
-		setComments((prev) => {
-			const newComments = comments.filter(
-				(comment) => !prev.some((prevComment) => prevComment.id === comment.id),
-			);
-			return [...prev, ...newComments];
-		});
-		return inputBox ? [inputBox, ...sortedNegations] : sortedNegations;
-	};
+			return inputBox
+				? [[inputBox, ...sortedNegations], comments]
+				: [sortedNegations, comments];
+		},
+		[children],
+	);
 
 	const refreshChildren = useCallback(async () => {
-		if (point.type == "input") return;
-		let newNeg: { relevance: Node[]; conviction: Node[] } = {
+		console.log("refresh children");
+		if (point.type === "input") return;
+		const newNeg: { relevance: Node[]; conviction: Node[] } = {
 			relevance: [],
 			conviction: [],
 		};
-		let newComments: { point: Node[]; endpoint: Node[] } = {
+		const newComments: { point: Node[]; endpoint: Node[] } = {
 			point: [],
 			endpoint: [],
 		};
-
-		if (point.type == "negation") {
-			[newNeg.relevance, newNeg.conviction] = await Promise.all([
+		if (point.type === "negation") {
+			[
+				[newNeg.relevance, newComments.point],
+				[newNeg.conviction, newComments.endpoint],
+			] = await Promise.all([
 				getNegationsForType(point, "relevance"),
-				getNegationsForType(point.endPoint!, "conviction"),
+				point.endPoint ? getNegationsForType(point.endPoint, "conviction") : [],
 			]);
 		} else {
-			[newNeg.conviction] = await Promise.all([
+			[[newNeg.conviction, newComments.point]] = await Promise.all([
 				getNegationsForType(point, "conviction"),
 			]);
 		}
-
-		setChildren(newNeg);
-	}, []);
+		setChildren({
+			relevance: newNeg.relevance,
+			conviction: newNeg.conviction,
+			comment: [...newComments.endpoint, ...newComments.point],
+		});
+	}, [getNegationsForType, point]);
 
 	const unfurlDropdown = useCallback(async () => {
-		setDetailsOpened((p) => !p);
-		if (!detailsOpened) {
-			setChildrenLoading(true);
-			await refreshChildren();
-			setChildrenLoading(false);
-		}
-	}, [children]);
+		setDetailsOpened((prevDetailsOpened) => {
+			if (!prevDetailsOpened) {
+				setChildrenLoading(true);
+				refreshChildren().then(() => setChildrenLoading(false));
+			}
+			return !prevDetailsOpened;
+		});
+	}, []);
 
 	return (
 		<PointContext.Provider
@@ -288,7 +320,6 @@ export function PointProvider({
 				detailsOpened,
 				setDetailsOpened,
 				children,
-				comments,
 				setChildren,
 				childrenLoading,
 				setChildrenLoading,

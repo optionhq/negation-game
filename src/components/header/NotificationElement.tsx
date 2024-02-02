@@ -3,7 +3,7 @@
 import { useSigner } from "@/contexts/SignerContext";
 import getNbNewNotifications from "@/lib/notifications/getNbNewNotifications";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { MdNotifications } from "react-icons/md";
 import HeaderElement from "./HeaderElement";
 
@@ -12,13 +12,13 @@ export default function NotificationElement() {
 	const pathName = usePathname();
 	const { signer } = useSigner();
 
-	async function fetchNotifications() {
+	const fetchNotifications = useCallback(async () => {
 		setNbNotifs(await getNbNewNotifications(signer));
-	}
+	}, [signer]);
 
 	useEffect(() => {
 		fetchNotifications();
-	}, [signer]);
+	}, [fetchNotifications]);
 
 	return (
 		<div onClick={() => setNbNotifs(0)}>
@@ -26,7 +26,7 @@ export default function NotificationElement() {
 				Icon={MdNotifications}
 				name="Notifications"
 				path="/notifications"
-				currentPath={pathName == "/notifications"}
+				currentPath={pathName === "/notifications"}
 				nbNotifs={nbNotifs}
 			/>
 		</div>

@@ -1,5 +1,4 @@
 import { BiCheck } from "react-icons/bi";
-import { TbExclamationMark } from "react-icons/tb";
 
 export default function AccuracyIcon() {
 	return (

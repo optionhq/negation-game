@@ -1,7 +1,6 @@
 import axios from "axios";
 import { Signer } from "neynar-next/server";
-import { DEFAULT_CHANNELID } from "../constants";
-import { Cast } from "neynar-next/server";
+import { DEFAULT_CHANNELID } from "../config";
 
 export default async function publish(
 	text: string,
@@ -10,7 +9,7 @@ export default async function publish(
 	embeds?: { url: string }[],
 ) {
 	try {
-		const castResponse = await axios.post(`/api/cast`, {
+		const castResponse = await axios.post("/api/cast", {
 			text: text,
 			parent: parentId ? parentId : DEFAULT_CHANNELID,
 			signerUuid: signer.signer_uuid,

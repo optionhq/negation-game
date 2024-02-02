@@ -1,7 +1,9 @@
+import { ReactNode } from "react";
+
 export default function Modal({
 	setSelected,
 	children,
-}: { setSelected: any; children: React.ReactNode }) {
+}: { setSelected: any; children: ReactNode }) {
 	return (
 		<div
 			className="fixed w-screen h-screen top-0 left-0 z-50 bg-black/30 flex items-center justify-center"

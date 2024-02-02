@@ -28,7 +28,7 @@ export default function RootLayout({
 					<SignerProvider>
 						<div className="flex flex-col h-full min-h-screen">
 							<Header />
-							<div className="flex-1">{children}</div>
+							<div className="flex-grow overflow-clip">{children}</div>
 							<MobileBottomHeader />
 						</div>
 					</SignerProvider>
