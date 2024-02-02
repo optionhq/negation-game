@@ -1,6 +1,6 @@
 import { Signer } from "neynar-next/server";
+import { NEGATION_SYMBOL } from "../config";
 import publish from "./publish";
-import { NEGATION_SYMBOL } from "../constants";
 
 type PostCastResponse = {
 	hash: string;

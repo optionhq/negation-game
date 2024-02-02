@@ -26,7 +26,7 @@ export default function RootLayout({
 					{/* <AuthKitProvider config={config}> */}
 					{/* <NeynarProvider> */}
 					<SignerProvider>
-						<div className="flex flex-col h-full min-h-screen">
+						<div className="flex flex-col min-h-screen">
 							<Header />
 							<div className="flex-1">{children}</div>
 							<MobileBottomHeader />

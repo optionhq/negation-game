@@ -1,8 +1,7 @@
-import { useRouter } from "next/router";
-import { useEffect } from "react";
+import { usePointIds } from "@/lib/hooks/usePointIds";
 import axios from "axios";
 import { Cast } from "neynar-next/server";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { getMaybeNegation } from "../../lib/useCasts";
 import { Node } from "../../types/Points";
 
@@ -46,16 +45,13 @@ export function HistoricalPoint({
 }
 
 export default function HistoricalPoints({ ids }: { ids: string[] }) {
-	const router = useRouter();
+	const [, setIds] = usePointIds();
 
 	function onClick(id: string) {
 		const index = ids.indexOf(id);
 		const newIds = ids.slice(index);
 
-		router.push({
-			pathname: router.pathname,
-			query: { ...router.query, id: newIds.join(",") },
-		});
+		setIds(newIds.join(","));
 	}
 
 	return (

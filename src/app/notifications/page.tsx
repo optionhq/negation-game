@@ -1,3 +1,5 @@
+"use client";
+
 import NotificationWrapper from "@/components/notifications/NotificationWrapper";
 import { useSigner } from "@/contexts/SignerContext";
 import getNotifications from "@/lib/notifications/getNotifications";

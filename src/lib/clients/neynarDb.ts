@@ -1,6 +1,8 @@
 import { Client } from "pg";
 
-export const getFarcasterDb = async (): Promise<Client> => {
+export const neynarDb = async <T>(
+	callback: (client: Client) => Promise<T>,
+): Promise<T> => {
 	if (!process.env.NEYNAR_DB_NAME) {
 		throw new Error("NEYNAR_DB_NAME not set");
 	}
@@ -27,5 +29,9 @@ export const getFarcasterDb = async (): Promise<Client> => {
 
 	await client.connect();
 
-	return client;
+	const result = await callback(client);
+
+	await client.end();
+
+	return result;
 };

@@ -1,3 +1,5 @@
+"use client";
+import { SPACES } from "@/config";
 import Link from "next/link";
 
 const infos: { [key: string]: { description: string } } = {
@@ -10,9 +12,7 @@ const infos: { [key: string]: { description: string } } = {
 	},
 };
 
-export default function Spaces() {
-	const spaces = JSON.parse(process.env.NEXT_PUBLIC_SPACES || "{}");
-
+export default function Page() {
 	return (
 		<div className="flex-1 flex items-center gap-6 pb-6 sm:gap-12 sm:pb-12 relative  flex-col">
 			<div className="w-full top-0 left-0 right-0 bg-purple-900/80 text-white p-3 flex flex-row items-center justify-center">
@@ -30,7 +30,7 @@ export default function Spaces() {
 				</div>
 			</div>
 			<div className="flex flex-row flex-wrap justify-center gap-4">
-				{Object.keys(spaces).map((space, i) => {
+				{Object.keys(SPACES).map((space, i) => {
 					return (
 						<button
 							type="button"
@@ -54,7 +54,7 @@ export default function Spaces() {
 									{infos[space]?.description}
 								</p>
 								<p className="text-gray-500">
-									<strong>Conversations</strong> : {spaces[space]?.length}
+									<strong>Conversations</strong> : {SPACES[space]?.length}
 								</p>
 							</Link>
 						</button>

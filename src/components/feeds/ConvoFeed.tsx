@@ -1,12 +1,10 @@
-import { useRouter } from "next/router";
-import { useCallback, useEffect, useRef, useState } from "react";
-import axios from "axios";
 import { getMaybeNegation } from "@/lib/useCasts";
 import { Node } from "@/types/Points";
+import axios from "axios";
+import { useCallback, useEffect, useRef, useState } from "react";
 import PointWrapper from "../points/PointWrapper";
 
-export default function ConvoFeed() {
-	const router = useRouter();
+export default function ConvoFeed({ conversation }: { conversation: string }) {
 	const [topic, setTopic] = useState("");
 	const isFetching = useRef(false);
 	const [points, setPoints] = useState<Node[]>([]);
@@ -30,24 +28,24 @@ export default function ConvoFeed() {
 	}
 
 	const fetchItems = useCallback(async () => {
-		if (!router.isReady || isFetching.current) return;
+		if (isFetching.current) return;
 		isFetching.current = true;
 
 		let _points: Node[] = [];
-		_points = await fetchThread(router.query.conversation as string);
+		_points = await fetchThread(conversation);
 
 		setPoints(_points);
 		isFetching.current = false;
-	}, [router]);
+	}, [conversation]);
 
 	useEffect(() => {
 		axios
-			.get(`/api/cast?type=hash&identifier=${router.query.conversation}`)
+			.get(`/api/cast?type=hash&identifier=${conversation}`)
 			.then((response) => setTopic(response.data.text))
 			.catch((error) => console.error(error));
 
 		fetchItems();
-	}, [router.query.conversation, fetchItems]);
+	}, [conversation, fetchItems]);
 
 	return (
 		<div className="flex flex-col items-center gap-4 centered-element py-4">

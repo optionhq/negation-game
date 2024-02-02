@@ -2,6 +2,12 @@ import { EdgeSingular, NodeSingular } from "cytoscape";
 
 export const style: cytoscape.Stylesheet[] = [
 	{
+		selector: "node.negation.hovered",
+		style: {
+			visibility: "visible",
+		},
+	},
+	{
 		selector: "node.point",
 		style: {
 			"background-color": "#fff",
@@ -11,7 +17,7 @@ export const style: cytoscape.Stylesheet[] = [
 			width: "400px",
 			height: "160px",
 			label: (node: NodeSingular) =>
-				`[${node.data("likes")}] ${breakLongWords(node.data("text"))}`,
+				breakLongWords(node.data("text")).replace(/\n/g, " "),
 			"text-wrap": "wrap",
 			"text-justification": "left",
 			"text-max-width": "360px",
@@ -35,23 +41,81 @@ export const style: cytoscape.Stylesheet[] = [
 			label: "data(likes)",
 		},
 	},
+	// {
+	// 	selector: "edge.eh-preview, edge.eh-ghost-edge",
+	// 	style: {
+	// 		"line-style": "dashed",
+	// 		"target-arrow-shape": "triangle",
+	// 		"target-arrow-color": "#000",
+	// 		"source-arrow-color": "#000",
+	// 		"target-arrow-fill": "hollow",
+
+	// 		"arrow-scale": 2,
+	// 		width: 2,
+	// 	},
+	// },
+
 	{
-		selector: "edge",
+		selector: "edge.negation, edge.eh-ghost-edge , edge.eh-preview",
 		style: {
 			visibility: "visible",
 			width: (edge: EdgeSingular) => Math.max(1, edge.source().data("likes")),
 			"target-arrow-shape": "triangle",
-			"arrow-scale": 1,
+			"arrow-scale": 2,
 			"curve-style": "unbundled-bezier",
 			"line-color": "#000",
 			"source-arrow-color": "#000",
 			"target-arrow-color": "#000",
+			"source-label": (edge: EdgeSingular) => edge.source().data("likes"),
+			"target-label": (edge: EdgeSingular) => edge.source().data("likes"),
+			"source-text-offset": 24,
+			"target-text-offset": 24,
+			"text-outline-color": "#eee",
+			"text-outline-width": 3,
 		},
 	},
+
+	{ selector: ".eh-source, .eh-target", style: { "border-color": "red" } },
+	{ selector: "node.eh-target.negation", style: { "background-color": "red" } },
+	{
+		selector: ".eh-ghost-edge.eh-preview-active",
+		style: {
+			opacity: 0,
+		},
+	},
+	{
+		selector: "edge.negation.provisional",
+		style: {
+			"line-style": "dashed",
+		},
+	},
+	{
+		selector: "node.point.provisional",
+		style: {
+			"border-style": "dashed",
+		},
+	},
+	{
+		selector: ".eh-ghost-edge , edge.eh-preview",
+		style: {
+			"line-color": "red",
+			"line-style": "dashed",
+			"target-arrow-color": "red",
+			"target-arrow-fill": "hollow",
+		},
+	},
+
 	{
 		selector: "edge.aux",
 		style: {
 			visibility: "hidden",
+		},
+	},
+	{
+		selector: "node.selected, node.hovered",
+		style: {
+			visibility: "visible",
+			"z-index": 100,
 		},
 	},
 ];

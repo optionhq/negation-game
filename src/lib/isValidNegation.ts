@@ -1,4 +1,4 @@
-import { NEGATION_SYMBOL } from "@/constants";
+import { NEGATION_SYMBOL } from "@/config";
 import { okUrls } from "./useEndPoints";
 
 export const isValidNegation = (title: string): boolean => {
