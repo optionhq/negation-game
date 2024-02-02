@@ -6,6 +6,7 @@ import { isValidNegation } from "@/lib/isValidNegation";
 import { Cast } from "@/types/Cast";
 import cytoscape, {
 	CollectionReturnValue,
+	EdgeSingular,
 	ElementsDefinition,
 } from "cytoscape";
 import { neynarDb } from "../clients/neynarDb";
@@ -89,10 +90,12 @@ ORDER BY c.created_at ASC;`,
 	}
 
 	const elements: CollectionReturnValue = pointId
-		? cy
-				.getElementById(pointId)
-				// @ts-expect-error
-				.component()
+		? calculateDissonance(
+				cy
+					.getElementById(pointId)
+					// @ts-expect-error
+					.component(),
+		  )
 		: // ? extendedClosedNeighborhood(pointId, cy.elements(), 2)
 		  cy.elements();
 
@@ -101,6 +104,53 @@ ORDER BY c.created_at ASC;`,
 			// .filter("[!aux]")
 			.jsons() as unknown as ElementsDefinition
 	);
+};
+
+const calculateDissonance = (component: CollectionReturnValue) => {
+	const negations = component.filter("node.negation");
+
+	const handledNegations = [] as string[];
+
+	for (const negation of negations) {
+		if (handledNegations.includes(negation.id())) continue;
+		handledNegations.push(negation.id());
+
+		const sourcePoint = component
+			.getElementById(`to-source-${negation.id()}`)
+			.target();
+		const targetPoint = component
+			.getElementById(`to-target-${negation.id()}`)
+			.target();
+
+		const counterpointLikes = negation
+			.neighborhood("edge.negation")
+			.reduce(
+				(sum, counterpointEdge: EdgeSingular) =>
+					sum + counterpointEdge.source().data("likes"),
+				0,
+			);
+
+		negation.data(
+			"dissonance",
+			Math.max(
+				0,
+				Math.min(sourcePoint.data("likes"), targetPoint.data("likes")) -
+					counterpointLikes,
+			),
+		);
+	}
+
+	const points = component.filter("node.point");
+
+	for (const point of points) {
+		const maxDissonance = point
+			.neighborhood("node.negation")
+			.map((negation) => negation.data("dissonance"))
+			.reduce((max, dissonance) => Math.max(max, dissonance), 0);
+		point.data("consilience", Math.max(0, point.data("likes") - maxDissonance));
+	}
+
+	return component;
 };
 
 const extendedClosedNeighborhood = (

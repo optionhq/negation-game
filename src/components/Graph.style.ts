@@ -11,13 +11,20 @@ export const style: cytoscape.Stylesheet[] = [
 		selector: "node.point",
 		style: {
 			"background-color": "#fff",
+			// "background-color": (node: NodeSingular) => {
+			// 	const disagreement = node.data("consilience") / node.data("likes");
+
+			// 	return `rgb(${360 - disagreement * 260}, 60%, 80%)`;
+			// },
 			"border-color": "#06d",
 			"border-width": 2,
 			shape: "round-rectangle",
 			width: "400px",
 			height: "160px",
 			label: (node: NodeSingular) =>
-				breakLongWords(node.data("text")).replace(/\n/g, " "),
+				`[${node.data("consilience")}/${node.data("likes")}] ${breakLongWords(
+					node.data("text"),
+				).replace(/\n/g, " ")}`,
 			"text-wrap": "wrap",
 			"text-justification": "left",
 			"text-max-width": "360px",
@@ -38,7 +45,7 @@ export const style: cytoscape.Stylesheet[] = [
 			color: "#fff",
 			width: 32,
 			height: 32,
-			label: "data(likes)",
+			label: "data(dissonance)",
 		},
 	},
 	// {
@@ -67,7 +74,7 @@ export const style: cytoscape.Stylesheet[] = [
 			"source-arrow-color": "#000",
 			"target-arrow-color": "#000",
 			"source-label": (edge: EdgeSingular) => edge.source().data("likes"),
-			"target-label": (edge: EdgeSingular) => edge.source().data("likes"),
+			"target-label": (edge: EdgeSingular) => edge.target().data("likes"),
 			"source-text-offset": 24,
 			"target-text-offset": 24,
 			"text-outline-color": "#eee",
@@ -116,6 +123,21 @@ export const style: cytoscape.Stylesheet[] = [
 		style: {
 			visibility: "visible",
 			"z-index": 100,
+		},
+	},
+
+	{
+		selector: "node.point.focused",
+		style: {
+			"background-color": "#ffd",
+			"border-color": "#fd0",
+		},
+	},
+	{
+		selector: "node.point.hovered",
+		style: {
+			"background-color": "#feb",
+			"border-color": "#fa0",
 		},
 	},
 ];

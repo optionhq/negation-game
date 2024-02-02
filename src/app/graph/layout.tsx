@@ -1,9 +1,9 @@
+import Header from "@/components/header/Header";
+import MobileBottomHeader from "@/components/header/MobileBottomHeader";
 import { SignerProvider } from "@/contexts/SignerContext";
 import "@/pages/globals.css";
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Header from "../components/header/Header";
-import MobileBottomHeader from "../components/header/MobileBottomHeader";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
@@ -28,7 +28,7 @@ export default function RootLayout({
 					<SignerProvider>
 						<div className="flex flex-col h-full min-h-screen">
 							<Header />
-							<div className="flex-grow overflow-clip">{children}</div>
+							<div className="flex-1">{children}</div>
 							<MobileBottomHeader />
 						</div>
 					</SignerProvider>

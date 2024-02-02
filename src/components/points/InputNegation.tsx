@@ -1,12 +1,7 @@
 import { useSigner } from "@/contexts/SignerContext";
+import { cn } from "@/lib/utils/cn";
 import { Node } from "@/types/Points";
-import React, {
-	useEffect,
-	useState,
-	useRef,
-	Dispatch,
-	SetStateAction,
-} from "react";
+import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 const MAX_CHAR_PER_CAST = 320;
 
@@ -15,6 +10,7 @@ export default function InputNegation({
 	placeHolder,
 	onPublish,
 	onClose,
+	className,
 }: {
 	pointBg?: string;
 	placeHolder: string;
@@ -27,6 +23,7 @@ export default function InputNegation({
 			comment: Node[];
 		}>
 	>;
+	className?: string;
 }) {
 	const [text, setText] = useState("");
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -54,6 +51,7 @@ export default function InputNegation({
 			return;
 		}
 		onPublish(text);
+		setText("");
 		onClose();
 	}
 
@@ -63,7 +61,11 @@ export default function InputNegation({
 
 	return (
 		<div
-			className={`${pointBg} w-full flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border`}
+			className={cn(
+				"w-full flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border",
+				pointBg,
+				className,
+			)}
 			onClick={(e) => e.stopPropagation()}
 		>
 			<textarea

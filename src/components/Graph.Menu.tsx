@@ -32,7 +32,7 @@ export const GraphMenu: FC<GraphMenuProps> = () => {
 			>
 				<div className="w-4 h-4 bg-white rotate-45" />
 			</div>
-			<div className="flex flex-col w-52 items-start px-4 py-2 divide-y bg-white divide-gray-100 z-10">
+			<div className="flex flex-col w-52 items-start px-4 py-2 divide-y bg-white divide-gray-100 ">
 				{selectedElement && (
 					<>
 						<a

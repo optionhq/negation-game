@@ -9,6 +9,10 @@ import Cytoscape, {
 } from "cytoscape";
 
 import { GRAPH_INTERACTIVE_MIN_ZOOM } from "@/config";
+import { useSigner } from "@/contexts/SignerContext";
+import { makePoint } from "@/lib/actions/makePoint";
+import { addPointNode } from "@/lib/cytoscape/addPointNode";
+import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
 import cytoscape from "cytoscape";
 import edgeHandles from "cytoscape-edgehandles";
 // @ts-expect-error
@@ -17,14 +21,16 @@ import popper from "cytoscape-popper";
 import { useAtom, useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { FC, HTMLAttributes, useEffect, useRef } from "react";
+import { BiSolidPencil } from "react-icons/bi";
 import { GraphMenu } from "./Graph.Menu";
-import { PointForm } from "./Graph.PointForm";
 import {
 	cytoscapeAtom,
 	edgeHandlesAtom,
 	pointBeingMadeAtom,
 	selectedElementAtom,
 } from "./Graph.state";
+import InputNegation from "./points/InputNegation";
+import { hoveredPointIdAtom } from "./points/Point";
 
 Cytoscape.use(euler);
 Cytoscape.use(popper);
@@ -33,15 +39,24 @@ Cytoscape.use(edgeHandles);
 interface GraphProps extends HTMLAttributes<HTMLDivElement> {
 	elements?: ElementsDefinition;
 	graphStyle?: Stylesheet[];
+	focusedElementId?: string;
 }
 
-export const Graph: FC<GraphProps> = ({ elements, graphStyle, ...props }) => {
+export const Graph: FC<GraphProps> = ({
+	elements,
+	graphStyle,
+	focusedElementId,
+	...props
+}) => {
 	const { push } = useRouter();
 	const cyContainer = useRef<HTMLDivElement>(null);
 	const [cy, setCy] = useAtom(cytoscapeAtom);
 	const setEdgeHandles = useSetAtom(edgeHandlesAtom);
 	const [selectedElement, setSelectedElement] = useAtom(selectedElementAtom);
 	const [pointBeingMade, setPointBeingMade] = useAtom(pointBeingMadeAtom);
+	const [hoveredPointId, setHoveredPointId] = useAtom(hoveredPointIdAtom);
+	const user = useSignedInUser();
+	const signer = useSigner().signer;
 
 	useEffect(() => {
 		if (!elements) return;
@@ -88,7 +103,7 @@ export const Graph: FC<GraphProps> = ({ elements, graphStyle, ...props }) => {
 			cytoscape.$(".eh-ghost-edge").forEach(console.log);
 		});
 
-		cytoscape.on("tap", (event) => {
+		const handleTap = (event: cytoscape.EventObject) => {
 			const target = event.target;
 
 			if (target === cytoscape) {
@@ -104,7 +119,15 @@ export const Graph: FC<GraphProps> = ({ elements, graphStyle, ...props }) => {
 			}
 
 			setSelectedElement(target);
+		};
+
+		cytoscape.on("tap", handleTap);
+
+		// TODO migrate to use XState with Browsing, MakingPoint and Negating states, setting up the event handlers for each state
+		cytoscape.on("ehstart", () => {
+			cytoscape.off("tap", handleTap);
 		});
+		cytoscape.on("ehstop", () => cytoscape.on("tap", handleTap));
 
 		cytoscape.on("tap", "node.point", (event) => {
 			// push(`/?id=0x${event.target.id()}`);
@@ -144,8 +167,8 @@ export const Graph: FC<GraphProps> = ({ elements, graphStyle, ...props }) => {
 			cytoscape.getElementById(nodeId).addClass("hovered");
 		});
 
-		cytoscape.on("mouseover", "edge.point", (e) => {
-			e.target.addClass("hovered");
+		cytoscape.on("mouseover", "node.point", (e) => {
+			setHoveredPointId(`0x${e.target.id()}`);
 		});
 
 		cytoscape.on("mouseout", "edge.negation, node.negation", (e) => {
@@ -153,8 +176,8 @@ export const Graph: FC<GraphProps> = ({ elements, graphStyle, ...props }) => {
 			cytoscape.getElementById(nodeId).removeClass("hovered");
 		});
 
-		cytoscape.on("mouseout", "edge.point", (e) => {
-			e.target.removeClass("hovered");
+		cytoscape.on("mouseout", "node.point", (e) => {
+			setHoveredPointId(undefined);
 		});
 
 		updateLayout(cytoscape, { fit: true, padding: 100, animate: false });
@@ -163,7 +186,62 @@ export const Graph: FC<GraphProps> = ({ elements, graphStyle, ...props }) => {
 			edgeHandles.destroy();
 			cytoscape.destroy();
 		};
-	}, [elements, graphStyle, setCy, setEdgeHandles, setSelectedElement]);
+	}, [
+		elements,
+		graphStyle,
+		setCy,
+		setEdgeHandles,
+		setSelectedElement,
+		setHoveredPointId,
+	]);
+
+	useEffect(() => {
+		if (!cy || !focusedElementId) return;
+
+		const selectedPoint =
+			cy.getElementById(`negation-${focusedElementId}`)?.source() ??
+			cy.getElementById(`${focusedElementId}`);
+
+		if (!selectedPoint) {
+			return;
+		}
+
+		cy.animate({
+			center: {
+				eles: selectedPoint,
+			},
+			zoom: 0.5,
+			duration: 500,
+			easing: "ease-in-out-cubic",
+		});
+
+		selectedPoint.addClass("focused");
+
+		return () => {
+			selectedPoint.removeClass("focused");
+		};
+	}, [cy, focusedElementId]);
+
+	useEffect(() => {
+		if (!cy || !hoveredPointId) return;
+
+		console.log("hoveredPointId", hoveredPointId);
+
+		const hoveredPoint =
+			cy.getElementById(`negation-${hoveredPointId.substring(2)}`)?.source() ??
+			cy.getElementById(`${hoveredPointId.substring(2)}`);
+
+		if (!hoveredPoint) {
+			console.log(hoveredPointId, "not found");
+			return;
+		}
+
+		hoveredPoint.addClass("hovered");
+
+		return () => {
+			hoveredPoint.removeClass("hovered");
+		};
+	}, [cy, hoveredPointId]);
 
 	useEffect(() => {
 		if (!selectedElement || !cy || selectedElement.hasClass("provisional"))
@@ -206,41 +284,71 @@ export const Graph: FC<GraphProps> = ({ elements, graphStyle, ...props }) => {
 		<div {...props}>
 			<div ref={cyContainer} className="w-full h-full" />
 			<GraphMenu />
-			{pointBeingMade && <PointForm pointBeingMade={pointBeingMade} />}
-			<button
-				className="absolute bottom-2 right-2"
-				onClick={() => {
-					if (!cy) return;
+			{pointBeingMade && (
+				<InputNegation
+					className="absolute bottom-0 w-full p-4"
+					placeHolder="Make your point..."
+					onClose={() => {
+						pointBeingMade.remove();
+						setPointBeingMade(null);
+					}}
+					onPublish={async (text) => {
+						if (!signer || !user || !cy) return;
 
-					const center = {
-						x: (cy.width() / 2 - cy.pan().x) / cy.zoom(),
-						y: (cy.height() / 2 - cy.pan().y) / cy.zoom(),
-					};
+						const { hash } = await makePoint(text, signer);
 
-					const newPointBeingMade = cy.add({
-						group: "nodes",
-						classes: ["point", "provisional"],
-						data: {
-							fname: "you",
-							text: "Make your point...",
-							likes: 0,
-						},
-						position: center,
-					});
+						addPointNode(
+							cy,
+							{
+								hash: hash.substring(2),
+								fname: user.username,
+								text,
+								likes: 0,
+								parentHash: null,
+							},
+							{ position: pointBeingMade.position() },
+						);
+					}}
+				/>
+			)}
+			{/* <PointForm pointBeingMade={pointBeingMade} /> */}
+			{!pointBeingMade && (
+				<button
+					className="absolute bottom-2 right-2 button"
+					onClick={() => {
+						if (!cy) return;
 
-					cy.animate({
-						center: {
-							eles: newPointBeingMade,
-						},
-						duration: 500,
-						easing: "ease-in-out-cubic",
-					});
+						const center = {
+							x: (cy.width() / 2 - cy.pan().x) / cy.zoom(),
+							y: (cy.height() / 2 - cy.pan().y) / cy.zoom(),
+						};
 
-					setPointBeingMade(newPointBeingMade);
-				}}
-			>
-				Make a point
-			</button>
+						const newPointBeingMade = cy.add({
+							group: "nodes",
+							classes: ["point", "provisional"],
+							data: {
+								fname: "you",
+								text: "Make your point...",
+								likes: 0,
+							},
+							position: center,
+						});
+
+						cy.animate({
+							center: {
+								eles: newPointBeingMade,
+							},
+							duration: 500,
+							easing: "ease-in-out-cubic",
+						});
+
+						setPointBeingMade(newPointBeingMade);
+					}}
+				>
+					<BiSolidPencil size={18} />
+					Make a point
+				</button>
+			)}
 		</div>
 	);
 };

@@ -1,5 +1,7 @@
 import { usePointIds } from "@/lib/hooks/usePointIds";
-import { useEffect } from "react";
+import { cn } from "@/lib/utils/cn";
+import { atom, useAtom } from "jotai";
+import { useEffect, useMemo } from "react";
 import { usePointContext } from "../../contexts/PointContext";
 import { Node } from "../../types/Points";
 import AccordionArrow from "../AccordionArrow";
@@ -9,6 +11,8 @@ import CommentsThread from "../feeds/CommentsThread";
 import Score from "../score/Score";
 import LoadingNegations from "./LoadingNegations";
 import NegationText from "./NegationText";
+
+export const hoveredPointIdAtom = atom<string | undefined>(undefined);
 
 export default function Point({
 	level,
@@ -25,12 +29,17 @@ export default function Point({
 }) {
 	const { point, detailsOpened, unfurlDropdown } = usePointContext();
 	const [ids, setIds] = usePointIds();
+	const [hoveredPointId, setHoveredPointId] = useAtom(hoveredPointIdAtom);
+	const currentPointId = useMemo(() => {
+		if (point.type === "root") return point.id;
+		if (point.type === "negation") return point?.endPoint?.id;
 
-	const pointBg = `${
-		level % 2
-			? " bg-indigo-25 hover:bg-indigo-50"
-			: " bg-slate-50 hover:bg-gray-100"
-	}`;
+		return undefined;
+	}, [point]);
+	const isHovered = useMemo(
+		() => hoveredPointId && hoveredPointId === currentPointId,
+		[hoveredPointId, currentPointId],
+	);
 
 	function getAncestry(): string | undefined {
 		// Call the parent's getAncestry function if it exists
@@ -86,7 +95,22 @@ export default function Point({
 			className="flex flex-col gap-1 w-full"
 			onClick={handleClick}
 		>
-			<summary className={`${pointBg} claim relative border cursor-pointer`}>
+			<summary
+				className={cn(
+					level % 2
+						? isHovered
+							? "bg-indigo-50"
+							: "bg-indigo-25"
+						: isHovered
+						  ? "bg-gray-100"
+						  : "bg-slate-50",
+					"claim relative border cursor-pointer",
+				)}
+				onMouseOver={() => {
+					setHoveredPointId(currentPointId);
+				}}
+				onMouseOut={() => setHoveredPointId(undefined)}
+			>
 				<AccordionArrow />
 				<div className="flex flex-col gap-3 items-start justify-center w-full">
 					<NegationText />
