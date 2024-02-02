@@ -7,6 +7,9 @@ const infos: { [key: string]: { description: string } } = {
 		description:
 			"Purple is a DAO whose goal is to proliferate and expand the Farcaster protocol and ecosystem. We will fund small grants via Prop House and larger on-chain proposals which proliferate Farcaster and/or build on top of the protocol.",
 	},
+	negationgame: {
+		description: "How extraterrestrials do governance.",
+	},
 };
 
 export default function Page() {
@@ -48,10 +51,10 @@ export default function Page() {
 									</h3>
 								</div>
 								<p className=" text-gray-500 text-left">
-									{infos[space].description}
+									{infos[space]?.description}
 								</p>
 								<p className="text-gray-500">
-									<strong>Conversations</strong> : {SPACES[space].length}
+									<strong>Conversations</strong> : {SPACES[space]?.length}
 								</p>
 							</Link>
 						</button>
