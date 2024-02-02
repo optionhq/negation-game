@@ -209,11 +209,17 @@ export function PointProvider({
 				const hasInput = newChildren[type]?.some(
 					(neg: Node) => neg.type === "input",
 				);
+				const parentId = point.endPoint
+					? type === "conviction"
+						? point.endPoint.id
+						: point.id
+					: point.id;
+
 				// If there's no input element, add one
 				if (!hasInput)
 					newChildren[type].push({
 						type: "input",
-						parentId: point.id,
+						parentId: parentId,
 						negationType: type,
 						title: "",
 					});
