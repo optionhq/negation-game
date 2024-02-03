@@ -1,10 +1,9 @@
-import { GoInfo } from "react-icons/go";
-import { Node } from "../../types/Points";
-import { usePointContext } from "../../contexts/PointContext";
 import { useState } from "react";
+import { BsFillSlashCircleFill, BsFillXCircleFill } from "react-icons/bs";
+import { GoInfo } from "react-icons/go";
+import { usePointContext } from "../../contexts/PointContext";
+import { Node } from "../../types/Points";
 import PointWrapper from "../points/PointWrapper";
-import { PiExcludeDuotone } from "react-icons/pi";
-import { MdDoNotDisturbOnTotalSilence } from "react-icons/md";
 
 function VeracityThreadHeader({
 	isVeracityVisible,
@@ -29,7 +28,7 @@ function VeracityThreadHeader({
 		>
 			<div className="flex flex-row items-center gap-2 justify-start">
 				{isVeracityVisible ? (
-					<PiExcludeDuotone size={18} color="rgb(30,64,175)" />
+					<BsFillXCircleFill size={18} color="rgb(30,64,175)" />
 				) : (
 					// <BsChevronExpand size={18}/>
 					<div className="w-[18px]">{nbItems}</div>
@@ -50,7 +49,7 @@ function VeracityThreadHeader({
 			</div>
 			{isVeracityVisible && (
 				<p className="text-gray-400/80 font-light">
-					these points ↓ are alternative options to the parent point ↑
+					these points ↓ are refuting the parent point ↑
 				</p>
 			)}
 		</button>
@@ -80,7 +79,7 @@ function RelevanceThreadHeader({
 		>
 			<div className="flex flex-row items-center gap-2 justify-center text-purple-800">
 				{isRelevanceVisible ? (
-					<MdDoNotDisturbOnTotalSilence size={18} color="rgb(107, 33, 168)" />
+					<BsFillSlashCircleFill size={18} color="rgb(107, 33, 168)" />
 				) : (
 					// <BsChevronExpand size={18}/>
 					<div className="w-[18px]">{nbItems}</div>
@@ -100,7 +99,8 @@ function RelevanceThreadHeader({
 			</div>
 			{isRelevanceVisible && (
 				<p className="text-gray-400/80 font-light">
-					these points ↓ are evidence against the parent point ↑ in this context
+					these points ↓ reject the validity of the parent point ↑ in this
+					context
 				</p>
 			)}
 		</button>
