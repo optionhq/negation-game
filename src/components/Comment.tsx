@@ -1,11 +1,10 @@
-import { PointProvider, usePointContext } from "../contexts/PointContext";
-import { useEffect, useState } from "react";
-import PointWrapper from "./PointWrapper";
-import TripleDotMenu from "./TripleDotMenu";
 import Image from "next/image";
+import { useEffect, useState } from "react";
+import { usePointContext } from "../contexts/PointContext";
+import TripleDotMenu from "./TripleDotMenu";
 
 export default function Comment({ level }: { level: number }) {
-	const { point, comments, refreshChildren, children } = usePointContext();
+	const { point, refreshChildren, children } = usePointContext();
 	const [isRefreshed, setIsRefreshed] = useState(false);
 
 	useEffect(() => {
@@ -32,7 +31,7 @@ export default function Comment({ level }: { level: number }) {
 			</div>
 			{/* <div className="absolute h-full w-[1px] bg-black ml-9 -z-20"></div> */}
 			<div className="flex flex-col gap-2">
-				{comments?.map((el, i) => (
+				{/* {comments?.map((el, i) => (
 					<PointWrapper
 						key={i}
 						level={level}
@@ -41,7 +40,7 @@ export default function Comment({ level }: { level: number }) {
 						getParentAncestry={() => ""}
 						refreshParentThread={() => Promise.resolve()}
 					/>
-				))}
+				))} */}
 			</div>
 		</div>
 	);
