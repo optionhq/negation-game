@@ -21,7 +21,9 @@ export function extractEndPointUrl(
 	if (cast.embeds) {
 		const embed = cast.embeds.find((embed: Embed) => {
 			if (embed.url !== undefined)
-				return urlCheck.some((urlRegex) => urlRegex.test(embed.url));
+				return urlCheck.some(
+					(urlRegex) => embed.url && urlRegex.test(embed.url),
+				);
 			return false;
 		});
 		return embed?.url || null;
