@@ -49,7 +49,7 @@ export default function PointFeed({
 
 	if (!point) return;
 	return (
-		<div className="flex flex-row-reverse overflow-clip w-full h-full ">
+		<div className="flex flex-row-reverse w-full h-full ">
 			<div className="w-full h-full flex flex-grow items-center justify-center bg-gray-100">
 				{!pointGraph && (
 					<BiLoaderAlt size={128} className="animate-spin text-purple-200" />
