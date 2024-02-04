@@ -40,6 +40,7 @@ export const GraphMenu: FC<GraphMenuProps> = () => {
 							href={`https://warpcast.com/${selectedElement.data(
 								"fname",
 							)}/0x${selectedElement.data("hash")}`}
+							target="_blank"
 						>
 							Open in Warpcast
 						</a>
