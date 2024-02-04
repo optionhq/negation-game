@@ -4,8 +4,8 @@ import { Node } from "@/types/Points";
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import MentionNotification from "./MentionNotification";
 import LikeNotification from "./LikeNotification";
+import MentionNotification from "./MentionNotification";
 import ReplyNotification from "./ReplyNotification";
 
 export default function NotificationWrapper({
@@ -36,10 +36,10 @@ export default function NotificationWrapper({
 
 	if (notification.type === "recasts") return <></>;
 	const replyHistoric =
-		notification.type === "reply" ? `%2C0x${node?.parentId}` : "";
+		notification.type === "reply" ? `,0x${node?.parentId}` : "";
 	return (
 		<div
-			onClick={() => node && router.push(`/?id=${node.id}${replyHistoric}`)}
+			onClick={() => node && router.push(`/?ids=${node.id}${replyHistoric}`)}
 			className={`border p-4 w-full md:w-[500px] rounded-md hover:bg-slate-50 cursor-pointer ${
 				isNew ? "bg-indigo-600/10" : ""
 			}`}
