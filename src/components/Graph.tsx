@@ -9,15 +9,12 @@ import Cytoscape, {
 } from "cytoscape";
 
 import { GRAPH_INTERACTIVE_MIN_ZOOM } from "@/config";
+import { useAssertCytoscapeInitialized } from "@/contexts/CytoscapeContext";
 import { useSigner } from "@/contexts/SignerContext";
 import { makePoint } from "@/lib/actions/makePoint";
 import { addPointNode } from "@/lib/cytoscape/addPointNode";
 import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
 import cytoscape from "cytoscape";
-import edgeHandles from "cytoscape-edgehandles";
-// @ts-expect-error
-import euler from "cytoscape-euler";
-import popper from "cytoscape-popper";
 import { useAtom, useSetAtom } from "jotai";
 import { useRouter } from "next/navigation";
 import { FC, HTMLAttributes, useEffect, useRef } from "react";
@@ -31,10 +28,6 @@ import {
 } from "./Graph.state";
 import InputNegation from "./points/InputNegation";
 import { hoveredPointIdAtom } from "./points/Point";
-
-Cytoscape.use(euler);
-Cytoscape.use(popper);
-Cytoscape.use(edgeHandles);
 
 interface GraphProps extends HTMLAttributes<HTMLDivElement> {
 	elements?: ElementsDefinition;
@@ -57,6 +50,7 @@ export const Graph: FC<GraphProps> = ({
 	const [hoveredPointId, setHoveredPointId] = useAtom(hoveredPointIdAtom);
 	const user = useSignedInUser();
 	const signer = useSigner().signer;
+	useAssertCytoscapeInitialized();
 
 	useEffect(() => {
 		if (!elements) return;

@@ -1,3 +1,4 @@
+import { CytoscapeProvider } from "@/contexts/CytoscapeContext";
 import { SignerProvider } from "@/contexts/SignerContext";
 import "@/pages/globals.css";
 import { Metadata } from "next";
@@ -25,24 +26,28 @@ export default function RootLayout({
 	children: React.ReactNode;
 }) {
 	return (
-		<html lang="en">
-			<body>
-				<div className={`${inter.className} h-full`}>
-					{/* <AuthKitProvider config={config}> */}
-					{/* <NeynarProvider> */}
-					<SignerProvider>
-						<div className="flex flex-col h-full min-h-screen">
-							<Header />
-							<div className="flex-grow overflow-clip">
-								<div className="w-full h-full overflow-scroll">{children}</div>
+		<CytoscapeProvider>
+			<html lang="en">
+				<body>
+					<div className={`${inter.className} h-full`}>
+						{/* <AuthKitProvider config={config}> */}
+						{/* <NeynarProvider> */}
+						<SignerProvider>
+							<div className="flex flex-col h-full min-h-screen">
+								<Header />
+								<div className="flex-grow overflow-clip">
+									<div className="w-full h-full overflow-scroll">
+										{children}
+									</div>
+								</div>
+								<MobileBottomHeader />
 							</div>
-							<MobileBottomHeader />
-						</div>
-					</SignerProvider>
-					{/* </NeynarProvider> */}
-					{/* </AuthKitProvider> */}
-				</div>
-			</body>
-		</html>
+						</SignerProvider>
+						{/* </NeynarProvider> */}
+						{/* </AuthKitProvider> */}
+					</div>
+				</body>
+			</html>
+		</CytoscapeProvider>
 	);
 }
