@@ -121,6 +121,8 @@ ORDER BY c.created_at ASC;`,
 
 	assignScores(elements);
 
+	elements.layout({ name: "grid" }).run();
+
 	return new Promise((resolve) => {
 		return elements
 			.layout({
@@ -140,7 +142,6 @@ ORDER BY c.created_at ASC;`,
 				maxSimulationTime: 4000,
 				fit: false,
 				animate: false,
-				randomize: true,
 				boundingBox: { x1: 0, y1: 0, w: 1000, h: 1000 },
 
 				stop: () => {
