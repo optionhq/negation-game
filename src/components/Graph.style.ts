@@ -36,7 +36,7 @@ export const style: cytoscape.Stylesheet[] = [
 
 		style: {
 			visibility: (node: NodeSingular) =>
-				node.connectedEdges("[!aux]").length === 0 ? "hidden" : "visible",
+				node.connectedEdges().length === 0 ? "hidden" : "visible",
 
 			"border-color": "#000",
 			"border-width": 2,
@@ -45,7 +45,7 @@ export const style: cytoscape.Stylesheet[] = [
 			color: "#fff",
 			width: 32,
 			height: 32,
-			label: "data(dissonance)",
+			label: (node: NodeSingular) => `${node.data("dissonance")}` || "",
 		},
 	},
 	// {
@@ -112,12 +112,12 @@ export const style: cytoscape.Stylesheet[] = [
 		},
 	},
 
-	{
-		selector: "edge.aux",
-		style: {
-			visibility: "hidden",
-		},
-	},
+	// {
+	// 	selector: "edge.aux",
+	// 	style: {
+	// 		visibility: "hidden",
+	// 	},
+	// },
 	{
 		selector: "node.selected, node.hovered",
 		style: {

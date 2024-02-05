@@ -63,6 +63,19 @@ export const Graph: FC<GraphProps> = ({
 			boxSelectionEnabled: false,
 			selectionType: "single",
 			minZoom: 0.05,
+			layout: {
+				name: "preset",
+				fit: true,
+				padding: 30,
+				transform: (node, position) => {
+					if (!node.hasClass("negation")) return position;
+
+					return getNegationPosition(node);
+				},
+				stop: (e) => {
+					e.cy.$("node.negation").lock();
+				},
+			},
 		});
 
 		setCy(cytoscape);
@@ -93,10 +106,6 @@ export const Graph: FC<GraphProps> = ({
 
 		setEdgeHandles(edgeHandles);
 
-		cytoscape.on("render", () => {
-			cytoscape.$(".eh-ghost-edge").forEach(console.log);
-		});
-
 		const handleTap = (event: cytoscape.EventObject) => {
 			const target = event.target;
 
@@ -122,10 +131,6 @@ export const Graph: FC<GraphProps> = ({
 			cytoscape.off("tap", handleTap);
 		});
 		cytoscape.on("ehstop", () => cytoscape.on("tap", handleTap));
-
-		cytoscape.on("tap", "node.point", (event) => {
-			// push(`/?id=0x${event.target.id()}`);
-		});
 
 		cytoscape.on("zoom", () => {
 			const currentZoomLevel = cytoscape.zoom();
@@ -156,6 +161,25 @@ export const Graph: FC<GraphProps> = ({
 			}
 		});
 
+		cytoscape.on("position", "node.point", (e) => {
+			const point = e.target as NodeSingular;
+
+			for (const edge of point.connectedEdges()) {
+				const negationNode = cytoscape.getElementById(
+					edge.id().replace("negation-", ""),
+				) as NodeSingular;
+				negationNode.unlock();
+				negationNode.position(edge.midpoint());
+				negationNode.lock();
+			}
+		});
+
+		cytoscape.on("add", "node.negation", (e) => {
+			const negation = e.target as NodeSingular;
+			negation.position(getNegationPosition(negation));
+			negation.lock();
+		});
+
 		cytoscape.on("mouseover", "edge.negation, node.negation", (e) => {
 			const nodeId = e.target.id().replace("negation-", "");
 			cytoscape.getElementById(nodeId).addClass("hovered");
@@ -174,7 +198,7 @@ export const Graph: FC<GraphProps> = ({
 			setHoveredPointId(undefined);
 		});
 
-		updateLayout(cytoscape, { fit: true, padding: 100, animate: false });
+		// updateLayout(cytoscape, { fit: true, padding: 100, animate: false });
 
 		return () => {
 			edgeHandles.destroy();
@@ -219,14 +243,11 @@ export const Graph: FC<GraphProps> = ({
 	useEffect(() => {
 		if (!cy || !hoveredPointId) return;
 
-		console.log("hoveredPointId", hoveredPointId);
-
 		const hoveredPoint =
 			cy.getElementById(`negation-${hoveredPointId.substring(2)}`)?.source() ??
 			cy.getElementById(`${hoveredPointId.substring(2)}`);
 
 		if (!hoveredPoint) {
-			console.log(hoveredPointId, "not found");
 			return;
 		}
 
@@ -362,7 +383,7 @@ const updateLayout = (cy: cytoscape.Core, options?: Partial<LayoutOptions>) => {
 	negationNodes.unlock();
 	cy.one("layoutstop", () => negationNodes.lock());
 	cy.layout({
-		name: "euler",
+		name: "cose",
 		// @ts-expect-error
 		springLength: (edge) => 400,
 		springCoeff: (edge: EdgeSingular) => 0.0008,
@@ -378,4 +399,13 @@ const updateLayout = (cy: cytoscape.Core, options?: Partial<LayoutOptions>) => {
 		maxSimulationTime: 4000,
 		...options,
 	}).run();
+};
+
+const getNegationPosition = (negation: NodeSingular) => {
+	if (!negation.hasClass("negation")) throw new Error("Not a negation node");
+	const negationEdge = negation
+		.cy()
+		.getElementById(`negation-${negation.id()}`);
+	if (negationEdge.empty()) throw new Error("Negation edge not found");
+	return negationEdge.midpoint();
 };

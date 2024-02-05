@@ -1,6 +1,7 @@
 import { useSigner } from "@/contexts/SignerContext";
 import { negate } from "@/lib/actions/negate";
-import { addNegationEdge } from "@/lib/cytoscape/addNegationEdge";
+import { addNegation } from "@/lib/cytoscape/addNegation";
+import { assignDissonance } from "@/lib/cytoscape/algo/assignDissonance";
 import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
 import { EdgeSingular, EventObject, NodeSingular } from "cytoscape";
 import { useAtom, useAtomValue } from "jotai";
@@ -58,26 +59,29 @@ export const GraphMenu: FC<GraphMenuProps> = () => {
 
 									const handleNewEdge = async (
 										_: EventObject,
-										sourceNode: NodeSingular,
-										targetNode: NodeSingular,
+										negatingPoint: NodeSingular,
+										negatedNode: NodeSingular,
 										provisionalEdge: EdgeSingular,
 									) => {
 										const { hash } = await negate(
-											`0x${sourceNode.id()}`,
-											`0x${targetNode.id()}`,
+											`0x${negatingPoint.id()}`,
+											`0x${negatedNode.id()}`,
 											signer.signer_uuid,
 										);
 
-										addNegationEdge(
+										const negation = addNegation(
 											cytoscape,
 											{
 												fname: user.username,
 												hash: hash.substring(2),
 												likes: 0,
-												parentHash: targetNode.id(),
+												parentHash: negatedNode.id(),
 											},
-											sourceNode.id(),
+											negatingPoint,
+											negatedNode,
 										);
+
+										assignDissonance({ negatedNode, negatingPoint, negation });
 
 										provisionalEdge.remove();
 										setSelectedElement(null);

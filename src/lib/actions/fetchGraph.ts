@@ -4,14 +4,20 @@ import { DEFAULT_CHANNELID } from "@/config";
 import { extractTruncatedHash } from "@/lib/extractTruncatedHash";
 import { isValidNegation } from "@/lib/isValidNegation";
 import { Cast } from "@/types/Cast";
-import cytoscape, {
+import Cytoscape, {
 	CollectionReturnValue,
 	EdgeSingular,
 	ElementsDefinition,
+	NodeSingular,
 } from "cytoscape";
+// @ts-expect-error
+import eulerExtension from "cytoscape-euler";
 import { neynarDb } from "../clients/neynarDb";
-import { addNegationEdge } from "../cytoscape/addNegationEdge";
+import { addNegation } from "../cytoscape/addNegation";
 import { addPointNode } from "../cytoscape/addPointNode";
+import { assignScores } from "../cytoscape/algo/assignScores";
+
+Cytoscape.use(eulerExtension);
 
 const findCast = (
 	truncatedHash: string,
@@ -59,11 +65,12 @@ ORDER BY c.created_at ASC;`,
 				.then((res) => res.rows),
 	)) as Cast[];
 
-	const cy = cytoscape({ headless: true });
+	const cytoscape = Cytoscape({ headless: true });
 
 	for (let i = 0; i < allNegationGameCasts.length; i++) {
-		if (allNegationGameCasts[i].parentHash === null) {
-			addPointNode(cy, allNegationGameCasts[i]);
+		const negatedNodeHash = allNegationGameCasts[i].parentHash;
+		if (negatedNodeHash === null) {
+			addPointNode(cytoscape, allNegationGameCasts[i]);
 
 			continue;
 		}
@@ -82,99 +89,68 @@ ORDER BY c.created_at ASC;`,
 			continue;
 		}
 
+		const negatingNode = cytoscape.getElementById(negatingCast.hash);
+		if (negatingNode.empty()) {
+			continue;
+		}
+
+		const negatedNode = cytoscape.getElementById(negatedNodeHash);
+		if (negatedNode.empty()) {
+			continue;
+		}
+
 		try {
-			addNegationEdge(cy, allNegationGameCasts[i], negatingCast.hash);
+			addNegation(
+				cytoscape,
+				allNegationGameCasts[i],
+				negatingNode,
+				negatedNode,
+			);
 		} catch (error) {
-			// console.error("error adding", allNegationGameCasts[i].hash);
+			console.error("error adding", allNegationGameCasts[i], error?.toString());
 		}
 	}
 
 	const elements: CollectionReturnValue = pointId
-		? calculateDissonance(
-				cy
-					.getElementById(pointId)
-					// @ts-expect-error
-					.component(),
-		  )
+		? cytoscape
+				.getElementById(pointId)
+				// @ts-expect-error
+				.component()
 		: // ? extendedClosedNeighborhood(pointId, cy.elements(), 2)
-		  cy.elements();
+		  cytoscape.elements();
 
-	return (
-		elements
-			// .filter("[!aux]")
-			.jsons() as unknown as ElementsDefinition
-	);
-};
+	assignScores(elements);
 
-const calculateDissonance = (component: CollectionReturnValue) => {
-	const negations = component.filter("node.negation");
+	// console.log(elements.nodes().map((e) => e.data()));
 
-	const handledNegations = [] as string[];
+	return new Promise((resolve) => {
+		return elements
+			.layout({
+				name: "euler",
+				// @ts-expect-error
+				springLength: (edge) => 400,
+				springCoeff: (edge: EdgeSingular) => 0.0008,
+				mass: (node: NodeSingular) => (node.hasClass("point") ? 100 : 10),
+				gravity: -3,
+				pull: 0.002,
+				theta: 0.888,
+				dragCoeff: 0.02,
+				movementThreshold: 1,
+				timeStep: 100,
+				refresh: 10,
+				maxIterations: 1000,
+				maxSimulationTime: 4000,
+				fit: false,
+				animate: false,
+				randomize: true,
+				boundingBox: { x1: 0, y1: 0, w: 1000, h: 1000 },
 
-	for (const negation of negations) {
-		if (handledNegations.includes(negation.id())) continue;
-		handledNegations.push(negation.id());
-
-		const sourcePoint = component
-			.getElementById(`to-source-${negation.id()}`)
-			.target();
-		const targetPoint = component
-			.getElementById(`to-target-${negation.id()}`)
-			.target();
-
-		const counterpointLikes = negation
-			.neighborhood("edge.negation")
-			.reduce(
-				(sum, counterpointEdge: EdgeSingular) =>
-					sum + counterpointEdge.source().data("likes"),
-				0,
-			);
-
-		negation.data(
-			"dissonance",
-			Math.max(
-				0,
-				Math.min(sourcePoint.data("likes"), targetPoint.data("likes")) -
-					counterpointLikes,
-			),
-		);
-	}
-
-	const points = component.filter("node.point");
-
-	for (const point of points) {
-		const maxDissonance = point
-			.neighborhood("node.negation")
-			.map((negation) => negation.data("dissonance"))
-			.reduce((max, dissonance) => Math.max(max, dissonance), 0);
-		point.data("consilience", Math.max(0, point.data("likes") - maxDissonance));
-	}
-
-	return component;
-};
-
-const extendedClosedNeighborhood = (
-	rootId: string,
-	allNodes: CollectionReturnValue,
-	maxDepth: number,
-) => {
-	let extendedClosedNeighborhood = allNodes
-		.cy()
-		.collection([allNodes.getElementById(rootId)]);
-
-	allNodes.breadthFirstSearch({
-		roots: allNodes.getElementById(rootId),
-		visit: (current, sourceEdge, previous, index, depth) => {
-			if (depth > maxDepth) {
-				return false;
-			}
-			current.data("depth", depth);
-			extendedClosedNeighborhood = extendedClosedNeighborhood.add(current);
-			if (sourceEdge)
-				extendedClosedNeighborhood = extendedClosedNeighborhood.add(sourceEdge);
-		},
-		directed: false,
+				stop: () => {
+					resolve(
+						elements.filter("[!aux]").jsons() as unknown as ElementsDefinition,
+					);
+				},
+			})
+			.run();
 	});
-
-	return extendedClosedNeighborhood;
 };

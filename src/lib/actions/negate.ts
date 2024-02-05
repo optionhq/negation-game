@@ -15,8 +15,6 @@ export const negate = async (
 		(await neynarApi.lookUpCastByHashOrWarpcastUrl(negatedHash, "hash")).cast,
 	]);
 
-	console.log({ negatingCast, negatedCast });
-
 	if (!isPointCast(negatingCast)) {
 		console.error("Source is not a Point. You can only use Points to negate.");
 		throw new Error(

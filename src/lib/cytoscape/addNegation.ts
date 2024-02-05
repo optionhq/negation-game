@@ -1,12 +1,13 @@
 import { Cast } from "@/types/Cast";
-import { Core } from "cytoscape";
+import { Core, NodeSingular } from "cytoscape";
 
-export const addNegationEdge = (
-	cy: Core,
+export const addNegation = (
+	cytoscape: Core,
 	negationCast: Omit<Cast, "text">,
-	negatingCastHash: string,
+	negatingPoint: NodeSingular,
+	negatedNode: NodeSingular,
 ) => {
-	const elements = cy.add([
+	const elements = cytoscape.add([
 		{
 			group: "nodes",
 
@@ -24,8 +25,8 @@ export const addNegationEdge = (
 				id: `negation-${negationCast.hash}`,
 				hash: negationCast.hash,
 				fname: negationCast.fname,
-				source: negatingCastHash,
-				target: negationCast.parentHash,
+				source: negatingPoint.id(),
+				target: negatedNode.id(),
 			},
 			classes: "negation",
 		},
@@ -34,7 +35,7 @@ export const addNegationEdge = (
 			data: {
 				id: `to-source-${negationCast.hash}`,
 				source: negationCast.hash,
-				target: negatingCastHash,
+				target: negatingPoint.id(),
 				aux: true,
 			},
 			classes: "aux",
@@ -44,16 +45,12 @@ export const addNegationEdge = (
 			data: {
 				id: `to-target-${negationCast.hash}`,
 				source: negationCast.hash,
-				target: negationCast.parentHash,
+				target: negatedNode.id(),
 				aux: true,
 			},
 			classes: "aux",
 		},
 	]);
 
-	elements
-		.getElementById(negationCast.hash)
-		.position(
-			elements.getElementById(`negation-${negationCast.hash}`).midpoint(),
-		);
+	return elements.getElementById(negationCast.hash);
 };
