@@ -40,12 +40,16 @@ export const style: cytoscape.Stylesheet[] = [
 
 			"border-color": "#000",
 			"border-width": 2,
-			"background-color": "#06d",
+			"background-color": (node: NodeSingular) =>
+				node.data("dissonance") !== undefined ? "#06d" : "#fa0",
 			"text-valign": "center",
 			color: "#fff",
 			width: 32,
 			height: 32,
-			label: (node: NodeSingular) => `${node.data("dissonance")}` || "",
+			label: (node: NodeSingular) =>
+				node.data("dissonance") !== undefined
+					? `${node.data("dissonance")}`
+					: "",
 		},
 	},
 	// {

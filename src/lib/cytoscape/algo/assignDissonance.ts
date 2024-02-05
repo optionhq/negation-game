@@ -1,12 +1,12 @@
 import { EdgeSingular, NodeSingular } from "cytoscape";
 
 export const assignDissonance = ({
-	negatedNode,
+	negatedPoint,
 	negatingPoint,
 	negation,
 }: {
 	negation: NodeSingular;
-	negatedNode: NodeSingular;
+	negatedPoint: NodeSingular;
 	negatingPoint: NodeSingular;
 }) => {
 	const counterpointLikes = negation
@@ -21,7 +21,7 @@ export const assignDissonance = ({
 		"dissonance",
 		Math.max(
 			0,
-			Math.min(negatingPoint.data("likes"), negatedNode.data("likes")) -
+			Math.min(negatingPoint.data("likes"), negatedPoint.data("likes")) -
 				counterpointLikes,
 		),
 	);

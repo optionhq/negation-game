@@ -81,7 +81,13 @@ export const GraphMenu: FC<GraphMenuProps> = () => {
 											negatedNode,
 										);
 
-										assignDissonance({ negatedNode, negatingPoint, negation });
+										if (negatedNode.hasClass("point")) {
+											assignDissonance({
+												negatedPoint: negatedNode,
+												negatingPoint,
+												negation,
+											});
+										}
 
 										provisionalEdge.remove();
 										setSelectedElement(null);
