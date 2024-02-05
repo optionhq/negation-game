@@ -121,8 +121,6 @@ ORDER BY c.created_at ASC;`,
 
 	assignScores(elements);
 
-	// console.log(elements.nodes().map((e) => e.data()));
-
 	return new Promise((resolve) => {
 		return elements
 			.layout({
