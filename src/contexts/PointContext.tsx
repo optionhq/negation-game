@@ -1,3 +1,5 @@
+import axios from "axios";
+import { Signer } from "neynar-next/server";
 import {
 	Dispatch,
 	SetStateAction,
@@ -7,12 +9,10 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import { Node } from "../types/Points";
-import unlike from "../lib/unlike";
 import like from "../lib/like";
-import { Signer } from "neynar-next/server";
+import unlike from "../lib/unlike";
 import { getMaybeNegation } from "../lib/useCasts";
-import axios from "axios";
+import { Node } from "../types/Points";
 
 type PointContextType = {
 	point: Node;
@@ -275,7 +275,6 @@ export function PointProvider({
 	);
 
 	const refreshChildren = useCallback(async () => {
-		console.log("refresh children");
 		if (point.type === "input") return;
 		const newNeg: { relevance: Node[]; conviction: Node[] } = {
 			relevance: [],
