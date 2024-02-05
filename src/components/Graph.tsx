@@ -9,7 +9,7 @@ import Cytoscape, {
 } from "cytoscape";
 
 import { GRAPH_INTERACTIVE_MIN_ZOOM } from "@/config";
-import { useAssertCytoscapeInitialized } from "@/contexts/CytoscapeContext";
+import { useAssertCytoscapeExtensionsLoaded } from "@/contexts/CytoscapeContext";
 import { useSigner } from "@/contexts/SignerContext";
 import { makePoint } from "@/lib/actions/makePoint";
 import { addPointNode } from "@/lib/cytoscape/addPointNode";
@@ -41,6 +41,7 @@ export const Graph: FC<GraphProps> = ({
 	focusedElementId,
 	...props
 }) => {
+	useAssertCytoscapeExtensionsLoaded();
 	const { push } = useRouter();
 	const cyContainer = useRef<HTMLDivElement>(null);
 	const [cy, setCy] = useAtom(cytoscapeAtom);
@@ -50,7 +51,6 @@ export const Graph: FC<GraphProps> = ({
 	const [hoveredPointId, setHoveredPointId] = useAtom(hoveredPointIdAtom);
 	const user = useSignedInUser();
 	const signer = useSigner().signer;
-	useAssertCytoscapeInitialized();
 
 	useEffect(() => {
 		if (!elements) return;

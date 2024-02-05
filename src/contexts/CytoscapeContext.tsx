@@ -30,7 +30,7 @@ export const CytoscapeProvider = ({ children }: PropsWithChildren) => {
 	);
 };
 
-export const useAssertCytoscapeInitialized = () => {
+export const useAssertCytoscapeExtensionsLoaded = () => {
 	const { initialized } = useContext(CytoscapeContext);
 	if (!initialized)
 		throw new Error("must be used inside a CytoscapeProvider component");
