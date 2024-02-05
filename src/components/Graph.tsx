@@ -251,8 +251,18 @@ export const Graph: FC<GraphProps> = ({
 				modifiers: [
 					{
 						name: "arrow",
+						options: { padding: 4 },
 					},
 					{ name: "offset", options: { offset: [0, 16] } },
+					{
+						name: "preventOverflow",
+						options: {
+							padding: 12,
+							mainAxis: true,
+							altAxis: true,
+							boundary: cyContainer.current,
+						},
+					},
 				],
 			},
 		});

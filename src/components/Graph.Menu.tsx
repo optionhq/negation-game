@@ -23,12 +23,12 @@ export const GraphMenu: FC<GraphMenuProps> = () => {
 	return (
 		<div
 			id="graph-menu"
-			className="absolute top-0 left-0  drop-shadow-lg"
+			className="group absolute top-0 left-0  drop-shadow-lg"
 			style={{ visibility: selectedElement ? "visible" : "hidden" }}
 		>
 			<div
 				data-popper-arrow
-				className="absolute -bottom-2 left-1/2 -translate-x-1/2"
+				className="absolute -bottom-2 group-data-[popper-placement=bottom]:-top-2 group-data-[popper-placement=bottom]:bottom-auto left-1/2 -translate-x-1/2"
 			>
 				<div className="w-4 h-4 bg-white rotate-45" />
 			</div>
