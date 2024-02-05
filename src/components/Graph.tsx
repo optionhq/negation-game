@@ -161,7 +161,7 @@ export const Graph: FC<GraphProps> = ({
 			}
 		});
 
-		cytoscape.on("position", "node.point", (e) => {
+		cytoscape.on("position", "node.point, node.negation", (e) => {
 			const point = e.target as NodeSingular;
 
 			for (const edge of point.connectedEdges()) {

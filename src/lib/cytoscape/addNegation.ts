@@ -7,6 +7,7 @@ export const addNegation = (
 	negatingPoint: NodeSingular,
 	negatedNode: NodeSingular,
 ) => {
+	const type = negatedNode.hasClass("point") ? "counterpoint" : "objection";
 	const elements = cytoscape.add([
 		{
 			group: "nodes",
@@ -17,7 +18,7 @@ export const addNegation = (
 				fname: negationCast.fname,
 				likes: negationCast.likes,
 			},
-			classes: "negation",
+			classes: ["negation", type],
 		},
 		{
 			group: "edges",
@@ -28,7 +29,7 @@ export const addNegation = (
 				source: negatingPoint.id(),
 				target: negatedNode.id(),
 			},
-			classes: "negation",
+			classes: ["negation", type],
 		},
 		{
 			group: "edges",
