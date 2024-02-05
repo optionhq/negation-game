@@ -29,6 +29,7 @@ export const style: cytoscape.Stylesheet[] = [
 			"text-justification": "left",
 			"text-max-width": "360px",
 			"text-valign": "center",
+			"z-index": 10,
 		},
 	},
 	{
@@ -70,11 +71,12 @@ export const style: cytoscape.Stylesheet[] = [
 		selector: "edge.negation, edge.eh-ghost-edge , edge.eh-preview",
 		style: {
 			visibility: "visible",
-			width: (edge: EdgeSingular) => Math.max(1, edge.source().data("likes")),
+			width: (edge: EdgeSingular) => Math.max(2, edge.source().data("likes")),
 			"target-arrow-shape": "triangle",
 			"arrow-scale": 2,
 			"curve-style": "unbundled-bezier",
-			"line-color": "#000",
+			"line-color": (edge: EdgeSingular) =>
+				edge.target().hasClass("point") ? "#000" : "#f70",
 			"source-arrow-color": "#000",
 			"target-arrow-color": "#000",
 			"source-label": (edge: EdgeSingular) => edge.source().data("likes"),
