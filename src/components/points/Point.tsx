@@ -28,7 +28,7 @@ export default function Point({
 	getParentAncestry: undefined | (() => string | undefined);
 }) {
 	const { point, detailsOpened, unfurlDropdown } = usePointContext();
-	const [ids, setIds] = usePointIds();
+	const { ids, setIds } = usePointIds();
 	const [hoveredPointId, setHoveredPointId] = useAtom(hoveredPointIdAtom);
 	const currentPointId = useMemo(() => {
 		if (point.type === "root") return point.id;

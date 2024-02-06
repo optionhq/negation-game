@@ -94,7 +94,7 @@ export const Graph: FC<GraphProps> = ({
 	return (
 		<div
 			className={cn(
-				"w-full h-full flex flex-grow items-center justify-center bg-gray-100",
+				"flex flex-grow items-center justify-center bg-gray-100",
 				className,
 			)}
 			{...props}

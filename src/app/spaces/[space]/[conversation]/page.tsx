@@ -6,7 +6,7 @@ import { usePointIds } from "@/lib/hooks/usePointIds";
 export default function Page({
 	params: { conversation },
 }: { params: { conversation: string } }) {
-	const [ids] = usePointIds();
+	const { ids } = usePointIds();
 	if (!ids) return <ConvoFeed conversation={conversation} />;
 	return <PointFeed fromPage="space" />;
 }

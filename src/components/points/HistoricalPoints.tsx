@@ -45,7 +45,7 @@ export function HistoricalPoint({
 }
 
 export default function HistoricalPoints({ ids }: { ids: string[] }) {
-	const [, setIds] = usePointIds();
+	const { setIds } = usePointIds();
 
 	function onClick(id: string) {
 		const index = ids.indexOf(id);

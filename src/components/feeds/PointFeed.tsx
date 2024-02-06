@@ -1,30 +1,24 @@
 import { usePointIds } from "@/lib/hooks/usePointIds";
 import { getMaybeNegation } from "@/lib/useCasts";
+import { cn } from "@/lib/utils/cn";
 import { Node } from "@/types/Points";
 import axios from "axios";
 import { Cast } from "neynar-next/server";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { BiChevronLeft } from "react-icons/bi";
-import { Graph } from "../Graph";
 import HistoricalPoints from "../points/HistoricalPoints";
 import PointWrapper from "../points/PointWrapper";
 
 export default function PointFeed({
 	fromPage,
-}: { fromPage: "home" | "space" }) {
+	className,
+}: { fromPage: "home" | "space"; className?: string }) {
 	const [historicalPointIds, setHistoricalPointIds] = useState<
 		string[] | undefined
 	>([]);
-	const [ids, setIds] = usePointIds();
-	const rootPointId = useMemo(() => {
-		const allPoints = ids?.split(",");
-		return allPoints ? allPoints[allPoints?.length - 1] : undefined;
-	}, [ids]);
-	const focusedElementId = useMemo(() => ids?.split(",")[0], [ids]);
-	const pointIds = useMemo(() => ids?.split(",") ?? [], [ids]);
-	const [point, setPoint] = useState<Node>();
+	const { setIds, pointIds, focusedElementId } = usePointIds();
 
-	console.log({ rootPointId, focusedElementId });
+	const [point, setPoint] = useState<Node>();
 
 	const init = useCallback(async () => {
 		// // if it's a history of selected casts, get the first one
@@ -44,34 +38,36 @@ export default function PointFeed({
 
 	if (!point) return;
 	return (
-		<div className="flex flex-row-reverse w-full h-full ">
-			<Graph rootPointId={rootPointId} focusedElementId={focusedElementId} />
-			<div className="relative flex flex-col overflow-scroll shrink-0  gap-2 items-start p-4 justify-start h-full w-[450px] bg-white shadow-lg">
-				<div
-					onClick={() => {
-						setIds(null);
-					}}
-					className="flex flex-row py-2 mb-4 font-medium cursor-pointer hover:bg-slate-100 rounded-md text-gray-500 z-10"
-				>
-					<BiChevronLeft size={20} />
-					<p className="px-2">
-						{fromPage === "space" ? "Go back to conversation" : "Go to Home"}
-					</p>
-				</div>
-				{historicalPointIds && historicalPointIds?.length !== 0 && (
-					<HistoricalPoints ids={historicalPointIds} />
-				)}
-				<PointWrapper
-					key={point.id}
-					level={0}
-					point={point}
-					parent={undefined}
-					setHistoricalItems={setHistoricalPointIds}
-					setParentChildren={() => {}}
-					getParentAncestry={undefined}
-					refreshParentThread={init}
-				/>
+		<div
+			className={cn(
+				"relative flex flex-col overflow-scroll gap-2 items-start p-4 justify-start h-full w-full bg-white",
+				className,
+			)}
+		>
+			<div
+				onClick={() => {
+					setIds(null);
+				}}
+				className="flex flex-row py-2 mb-4 font-medium cursor-pointer hover:bg-slate-100 rounded-md text-gray-500 z-10"
+			>
+				<BiChevronLeft size={20} />
+				<p className="px-2">
+					{fromPage === "space" ? "Go back to conversation" : "Go to Home"}
+				</p>
 			</div>
+			{historicalPointIds && historicalPointIds?.length !== 0 && (
+				<HistoricalPoints ids={historicalPointIds} />
+			)}
+			<PointWrapper
+				key={point.id}
+				level={0}
+				point={point}
+				parent={undefined}
+				setHistoricalItems={setHistoricalPointIds}
+				setParentChildren={() => {}}
+				getParentAncestry={undefined}
+				refreshParentThread={init}
+			/>
 		</div>
 	);
 }
