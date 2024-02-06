@@ -16,9 +16,14 @@ export const style: cytoscape.Stylesheet[] = [
 			width: "400px",
 			height: "160px",
 			label: (node: NodeSingular) =>
-				`[${node.data("consilience")}/${node.data("likes")}] ${breakLongWords(
-					node.data("text"),
-				).replace(/\n/g, " ")}`,
+				`[${
+					Number.isInteger(node.data("consilience"))
+						? `${node.data("consilience")}/`
+						: ""
+				}${node.data("likes")}] ${breakLongWords(node.data("text")).replace(
+					/\n/g,
+					" ",
+				)}`,
 			"text-wrap": "wrap",
 			"text-justification": "left",
 			"text-max-width": "360px",
