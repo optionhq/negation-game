@@ -1,8 +1,12 @@
 "use client";
 
 import Cytoscape, {
+	Core,
 	EdgeSingular,
-	ElementsDefinition,
+	ElementDefinition,
+	EventObject,
+	EventObjectEdge,
+	EventObjectNode,
 	LayoutOptions,
 	NodeSingular,
 	Stylesheet,
@@ -12,25 +16,30 @@ import { GRAPH_INTERACTIVE_MIN_ZOOM } from "@/config";
 import { useAssertCytoscapeExtensionsLoaded } from "@/contexts/CytoscapeContext";
 import { useSigner } from "@/contexts/SignerContext";
 import { makePoint } from "@/lib/actions/makePoint";
+import { negate } from "@/lib/actions/negate";
+import { addNegation } from "@/lib/cytoscape/addNegation";
 import { addPointNode } from "@/lib/cytoscape/addPointNode";
+import { assignDissonance } from "@/lib/cytoscape/algo/assignDissonance";
 import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
 import cytoscape from "cytoscape";
-import { useAtom, useSetAtom } from "jotai";
-import { useRouter } from "next/navigation";
-import { FC, HTMLAttributes, useEffect, useRef } from "react";
+import { EdgeHandlesInstance } from "cytoscape-edgehandles";
+import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import {
+	FC,
+	HTMLAttributes,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { BiSolidPencil } from "react-icons/bi";
 import { GraphMenu } from "./Graph.Menu";
-import {
-	cytoscapeAtom,
-	edgeHandlesAtom,
-	pointBeingMadeAtom,
-	selectedElementAtom,
-} from "./Graph.state";
+import { pointBeingMadeAtom, selectedElementAtom } from "./Graph.state";
 import InputNegation from "./points/InputNegation";
 import { hoveredPointIdAtom } from "./points/Point";
 
 interface GraphProps extends HTMLAttributes<HTMLDivElement> {
-	elements?: ElementsDefinition;
+	elements?: ElementDefinition[];
 	graphStyle?: Stylesheet[];
 	focusedElementId?: string;
 }
@@ -41,71 +50,158 @@ export const Graph: FC<GraphProps> = ({
 	focusedElementId,
 	...props
 }) => {
-	useAssertCytoscapeExtensionsLoaded();
-	const { push } = useRouter();
 	const cyContainer = useRef<HTMLDivElement>(null);
-	const [cy, setCy] = useAtom(cytoscapeAtom);
-	const setEdgeHandles = useSetAtom(edgeHandlesAtom);
-	const [selectedElement, setSelectedElement] = useAtom(selectedElementAtom);
+	const { cytoscape, edgeHandles } = useCytoscape({
+		style: graphStyle,
+		containerRef: cyContainer,
+	});
 	const [pointBeingMade, setPointBeingMade] = useAtom(pointBeingMadeAtom);
-	const [hoveredPointId, setHoveredPointId] = useAtom(hoveredPointIdAtom);
+
 	const user = useSignedInUser();
 	const signer = useSigner().signer;
+	useToogleInteractiveOnZoom({ cytoscape, enabled: true });
+	useTrackSelectedElement({ cytoscape, enabled: true });
+	useTrackHoveredElement({ cytoscape, enabled: true });
+	const { hasElements } = useHandleIncomingElements({ cytoscape, elements });
+	useNegationNodesAutoReposition({
+		cytoscape,
+		enabled: hasElements,
+	});
+	useHandleElementFocus({ cytoscape, focusedElementId, enabled: true });
+	const { isNegating, handleNegate } = useHandleNegate({
+		cytoscape,
+		edgeHandles,
+		enabled: true,
+	});
+
+	useDisplayMenuOnSelectedElement({
+		cytoscape,
+		enabled: !isNegating,
+	});
+
+	return (
+		<div {...props}>
+			<div ref={cyContainer} className="w-full h-full" />
+			<GraphMenu handleNegate={handleNegate} />
+			{pointBeingMade && (
+				<InputNegation
+					className="absolute bottom-0 w-full p-4"
+					placeHolder="Make your point..."
+					onClose={() => {
+						pointBeingMade.remove();
+						setPointBeingMade(null);
+					}}
+					onPublish={async (text) => {
+						if (!signer || !user || !cytoscape) return;
+
+						const { hash } = await makePoint(text, signer);
+
+						addPointNode(
+							cytoscape,
+							{
+								hash,
+								fname: user.username,
+								text,
+								likes: 0,
+								parentHash: null,
+							},
+							{ position: pointBeingMade.position() },
+						);
+					}}
+				/>
+			)}
+			{!pointBeingMade && cytoscape && (
+				<button
+					className="absolute bottom-2 right-2 button"
+					onClick={() => {
+						const center = {
+							x: (cytoscape.width() / 2 - cytoscape.pan().x) / cytoscape.zoom(),
+							y:
+								(cytoscape.height() / 2 - cytoscape.pan().y) / cytoscape.zoom(),
+						};
+
+						const newPointBeingMade = cytoscape.add({
+							group: "nodes",
+							classes: ["point", "provisional"],
+							data: {
+								fname: "you",
+								text: "Make your point...",
+								likes: 0,
+							},
+							position: center,
+						});
+
+						cytoscape.animate({
+							center: {
+								eles: newPointBeingMade,
+							},
+							duration: 500,
+							easing: "ease-in-out-cubic",
+						});
+
+						setPointBeingMade(newPointBeingMade);
+					}}
+				>
+					<BiSolidPencil size={18} />
+					Make a point
+				</button>
+			)}
+		</div>
+	);
+};
+
+const getNegationPositionFromNode = (negation: NodeSingular) => {
+	if (!negation.hasClass("negation")) throw new Error("Not a negation node");
+	const negationEdge = negation
+		.cy()
+		.getElementById(`negation-${negation.id()}`);
+	if (negationEdge.empty()) throw new Error("Negation edge not found");
+	return negationEdge.midpoint();
+};
+
+const positionNegationNodeOverNegationEdgeFromNode = (
+	negationNode: NodeSingular,
+) => {
+	negationNode.unlock();
+	negationNode.position(getNegationPositionFromNode(negationNode));
+	negationNode.lock();
+};
+
+const positionNegationNodeOverNegationEdgeFromEdge = (
+	negationEdge: EdgeSingular,
+) => {
+	const negationNode = negationEdge
+		.cy()
+		.getElementById(negationEdge.id().replace("negation-", "")) as NodeSingular;
+	negationNode.unlock();
+	negationNode.position(getNegationPositionFromNode(negationNode));
+	negationNode.lock();
+};
+
+const updateLayout = (
+	cytoscape: cytoscape.Core,
+	options?: Partial<LayoutOptions>,
+) => {
+	cytoscape
+		.layout({
+			name: "preset",
+			transform: (node, position) => {
+				if (!node.hasClass("negation")) return position;
+				return getNegationPositionFromNode(node);
+			},
+			...options,
+		})
+		.run();
+};
+
+const useTrackSelectedElement = ({
+	cytoscape,
+	enabled,
+}: { cytoscape: Core | null; enabled: boolean }) => {
+	const setSelectedElement = useSetAtom(selectedElementAtom);
 
 	useEffect(() => {
-		if (!elements) return;
-
-		const cytoscape = Cytoscape({
-			elements,
-			container: cyContainer.current,
-			style: graphStyle,
-			autounselectify: true,
-			boxSelectionEnabled: false,
-			selectionType: "single",
-			minZoom: 0.05,
-			layout: {
-				name: "preset",
-				fit: true,
-				padding: 30,
-				transform: (node, position) => {
-					if (!node.hasClass("negation")) return position;
-
-					return getNegationPosition(node);
-				},
-				stop: (e) => {
-					e.cy.$("node.negation").lock();
-				},
-			},
-		});
-
-		setCy(cytoscape);
-
-		const edgeHandles = cytoscape.edgehandles({
-			edgeParams: (source, target) => ({
-				data: {
-					hash: "negation-new",
-					fname: "negation-new",
-					source: source.id(),
-					target: target.id(),
-				},
-				classes: ["negation", "provisional"],
-			}),
-			canConnect: (source, target) => {
-				if (source === target) return false;
-				if (
-					target.hasClass("negation") &&
-					cytoscape.getElementById(`to-source-${target.id()}`).target() ===
-						source
-				)
-					return false;
-				if (source.edgesTo(target).length > 0) return false;
-				return true;
-			},
-			snap: true,
-		});
-
-		setEdgeHandles(edgeHandles);
-
+		if (!cytoscape || !enabled) return;
 		const handleTap = (event: cytoscape.EventObject) => {
 			const target = event.target;
 
@@ -126,126 +222,72 @@ export const Graph: FC<GraphProps> = ({
 
 		cytoscape.on("tap", handleTap);
 
-		// TODO migrate to use XState with Browsing, MakingPoint and Negating states, setting up the event handlers for each state
-		cytoscape.on("ehstart", () => {
+		return () => {
 			cytoscape.off("tap", handleTap);
-		});
-		cytoscape.on("ehstop", () => cytoscape.on("tap", handleTap));
+		};
+	}, [cytoscape, enabled, setSelectedElement]);
+};
 
-		cytoscape.on("zoom", () => {
-			const currentZoomLevel = cytoscape.zoom();
+const useTrackHoveredElement = ({
+	cytoscape,
+	enabled,
+}: { cytoscape: Core | null; enabled: boolean }) => {
+	const [hoveredPointId, setHoveredPointId] = useAtom(hoveredPointIdAtom);
 
-			currentZoomLevel > GRAPH_INTERACTIVE_MIN_ZOOM
-				? cytoscape
-						.nodes()
-						.grabify()
-						// @ts-expect-error
-						.unpanify()
-				: cytoscape
-						.nodes()
-						.ungrabify()
-						// @ts-expect-error
-						.panify();
-		});
+	useEffect(() => {
+		if (!cytoscape || !enabled) return;
 
-		cytoscape.on("position", "node.point", (e) => {
-			const point = e.target as NodeSingular;
+		const handleMouseOver = (e: EventObjectNode | EventObjectEdge) => {
+			const element = e.target;
+			element.addClass("hovered");
+			if (element.isEdge() && element.hasClass("negation"))
+				cytoscape
+					.getElementById(element.id().replace("negation-", ""))
+					.addClass("hovered");
 
-			for (const edge of point.connectedEdges()) {
-				const negationNode = cytoscape.getElementById(
-					edge.id().replace("negation-", ""),
-				) as NodeSingular;
-				negationNode.unlock();
-				negationNode.position(edge.midpoint());
-				negationNode.lock();
-			}
-		});
+			setHoveredPointId(element.id());
+		};
 
-		cytoscape.on("position", "node.point, node.negation", (e) => {
-			const point = e.target as NodeSingular;
-
-			for (const edge of point.connectedEdges()) {
-				const negationNode = cytoscape.getElementById(
-					edge.id().replace("negation-", ""),
-				) as NodeSingular;
-				negationNode.unlock();
-				negationNode.position(edge.midpoint());
-				negationNode.lock();
-			}
-		});
-
-		cytoscape.on("add", "node.negation", (e) => {
-			const negation = e.target as NodeSingular;
-			negation.position(getNegationPosition(negation));
-			negation.lock();
-		});
-
-		cytoscape.on("mouseover", "edge.negation, node.negation", (e) => {
-			const nodeId = e.target.id().replace("negation-", "");
-			cytoscape.getElementById(nodeId).addClass("hovered");
-		});
-
-		cytoscape.on("mouseover", "node.point", (e) => {
-			setHoveredPointId(`0x${e.target.id()}`);
-		});
-
-		cytoscape.on("mouseout", "edge.negation, node.negation", (e) => {
-			const nodeId = e.target.id().replace("negation-", "");
-			cytoscape.getElementById(nodeId).removeClass("hovered");
-		});
-
-		cytoscape.on("mouseout", "node.point", (e) => {
+		const handleMouseOut = (e: EventObjectNode | EventObjectEdge) => {
 			setHoveredPointId(undefined);
-		});
+			e.target.removeClass("hovered");
+			if (e.target.isEdge() && e.target.hasClass("negation"))
+				cytoscape
+					.getElementById(e.target.id().replace("negation-", ""))
+					.removeClass("hovered");
+		};
 
-		// updateLayout(cytoscape, { fit: true, padding: 100, animate: false });
+		cytoscape.on(
+			"mouseover",
+			"edge.negation, node.negation, node.point",
+			handleMouseOver,
+		);
+		cytoscape.on(
+			"mouseout",
+			"edge.negation, node.negation, node.point",
+			handleMouseOut,
+		);
 
 		return () => {
-			edgeHandles.destroy();
-			cytoscape.destroy();
+			cytoscape.off(
+				"mouseover",
+				"edge.negation, node.negation, node.point",
+				handleMouseOver,
+			);
+			cytoscape.off(
+				"mouseout",
+				"edge.negation, node.negation, node.point",
+				handleMouseOut,
+			);
 		};
-	}, [
-		elements,
-		graphStyle,
-		setCy,
-		setEdgeHandles,
-		setSelectedElement,
-		setHoveredPointId,
-	]);
+	}, [cytoscape, enabled, setHoveredPointId]);
 
 	useEffect(() => {
-		if (!cy || !focusedElementId) return;
-
-		const selectedPoint =
-			cy.getElementById(`negation-${focusedElementId}`)?.source() ??
-			cy.getElementById(`${focusedElementId}`);
-
-		if (!selectedPoint) {
-			return;
-		}
-
-		cy.animate({
-			center: {
-				eles: selectedPoint,
-			},
-			zoom: 0.5,
-			duration: 500,
-			easing: "ease-in-out-cubic",
-		});
-
-		selectedPoint.addClass("focused");
-
-		return () => {
-			selectedPoint.removeClass("focused");
-		};
-	}, [cy, focusedElementId]);
-
-	useEffect(() => {
-		if (!cy || !hoveredPointId) return;
+		if (!cytoscape || !enabled || !hoveredPointId) return;
 
 		const hoveredPoint =
-			cy.getElementById(`negation-${hoveredPointId.substring(2)}`)?.source() ??
-			cy.getElementById(`${hoveredPointId.substring(2)}`);
+			cytoscape.getElementById(`negation-${hoveredPointId}`)?.source() ??
+			cytoscape.getElementById(`${hoveredPointId}`);
 
 		if (!hoveredPoint) {
 			return;
@@ -256,10 +298,207 @@ export const Graph: FC<GraphProps> = ({
 		return () => {
 			hoveredPoint.removeClass("hovered");
 		};
-	}, [cy, hoveredPointId]);
+	}, [cytoscape, hoveredPointId, enabled]);
+};
+
+const useHandleNegate = ({
+	cytoscape,
+	edgeHandles,
+	enabled,
+}: {
+	cytoscape: Core | null;
+	edgeHandles: EdgeHandlesInstance | null;
+	enabled: boolean;
+}) => {
+	const signerUuid = useSigner().signer?.signer_uuid;
+	const user = useSignedInUser();
+	const [selectedElement, setSelectedElement] = useAtom(selectedElementAtom);
+	const [isNegating, setIsNegating] = useState(false);
 
 	useEffect(() => {
-		if (!selectedElement || !cy || selectedElement.hasClass("provisional"))
+		if (!cytoscape || !edgeHandles || !enabled) return;
+		const startNegating = () => {
+			setIsNegating(true);
+		};
+
+		const stopNegating = () => {
+			setIsNegating(false);
+		};
+
+		cytoscape.on("ehstart", startNegating);
+		cytoscape.on("ehcomplete", stopNegating);
+		cytoscape.on("ehcancel", stopNegating);
+
+		return () => {
+			cytoscape.off("ehstart", startNegating);
+			cytoscape.off("ehcomplete", stopNegating);
+			cytoscape.off("ehcancel", stopNegating);
+		};
+	}, [cytoscape, edgeHandles, enabled]);
+
+	useEffect(() => {
+		if (!cytoscape || !edgeHandles || !enabled || !signerUuid || !user) return;
+
+		const handleNewEdge = async (
+			_: EventObject,
+			negatingPoint: NodeSingular,
+			negatedNode: NodeSingular,
+			provisionalEdge: EdgeSingular,
+		) => {
+			const { hash } = await negate(
+				negatingPoint.id(),
+				negatedNode.id(),
+				signerUuid,
+			);
+
+			const negation = addNegation(
+				cytoscape,
+				{
+					fname: user.username,
+					hash: hash,
+					likes: 0,
+					parentHash: negatedNode.id(),
+				},
+				negatingPoint,
+				negatedNode,
+			);
+
+			if (negation.hasClass("counterpoint")) {
+				assignDissonance({
+					negatedPoint: negatedNode,
+					negatingPoint,
+					counterpoint: negation,
+				});
+			}
+
+			provisionalEdge.remove();
+		};
+
+		cytoscape.on("ehcomplete", handleNewEdge);
+
+		return () => {
+			cytoscape.off("ehcomplete", handleNewEdge);
+		};
+	}, [cytoscape, enabled, signerUuid, user, setSelectedElement, edgeHandles]);
+
+	const handleNegate = useCallback(() => {
+		if (!selectedElement || !edgeHandles || !enabled) return;
+
+		edgeHandles.start(
+			// @ts-expect-error
+			selectedElement,
+		);
+
+		setSelectedElement(null);
+	}, [edgeHandles, selectedElement, setSelectedElement, enabled]);
+
+	return { isNegating, handleNegate };
+};
+
+const useNegationNodesAutoReposition = ({
+	cytoscape,
+	enabled,
+}: { cytoscape: Core | null; enabled: boolean }) => {
+	useEffect(() => {
+		if (!cytoscape || !enabled) return;
+
+		cytoscape
+			.nodes("node.negation")
+			.forEach(positionNegationNodeOverNegationEdgeFromNode);
+
+		const repositionNegationNodesOnMove = (e: EventObjectNode) =>
+			e.target
+				.connectedEdges("edge.negation")
+				.forEach(positionNegationNodeOverNegationEdgeFromEdge);
+
+		cytoscape.on(
+			"position",
+			"node.point, node.negation",
+			repositionNegationNodesOnMove,
+		);
+
+		const repositionNewNegationNode = (e: EventObjectNode) => {
+			positionNegationNodeOverNegationEdgeFromNode(e.target);
+		};
+
+		cytoscape.on("add", "node.negation", repositionNewNegationNode);
+
+		return () => {
+			cytoscape.off(
+				"position",
+				"node.point, node.negation",
+				repositionNegationNodesOnMove,
+			);
+			cytoscape.off("add", "node.negation", repositionNewNegationNode);
+		};
+	}, [cytoscape, enabled]);
+};
+
+const useHandleIncomingElements = ({
+	cytoscape,
+	elements,
+}: { cytoscape: Core | null; elements?: ElementDefinition[] }) => {
+	useEffect(() => {
+		if (!cytoscape) return;
+		cytoscape.startBatch();
+		cytoscape.elements().remove();
+		elements && cytoscape.add(elements);
+		updateLayout(cytoscape);
+		cytoscape.endBatch();
+	}, [cytoscape, elements]);
+
+	return {
+		hasElements: !!elements && elements.length > 0,
+	};
+};
+
+const useHandleElementFocus = ({
+	cytoscape,
+	focusedElementId,
+	enabled,
+}: { cytoscape: Core | null; focusedElementId?: string; enabled: boolean }) => {
+	useEffect(() => {
+		if (!cytoscape || !focusedElementId || !enabled) return;
+
+		const selectedPoint =
+			cytoscape.getElementById(`negation-${focusedElementId}`)?.source() ??
+			cytoscape.getElementById(`${focusedElementId}`);
+
+		if (!selectedPoint) {
+			return;
+		}
+
+		selectedPoint.addClass("focused");
+
+		cytoscape.animate({
+			center: {
+				eles: selectedPoint,
+			},
+			zoom: 0.5,
+			duration: 500,
+			easing: "ease-in-out-cubic",
+		});
+
+		return () => {
+			selectedPoint.removeClass("focused");
+		};
+	}, [cytoscape, focusedElementId, enabled]);
+};
+
+const useDisplayMenuOnSelectedElement = ({
+	cytoscape,
+	enabled,
+}: { cytoscape: Core | null; enabled: boolean }) => {
+	const selectedElement = useAtomValue(selectedElementAtom);
+	const [menuIsOpen, setMenuIsOpen] = useState(selectedElement !== null);
+
+	useEffect(() => {
+		if (
+			!cytoscape ||
+			!enabled ||
+			!selectedElement ||
+			selectedElement.hasClass("provisional")
+		)
 			return;
 
 		selectedElement.addClass("selected");
@@ -281,131 +520,127 @@ export const Graph: FC<GraphProps> = ({
 							padding: 12,
 							mainAxis: true,
 							altAxis: true,
-							boundary: cyContainer.current,
+							boundary: cytoscape.container(),
 						},
 					},
 				],
 			},
 		});
 
-		const updateTip = () => {
+		setMenuIsOpen(true);
+
+		const updatePopper = () => {
 			popper.update();
 		};
 
-		updateTip();
-
-		cy.on("pan zoom", updateTip);
-		selectedElement.on("position", updateTip);
+		cytoscape.on("pan zoom", updatePopper);
+		selectedElement.on("position", updatePopper);
 
 		return () => {
 			popper.destroy();
-			cy.off("pan zoom", updateTip);
-			selectedElement.off("position", "", updateTip);
+			cytoscape.off("pan zoom", updatePopper);
+			selectedElement.off("position", "", updatePopper);
 			selectedElement.removeClass("selected");
+			setMenuIsOpen(false);
 		};
-	}, [selectedElement, cy]);
+	}, [selectedElement, cytoscape, enabled]);
 
-	return (
-		<div {...props}>
-			<div ref={cyContainer} className="w-full h-full" />
-			<GraphMenu />
-			{pointBeingMade && (
-				<InputNegation
-					className="absolute bottom-0 w-full p-4"
-					placeHolder="Make your point..."
-					onClose={() => {
-						pointBeingMade.remove();
-						setPointBeingMade(null);
-					}}
-					onPublish={async (text) => {
-						if (!signer || !user || !cy) return;
+	return { menuIsOpen };
+};
 
-						const { hash } = await makePoint(text, signer);
-
-						addPointNode(
-							cy,
-							{
-								hash: hash.substring(2),
-								fname: user.username,
-								text,
-								likes: 0,
-								parentHash: null,
-							},
-							{ position: pointBeingMade.position() },
-						);
-					}}
-				/>
-			)}
-			{/* <PointForm pointBeingMade={pointBeingMade} /> */}
-			{!pointBeingMade && (
-				<button
-					className="absolute bottom-2 right-2 button"
-					onClick={() => {
-						if (!cy) return;
-
-						const center = {
-							x: (cy.width() / 2 - cy.pan().x) / cy.zoom(),
-							y: (cy.height() / 2 - cy.pan().y) / cy.zoom(),
-						};
-
-						const newPointBeingMade = cy.add({
-							group: "nodes",
-							classes: ["point", "provisional"],
-							data: {
-								fname: "you",
-								text: "Make your point...",
-								likes: 0,
-							},
-							position: center,
-						});
-
-						cy.animate({
-							center: {
-								eles: newPointBeingMade,
-							},
-							duration: 500,
-							easing: "ease-in-out-cubic",
-						});
-
-						setPointBeingMade(newPointBeingMade);
-					}}
-				>
-					<BiSolidPencil size={18} />
-					Make a point
-				</button>
-			)}
-		</div>
+const useCytoscape = ({
+	style,
+	containerRef,
+}: {
+	style?: Stylesheet[];
+	containerRef: React.MutableRefObject<HTMLDivElement | null>;
+}) => {
+	useAssertCytoscapeExtensionsLoaded();
+	const [cytoscape, setCytoscape] = useState<Core | null>(null);
+	const [edgeHandles, setEdgeHandles] = useState<EdgeHandlesInstance | null>(
+		null,
 	);
+
+	useEffect(() => {
+		if (!containerRef.current) return;
+		const cytoscape = Cytoscape({
+			style,
+			container: containerRef.current,
+			autounselectify: true,
+			userPanningEnabled: true,
+			userZoomingEnabled: true,
+			boxSelectionEnabled: false,
+			selectionType: "single",
+			minZoom: 0.05,
+		});
+
+		setCytoscape(cytoscape);
+
+		const edgeHandles = cytoscape.edgehandles({
+			edgeParams: (source, target) => ({
+				data: {
+					hash: "negation-new",
+					fname: "negation-new",
+					source: source.id(),
+					target: target.id(),
+				},
+				classes: ["negation", "provisional"],
+			}),
+			canConnect: (source, target) => {
+				if (source === target) return false;
+				if (
+					target.hasClass("negation") &&
+					(cytoscape.getElementById(`negation-${target.id()}`) as EdgeSingular)
+						.connectedNodes()
+						.contains(source)
+				)
+					return false;
+				if (source.edgesTo(target).length > 0) return false;
+				return true;
+			},
+			snap: true,
+		});
+
+		setEdgeHandles(edgeHandles);
+
+		return () => {
+			edgeHandles.destroy();
+			cytoscape.destroy();
+		};
+	}, [containerRef, style]);
+
+	return {
+		cytoscape: cytoscape,
+		edgeHandles: edgeHandles,
+	};
 };
 
-const updateLayout = (cy: cytoscape.Core, options?: Partial<LayoutOptions>) => {
-	const negationNodes = cy.$("node.negation");
-	negationNodes.unlock();
-	cy.one("layoutstop", () => negationNodes.lock());
-	cy.layout({
-		name: "cose",
-		// @ts-expect-error
-		springLength: (edge) => 400,
-		springCoeff: (edge: EdgeSingular) => 0.0008,
-		mass: (node: NodeSingular) => (node.hasClass("point") ? 100 : 10),
-		gravity: -3,
-		pull: 0.002,
-		theta: 0.888,
-		dragCoeff: 0.02,
-		movementThreshold: 1,
-		timeStep: 100,
-		refresh: 10,
-		maxIterations: 1000,
-		maxSimulationTime: 4000,
-		...options,
-	}).run();
-};
+const useToogleInteractiveOnZoom = ({
+	cytoscape,
+	enabled,
+}: { cytoscape: Core | null; enabled: boolean }) => {
+	useEffect(() => {
+		if (!cytoscape || !enabled) return;
+		const handleZoom = () => {
+			const currentZoomLevel = cytoscape.zoom();
 
-const getNegationPosition = (negation: NodeSingular) => {
-	if (!negation.hasClass("negation")) throw new Error("Not a negation node");
-	const negationEdge = negation
-		.cy()
-		.getElementById(`negation-${negation.id()}`);
-	if (negationEdge.empty()) throw new Error("Negation edge not found");
-	return negationEdge.midpoint();
+			currentZoomLevel > GRAPH_INTERACTIVE_MIN_ZOOM
+				? cytoscape
+						.nodes()
+						.grabify()
+						// @ts-expect-error
+						.unpanify()
+				: cytoscape
+						.nodes()
+						.ungrabify()
+						// @ts-expect-error
+						.panify();
+		};
+		cytoscape.on("zoom", handleZoom);
+		handleZoom();
+
+		return () => {
+			cytoscape.off("zoom", handleZoom);
+		};
+	}, [cytoscape, enabled]);
 };

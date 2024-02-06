@@ -12,6 +12,9 @@
       },
       "suspicious": {
         "noEmptyInterface": "off"
+      },
+      "correctness": {
+        "useExhaustiveDependencies": "off"
       }
     }
   }

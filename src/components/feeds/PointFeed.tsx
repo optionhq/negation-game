@@ -28,7 +28,7 @@ export default function PointFeed({
 	const [point, setPoint] = useState<Node>();
 
 	const { data: pointGraph } = useSWR(["graph", rootPointId], () =>
-		rootPointId ? fetchGraph(rootPointId.substring(2)) : null,
+		rootPointId ? fetchGraph(rootPointId) : null,
 	);
 
 	const init = useCallback(async () => {
@@ -59,7 +59,7 @@ export default function PointFeed({
 						className="relative w-full h-full bg-gray-100"
 						elements={pointGraph}
 						graphStyle={style}
-						focusedElementId={focusedElementId?.substring(2)}
+						focusedElementId={focusedElementId}
 					/>
 				)}
 			</div>

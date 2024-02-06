@@ -2,12 +2,6 @@ import { EdgeSingular, NodeSingular } from "cytoscape";
 
 export const style: cytoscape.Stylesheet[] = [
 	{
-		selector: "node.negation.hovered",
-		style: {
-			visibility: "visible",
-		},
-	},
-	{
 		selector: "node.point",
 		style: {
 			"background-color": "#fff",
@@ -34,10 +28,11 @@ export const style: cytoscape.Stylesheet[] = [
 	},
 	{
 		selector: "node.negation",
-
 		style: {
 			visibility: (node: NodeSingular) =>
-				node.connectedEdges().length === 0 ? "hidden" : "visible",
+				node.hasClass("hovered") || node.connectedEdges().length > 0
+					? "visible"
+					: "hidden",
 
 			"border-color": "#000",
 			"border-width": 2,
@@ -87,8 +82,6 @@ export const style: cytoscape.Stylesheet[] = [
 			"text-outline-width": 3,
 		},
 	},
-
-	{ selector: ".eh-source, .eh-target", style: { "border-color": "red" } },
 	{ selector: "node.eh-target.negation", style: { "background-color": "red" } },
 	{
 		selector: ".eh-ghost-edge.eh-preview-active",
@@ -106,6 +99,7 @@ export const style: cytoscape.Stylesheet[] = [
 		selector: "node.point.provisional",
 		style: {
 			"border-style": "dashed",
+			label: "Make your point...",
 		},
 	},
 	{
@@ -125,7 +119,7 @@ export const style: cytoscape.Stylesheet[] = [
 	// 	},
 	// },
 	{
-		selector: "node.selected, node.hovered",
+		selector: "node.selected",
 		style: {
 			visibility: "visible",
 			"z-index": 100,
@@ -146,6 +140,7 @@ export const style: cytoscape.Stylesheet[] = [
 			"border-color": "#fa0",
 		},
 	},
+	{ selector: ".eh-source, .eh-target", style: { "border-color": "red" } },
 ];
 
 const breakLongWords = (text: string) =>

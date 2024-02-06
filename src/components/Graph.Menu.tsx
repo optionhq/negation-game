@@ -1,31 +1,18 @@
-import { useSigner } from "@/contexts/SignerContext";
-import { negate } from "@/lib/actions/negate";
-import { addNegation } from "@/lib/cytoscape/addNegation";
-import { assignDissonance } from "@/lib/cytoscape/algo/assignDissonance";
-import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
-import { EdgeSingular, EventObject, NodeSingular } from "cytoscape";
-import { useAtom, useAtomValue } from "jotai";
+import { useAtomValue } from "jotai";
 import { FC } from "react";
-import {
-	cytoscapeAtom,
-	edgeHandlesAtom,
-	selectedElementAtom,
-} from "./Graph.state";
+import { selectedElementAtom } from "./Graph.state";
 
-export interface GraphMenuProps {}
+export interface GraphMenuProps {
+	handleNegate: () => void;
+}
 
-export const GraphMenu: FC<GraphMenuProps> = () => {
-	const edgeHandles = useAtomValue(edgeHandlesAtom);
-	const cytoscape = useAtomValue(cytoscapeAtom);
-	const signer = useSigner().signer;
-	const user = useSignedInUser();
-	const [selectedElement, setSelectedElement] = useAtom(selectedElementAtom);
-
+export const GraphMenu: FC<GraphMenuProps> = ({ handleNegate }) => {
+	const selectedElement = useAtomValue(selectedElementAtom);
 	return (
 		<div
 			id="graph-menu"
 			className="group absolute top-0 left-0  drop-shadow-lg"
-			style={{ visibility: selectedElement ? "visible" : "hidden" }}
+			style={{ visibility: selectedElement !== null ? "visible" : "hidden" }}
 		>
 			<div
 				data-popper-arrow
@@ -49,58 +36,7 @@ export const GraphMenu: FC<GraphMenuProps> = () => {
 							<button
 								type="button"
 								className="w-full py-2 hover:text-purple-800"
-								onClick={() => {
-									if (!signer || !user || !cytoscape) return;
-
-									edgeHandles?.start(
-										// @ts-expect-error
-										selectedElement,
-									);
-
-									const handleNewEdge = async (
-										_: EventObject,
-										negatingPoint: NodeSingular,
-										negatedNode: NodeSingular,
-										provisionalEdge: EdgeSingular,
-									) => {
-										const { hash } = await negate(
-											`0x${negatingPoint.id()}`,
-											`0x${negatedNode.id()}`,
-											signer.signer_uuid,
-										);
-
-										const negation = addNegation(
-											cytoscape,
-											{
-												fname: user.username,
-												hash: hash.substring(2),
-												likes: 0,
-												parentHash: negatedNode.id(),
-											},
-											negatingPoint,
-											negatedNode,
-										);
-
-										if (negation.hasClass("counterpoint")) {
-											assignDissonance({
-												negatedPoint: negatedNode,
-												negatingPoint,
-												counterpoint: negation,
-											});
-										}
-
-										provisionalEdge.remove();
-										setSelectedElement(null);
-									};
-
-									cytoscape.one("ehcomplete", handleNewEdge);
-
-									cytoscape.one("ehcancel", () =>
-										cytoscape.off("ehcomplete", handleNewEdge),
-									);
-
-									setSelectedElement(null);
-								}}
+								onClick={handleNegate}
 							>
 								Use to negate
 							</button>

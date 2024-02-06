@@ -7,7 +7,7 @@ import { Cast } from "@/types/Cast";
 import Cytoscape, {
 	CollectionReturnValue,
 	EdgeSingular,
-	ElementsDefinition,
+	ElementDefinition,
 	NodeSingular,
 } from "cytoscape";
 // @ts-expect-error
@@ -34,7 +34,7 @@ const findCast = (
 
 export const fetchGraph = async (
 	pointId?: string,
-): Promise<ElementsDefinition> => {
+): Promise<ElementDefinition[]> => {
 	const allNegationGameCasts = (await neynarDb(
 		async (client) =>
 			await client
@@ -43,9 +43,9 @@ export const fetchGraph = async (
   SELECT
     -- c.created_at,
     p.fname,
-    encode(c.hash, 'hex') AS hash,
+    CONCAT('0x',encode(c.hash, 'hex')) AS hash,
     c.text,
-    encode(c.parent_hash, 'hex') AS "parentHash",
+    (CASE WHEN (c.parent_hash IS NULL) THEN NULL ELSE CONCAT('0x',encode(c.parent_hash, 'hex')) END) AS "parentHash",
     -- c.embeds,
     COUNT(r.target_hash)::int AS likes
 FROM
@@ -70,32 +70,40 @@ ORDER BY c.created_at ASC;`,
 	for (let i = 0; i < allNegationGameCasts.length; i++) {
 		const negatedNodeHash = allNegationGameCasts[i].parentHash;
 		if (negatedNodeHash === null) {
+			// console.log("adding point node", allNegationGameCasts[i]);
 			addPointNode(cytoscape, allNegationGameCasts[i]);
 
 			continue;
 		}
 
-		if (!isValidNegation(allNegationGameCasts[i].text)) continue;
+		if (!isValidNegation(allNegationGameCasts[i].text)) {
+			// console.log("invalid negation", allNegationGameCasts[i]);
+			continue;
+		}
 
 		const truncatedFromHash = extractTruncatedHash(
 			allNegationGameCasts[i].text,
 		);
 		if (truncatedFromHash === null) {
+			// console.log("negating cast embed not found", allNegationGameCasts[i]);
 			continue;
 		}
 
 		const negatingCast = findCast(truncatedFromHash, allNegationGameCasts, i);
 		if (negatingCast === null) {
+			// console.log("negating cast not found", allNegationGameCasts[i]);
 			continue;
 		}
 
 		const negatingNode = cytoscape.getElementById(negatingCast.hash);
 		if (negatingNode.empty()) {
+			// console.log("negating node not found", allNegationGameCasts[i]);
 			continue;
 		}
 
 		const negatedNode = cytoscape.getElementById(negatedNodeHash);
 		if (negatedNode.empty()) {
+			// console.log("negated node not found", allNegationGameCasts[i]);
 			continue;
 		}
 
@@ -123,6 +131,8 @@ ORDER BY c.created_at ASC;`,
 
 	elements.layout({ name: "grid" }).run();
 
+	// console.log(elements.jsons());
+
 	return new Promise((resolve) => {
 		return elements
 			.layout({
@@ -146,7 +156,7 @@ ORDER BY c.created_at ASC;`,
 
 				stop: () => {
 					resolve(
-						elements.filter("[!aux]").jsons() as unknown as ElementsDefinition,
+						elements.filter("[!aux]").jsons() as unknown as ElementDefinition[],
 					);
 				},
 			})
