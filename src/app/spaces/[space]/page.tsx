@@ -6,7 +6,7 @@ export default function Page({
 	params: { space },
 }: { params: { space: string } }) {
 	return (
-		<div className="flex flex-col gap-2 h-full items-center justify-center my-12">
+		<div className="flex flex-col gap-2 h-full items-center  my-12">
 			{SPACES[space]?.map((id: string) => (
 				<ConversationPreview key={id} id={id} />
 			))}
