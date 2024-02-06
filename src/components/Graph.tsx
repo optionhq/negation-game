@@ -15,12 +15,14 @@ import Cytoscape, {
 import { GRAPH_INTERACTIVE_MIN_ZOOM } from "@/config";
 import { useAssertCytoscapeExtensionsLoaded } from "@/contexts/CytoscapeContext";
 import { useSigner } from "@/contexts/SignerContext";
+import { fetchGraph } from "@/lib/actions/fetchGraph";
 import { makePoint } from "@/lib/actions/makePoint";
 import { negate } from "@/lib/actions/negate";
 import { addNegation } from "@/lib/cytoscape/addNegation";
 import { addPointNode } from "@/lib/cytoscape/addPointNode";
 import { assignDissonance } from "@/lib/cytoscape/algo/assignDissonance";
 import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
+import { cn } from "@/lib/utils/cn";
 import cytoscape from "cytoscape";
 import { EdgeHandlesInstance } from "cytoscape-edgehandles";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -32,30 +34,35 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { BiSolidPencil } from "react-icons/bi";
+import { BiLoaderAlt, BiSolidPencil } from "react-icons/bi";
+import useSWR from "swr";
 import { GraphMenu } from "./Graph.Menu";
 import { pointBeingMadeAtom, selectedElementAtom } from "./Graph.state";
+import { style } from "./Graph.style";
 import InputNegation from "./points/InputNegation";
 import { hoveredPointIdAtom } from "./points/Point";
 
 interface GraphProps extends HTMLAttributes<HTMLDivElement> {
-	elements?: ElementDefinition[];
-	graphStyle?: Stylesheet[];
 	focusedElementId?: string;
+	rootPointId?: string;
 }
 
 export const Graph: FC<GraphProps> = ({
-	elements,
-	graphStyle,
+	rootPointId,
 	focusedElementId,
+	className,
 	...props
 }) => {
+	const { data: elements, isLoading } = useSWR(["graph", rootPointId], () =>
+		fetchGraph(rootPointId),
+	);
 	const cyContainer = useRef<HTMLDivElement>(null);
 	const { cytoscape, edgeHandles } = useCytoscape({
-		style: graphStyle,
+		style,
 		containerRef: cyContainer,
+		enabled: !isLoading,
 	});
-	const [pointBeingMade, setPointBeingMade] = useAtom(pointBeingMadeAtom);
+	const [pointBeingMade] = useAtom(pointBeingMadeAtom);
 
 	useToogleInteractiveOnZoom({ cytoscape, enabled: true });
 	useTrackSelectedElement({ cytoscape, enabled: true });
@@ -85,25 +92,38 @@ export const Graph: FC<GraphProps> = ({
 	});
 
 	return (
-		<div {...props}>
-			<div ref={cyContainer} className="w-full h-full" />
-			<GraphMenu handleNegate={handleNegate} />
-			{isPointBeingMade && (
-				<InputNegation
-					className="absolute bottom-0 w-full p-4"
-					placeHolder="Make your point..."
-					onClose={handleMakePointMadeOrDismissed}
-					onPublish={handleMakePointSubmitted}
-				/>
+		<div
+			className={cn(
+				"w-full h-full flex flex-grow items-center justify-center bg-gray-100",
+				className,
 			)}
-			{!pointBeingMade && cytoscape && (
-				<button
-					className="absolute bottom-2 right-2 button"
-					onClick={handleMakePoint}
-				>
-					<BiSolidPencil size={18} />
-					Make a point
-				</button>
+			{...props}
+		>
+			{isLoading && (
+				<BiLoaderAlt size={128} className="animate-spin text-purple-200" />
+			)}
+			{!isLoading && (
+				<div className="relative w-full h-full">
+					<div ref={cyContainer} className="w-full h-full" />
+					<GraphMenu handleNegate={handleNegate} />
+					{isPointBeingMade && (
+						<InputNegation
+							className="absolute bottom-0 w-full p-4"
+							placeHolder="Make your point..."
+							onClose={handleMakePointMadeOrDismissed}
+							onPublish={handleMakePointSubmitted}
+						/>
+					)}
+					{!pointBeingMade && cytoscape && (
+						<button
+							className="absolute bottom-2 right-2 button"
+							onClick={handleMakePoint}
+						>
+							<BiSolidPencil size={18} />
+							Make a point
+						</button>
+					)}
+				</div>
 			)}
 		</div>
 	);
@@ -514,9 +534,11 @@ const useDisplayMenuOnSelectedElement = ({
 const useCytoscape = ({
 	style,
 	containerRef,
+	enabled,
 }: {
 	style?: Stylesheet[];
 	containerRef: React.MutableRefObject<HTMLDivElement | null>;
+	enabled: boolean;
 }) => {
 	useAssertCytoscapeExtensionsLoaded();
 	const [cytoscape, setCytoscape] = useState<Core | null>(null);
@@ -525,7 +547,7 @@ const useCytoscape = ({
 	);
 
 	useEffect(() => {
-		if (!containerRef.current) return;
+		if (!containerRef.current || !enabled) return;
 		const cytoscape = Cytoscape({
 			style,
 			container: containerRef.current,
@@ -570,7 +592,7 @@ const useCytoscape = ({
 			edgeHandles.destroy();
 			cytoscape.destroy();
 		};
-	}, [containerRef, style]);
+	}, [enabled, containerRef, style]);
 
 	return {
 		cytoscape: cytoscape,

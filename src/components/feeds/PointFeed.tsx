@@ -1,14 +1,11 @@
-import { fetchGraph } from "@/lib/actions/fetchGraph";
 import { usePointIds } from "@/lib/hooks/usePointIds";
 import { getMaybeNegation } from "@/lib/useCasts";
 import { Node } from "@/types/Points";
 import axios from "axios";
 import { Cast } from "neynar-next/server";
 import { useCallback, useEffect, useMemo, useState } from "react";
-import { BiChevronLeft, BiLoaderAlt } from "react-icons/bi";
-import useSWR from "swr";
+import { BiChevronLeft } from "react-icons/bi";
 import { Graph } from "../Graph";
-import { style } from "../Graph.style";
 import HistoricalPoints from "../points/HistoricalPoints";
 import PointWrapper from "../points/PointWrapper";
 
@@ -27,9 +24,7 @@ export default function PointFeed({
 	const pointIds = useMemo(() => ids?.split(",") ?? [], [ids]);
 	const [point, setPoint] = useState<Node>();
 
-	const { data: pointGraph } = useSWR(["graph", rootPointId], () =>
-		rootPointId ? fetchGraph(rootPointId) : null,
-	);
+	console.log({ rootPointId, focusedElementId });
 
 	const init = useCallback(async () => {
 		// // if it's a history of selected casts, get the first one
@@ -50,19 +45,7 @@ export default function PointFeed({
 	if (!point) return;
 	return (
 		<div className="flex flex-row-reverse w-full h-full ">
-			<div className="w-full h-full flex flex-grow items-center justify-center bg-gray-100">
-				{!pointGraph && (
-					<BiLoaderAlt size={128} className="animate-spin text-purple-200" />
-				)}
-				{pointGraph && (
-					<Graph
-						className="relative w-full h-full bg-gray-100"
-						elements={pointGraph}
-						graphStyle={style}
-						focusedElementId={focusedElementId}
-					/>
-				)}
-			</div>
+			<Graph rootPointId={rootPointId} focusedElementId={focusedElementId} />
 			<div className="relative flex flex-col overflow-scroll shrink-0  gap-2 items-start p-4 justify-start h-full w-[450px] bg-white shadow-lg">
 				<div
 					onClick={() => {
