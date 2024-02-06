@@ -57,8 +57,6 @@ export const Graph: FC<GraphProps> = ({
 	});
 	const [pointBeingMade, setPointBeingMade] = useAtom(pointBeingMadeAtom);
 
-	const user = useSignedInUser();
-	const signer = useSigner().signer;
 	useToogleInteractiveOnZoom({ cytoscape, enabled: true });
 	useTrackSelectedElement({ cytoscape, enabled: true });
 	useTrackHoveredElement({ cytoscape, enabled: true });
@@ -74,6 +72,13 @@ export const Graph: FC<GraphProps> = ({
 		enabled: true,
 	});
 
+	const {
+		handleMakePoint,
+		isPointBeingMade,
+		handleMakePointMadeOrDismissed,
+		handleMakePointSubmitted,
+	} = useHandleMakePoint({ cytoscape, enabled: true });
+
 	useDisplayMenuOnSelectedElement({
 		cytoscape,
 		enabled: !isNegating,
@@ -83,64 +88,18 @@ export const Graph: FC<GraphProps> = ({
 		<div {...props}>
 			<div ref={cyContainer} className="w-full h-full" />
 			<GraphMenu handleNegate={handleNegate} />
-			{pointBeingMade && (
+			{isPointBeingMade && (
 				<InputNegation
 					className="absolute bottom-0 w-full p-4"
 					placeHolder="Make your point..."
-					onClose={() => {
-						pointBeingMade.remove();
-						setPointBeingMade(null);
-					}}
-					onPublish={async (text) => {
-						if (!signer || !user || !cytoscape) return;
-
-						const { hash } = await makePoint(text, signer);
-
-						addPointNode(
-							cytoscape,
-							{
-								hash,
-								fname: user.username,
-								text,
-								likes: 0,
-								parentHash: null,
-							},
-							{ position: pointBeingMade.position() },
-						);
-					}}
+					onClose={handleMakePointMadeOrDismissed}
+					onPublish={handleMakePointSubmitted}
 				/>
 			)}
 			{!pointBeingMade && cytoscape && (
 				<button
 					className="absolute bottom-2 right-2 button"
-					onClick={() => {
-						const center = {
-							x: (cytoscape.width() / 2 - cytoscape.pan().x) / cytoscape.zoom(),
-							y:
-								(cytoscape.height() / 2 - cytoscape.pan().y) / cytoscape.zoom(),
-						};
-
-						const newPointBeingMade = cytoscape.add({
-							group: "nodes",
-							classes: ["point", "provisional"],
-							data: {
-								fname: "you",
-								text: "Make your point...",
-								likes: 0,
-							},
-							position: center,
-						});
-
-						cytoscape.animate({
-							center: {
-								eles: newPointBeingMade,
-							},
-							duration: 500,
-							easing: "ease-in-out-cubic",
-						});
-
-						setPointBeingMade(newPointBeingMade);
-					}}
+					onClick={handleMakePoint}
 				>
 					<BiSolidPencil size={18} />
 					Make a point
@@ -155,7 +114,7 @@ const getNegationPositionFromNode = (negation: NodeSingular) => {
 	const negationEdge = negation
 		.cy()
 		.getElementById(`negation-${negation.id()}`);
-	if (negationEdge.empty()) throw new Error("Negation edge not found");
+	if (negationEdge.empty()) return negationEdge.position();
 	return negationEdge.midpoint();
 };
 
@@ -189,6 +148,10 @@ const updateLayout = (
 				if (!node.hasClass("negation")) return position;
 				return getNegationPositionFromNode(node);
 			},
+			// @ts-expect-error
+			animate: true,
+			animationDuration: 1000,
+
 			...options,
 		})
 		.run();
@@ -643,4 +606,80 @@ const useToogleInteractiveOnZoom = ({
 			cytoscape.off("zoom", handleZoom);
 		};
 	}, [cytoscape, enabled]);
+};
+
+const useHandleMakePoint = ({
+	cytoscape,
+	enabled,
+}: { cytoscape: Core | null; enabled: boolean }) => {
+	const [pointBeingMade, setPointBeingMade] = useAtom(pointBeingMadeAtom);
+	const isPointBeingMade = !!pointBeingMade;
+	const user = useSignedInUser();
+	const signer = useSigner().signer;
+
+	const handleMakePointMadeOrDismissed = useCallback(() => {
+		if (!pointBeingMade) return;
+
+		pointBeingMade.remove();
+		setPointBeingMade(null);
+	}, [pointBeingMade, setPointBeingMade]);
+
+	const handleMakePointSubmitted = useCallback(
+		async (text: string) => {
+			if (!signer || !user || !pointBeingMade || !cytoscape) return;
+			await makePoint(text, signer)
+				.then(({ hash }) => {
+					addPointNode(
+						cytoscape,
+						{
+							hash,
+							fname: user.username,
+							text,
+							likes: 0,
+							parentHash: null,
+						},
+						{ position: pointBeingMade.position() },
+					);
+				})
+				// TODO handle error and show toast
+				.catch();
+		},
+		[signer, user, pointBeingMade, cytoscape],
+	);
+
+	const handleMakePoint = useCallback(() => {
+		if (!cytoscape || !enabled) return;
+		const center = {
+			x: (cytoscape.width() / 2 - cytoscape.pan().x) / cytoscape.zoom(),
+			y: (cytoscape.height() / 2 - cytoscape.pan().y) / cytoscape.zoom(),
+		};
+
+		const newPointBeingMade = cytoscape.add({
+			group: "nodes",
+			classes: ["point", "provisional"],
+			data: {
+				fname: "you",
+				text: "Make your point...",
+				likes: 0,
+			},
+			position: center,
+		});
+
+		cytoscape.animate({
+			center: {
+				eles: newPointBeingMade,
+			},
+			duration: 500,
+			easing: "ease-in-out-cubic",
+		});
+
+		setPointBeingMade(newPointBeingMade);
+	}, [cytoscape, enabled, setPointBeingMade]);
+
+	return {
+		handleMakePoint,
+		isPointBeingMade,
+		handleMakePointMadeOrDismissed,
+		handleMakePointSubmitted,
+	};
 };
