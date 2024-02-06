@@ -113,6 +113,7 @@ ORDER BY c.created_at ASC;`,
 				allNegationGameCasts[i],
 				negatingNode,
 				negatedNode,
+				true,
 			);
 		} catch (error) {
 			console.error("error adding", allNegationGameCasts[i], error?.toString());
