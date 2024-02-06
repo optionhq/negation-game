@@ -1,5 +1,5 @@
 import { useSigner } from "@/contexts/SignerContext";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/utils";
 import { Node } from "@/types/Points";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 

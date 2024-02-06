@@ -1,6 +1,6 @@
 import { usePointIds } from "@/lib/hooks/usePointIds";
 import { getMaybeNegation } from "@/lib/useCasts";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/utils";
 import { Node } from "@/types/Points";
 import axios from "axios";
 import { Cast } from "neynar-next/server";

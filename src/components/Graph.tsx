@@ -22,7 +22,7 @@ import { addNegation } from "@/lib/cytoscape/addNegation";
 import { addPointNode } from "@/lib/cytoscape/addPointNode";
 import { assignDissonance } from "@/lib/cytoscape/algo/assignDissonance";
 import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/utils";
 import cytoscape from "cytoscape";
 import { EdgeHandlesInstance } from "cytoscape-edgehandles";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";

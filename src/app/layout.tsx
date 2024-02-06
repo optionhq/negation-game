@@ -1,11 +1,13 @@
+import Header from "@/components/header/Header";
+import MobileBottomHeader from "@/components/header/MobileBottomHeader";
 import { CytoscapeProvider } from "@/contexts/CytoscapeContext";
 import { SignerProvider } from "@/contexts/SignerContext";
-import "@/pages/globals.css";
+import "@/globals.css";
+import { cn } from "@/lib/utils";
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
-import Header from "../components/header/Header";
-import MobileBottomHeader from "../components/header/MobileBottomHeader";
-const inter = Inter({ subsets: ["latin"] });
+("../components/header/MobileBottomHeader");
+const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
 	metadataBase: new URL(
@@ -27,25 +29,17 @@ export default function RootLayout({
 }) {
 	return (
 		<CytoscapeProvider>
-			<html lang="en">
-				<body>
-					<div className={`${inter.className} h-full`}>
-						{/* <AuthKitProvider config={config}> */}
-						{/* <NeynarProvider> */}
-						<SignerProvider>
-							<div className="flex flex-col h-full min-h-screen">
-								<Header />
-								<div className="flex-grow overflow-clip">
-									<div className="w-full h-full overflow-scroll">
-										{children}
-									</div>
-								</div>
-								<MobileBottomHeader />
+			<html lang="en" className="h-full">
+				<body className={cn("font-sans h-full", inter.variable)}>
+					<SignerProvider>
+						<div className="flex flex-col h-full min-h-screen">
+							<Header />
+							<div className="flex-grow overflow-clip">
+								<div className="w-full h-full overflow-scroll">{children}</div>
 							</div>
-						</SignerProvider>
-						{/* </NeynarProvider> */}
-						{/* </AuthKitProvider> */}
-					</div>
+							<MobileBottomHeader />
+						</div>
+					</SignerProvider>
 				</body>
 			</html>
 		</CytoscapeProvider>
