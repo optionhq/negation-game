@@ -1,5 +1,5 @@
 import { usePointContext } from "@/contexts/PointContext";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 
 export default function Publishing({
