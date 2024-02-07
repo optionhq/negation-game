@@ -22,7 +22,7 @@ import { addNegation } from "@/lib/cytoscape/addNegation";
 import { addPointNode } from "@/lib/cytoscape/addPointNode";
 import { assignDissonance } from "@/lib/cytoscape/algo/assignDissonance";
 import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/utils";
 import cytoscape from "cytoscape";
 import { EdgeHandlesInstance } from "cytoscape-edgehandles";
 import { useAtom, useAtomValue, useSetAtom } from "jotai";
@@ -36,6 +36,11 @@ import {
 } from "react";
 import { BiLoaderAlt, BiSolidPencil } from "react-icons/bi";
 import useSWR from "swr";
+import {
+	useDebounceCallback,
+	useResizeObserver,
+	useUpdateEffect,
+} from "usehooks-ts";
 import { GraphMenu } from "./Graph.Menu";
 import { pointBeingMadeAtom, selectedElementAtom } from "./Graph.state";
 import { style } from "./Graph.style";
@@ -67,10 +72,10 @@ export const Graph: FC<GraphProps> = ({
 	useToogleInteractiveOnZoom({ cytoscape, enabled: true });
 	useTrackSelectedElement({ cytoscape, enabled: true });
 	useTrackHoveredElement({ cytoscape, enabled: true });
-	const { hasElements } = useHandleIncomingElements({ cytoscape, elements });
+	useHandleIncomingElements({ cytoscape, elements });
 	useNegationNodesAutoReposition({
 		cytoscape,
-		enabled: hasElements,
+		enabled: !isLoading,
 	});
 	useHandleElementFocus({ cytoscape, focusedElementId, enabled: true });
 	const { isNegating, handleNegate } = useHandleNegate({
@@ -90,6 +95,8 @@ export const Graph: FC<GraphProps> = ({
 		cytoscape,
 		enabled: !isNegating,
 	});
+
+	useResizeWithContainer({ cytoscape, containerRef: cyContainer });
 
 	return (
 		<div
@@ -131,11 +138,12 @@ export const Graph: FC<GraphProps> = ({
 
 const getNegationPositionFromNode = (negation: NodeSingular) => {
 	if (!negation.hasClass("negation")) throw new Error("Not a negation node");
-	const negationEdge = negation
-		.cy()
-		.getElementById(`negation-${negation.id()}`);
-	if (negationEdge.empty()) return negationEdge.position();
-	return negationEdge.midpoint();
+
+	try {
+		return negation.cy().getElementById(`negation-${negation.id()}`).midpoint();
+	} catch (e) {
+		return negation.position();
+	}
 };
 
 const positionNegationNodeOverNegationEdgeFromNode = (
@@ -161,6 +169,7 @@ const updateLayout = (
 	cytoscape: cytoscape.Core,
 	options?: Partial<LayoutOptions>,
 ) => {
+	if (cytoscape.destroyed()) return;
 	cytoscape
 		.layout({
 			name: "preset",
@@ -421,7 +430,7 @@ const useHandleIncomingElements = ({
 	cytoscape,
 	elements,
 }: { cytoscape: Core | null; elements?: ElementDefinition[] }) => {
-	useEffect(() => {
+	useUpdateEffect(() => {
 		if (!cytoscape) return;
 		cytoscape.startBatch();
 		cytoscape.elements().remove();
@@ -429,10 +438,6 @@ const useHandleIncomingElements = ({
 		updateLayout(cytoscape);
 		cytoscape.endBatch();
 	}, [cytoscape, elements]);
-
-	return {
-		hasElements: !!elements && elements.length > 0,
-	};
 };
 
 const useHandleElementFocus = ({
@@ -557,6 +562,15 @@ const useCytoscape = ({
 			boxSelectionEnabled: false,
 			selectionType: "single",
 			minZoom: 0.05,
+			layout: {
+				name: "preset",
+				transform: (node, position) => {
+					if (!node.hasClass("negation")) return position;
+					return getNegationPositionFromNode(node);
+				},
+				fit: true,
+				animate: false,
+			},
 		});
 
 		setCytoscape(cytoscape);
@@ -704,4 +718,18 @@ const useHandleMakePoint = ({
 		handleMakePointMadeOrDismissed,
 		handleMakePointSubmitted,
 	};
+};
+
+const useResizeWithContainer = ({
+	cytoscape,
+	containerRef,
+}: {
+	cytoscape: Core | null;
+	containerRef: React.MutableRefObject<HTMLDivElement | null>;
+}) => {
+	const onResize = useDebounceCallback(() => cytoscape?.resize(), 200);
+	useResizeObserver({
+		ref: containerRef,
+		onResize,
+	});
 };

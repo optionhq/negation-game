@@ -1,3 +1,5 @@
+"use client";
+
 import { usePointIds } from "@/lib/hooks/usePointIds";
 import axios from "axios";
 import { Cast } from "neynar-next/server";

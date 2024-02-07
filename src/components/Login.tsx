@@ -1,11 +1,12 @@
-// src/components/Login.tsx
-import React from "react";
+"use client";
+
+import { useSigner } from "@/contexts/SignerContext";
+import axios from "axios";
 import Image from "next/image";
 import { User } from "neynar-next/server";
+import React from "react";
 import useSWR from "swr";
-import axios from "axios";
 import { NeynarSigninButton } from "./SignInButton";
-import { useSigner } from "@/contexts/SignerContext";
 
 // Define the fetcher function
 const fetcher = (url: string) => axios.get(url).then((res) => res.data);

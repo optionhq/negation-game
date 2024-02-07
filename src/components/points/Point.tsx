@@ -1,5 +1,5 @@
 import { usePointIds } from "@/lib/hooks/usePointIds";
-import { cn } from "@/lib/utils/cn";
+import { cn } from "@/lib/utils";
 import { atom, useAtom } from "jotai";
 import { useEffect, useMemo } from "react";
 import { usePointContext } from "../../contexts/PointContext";
