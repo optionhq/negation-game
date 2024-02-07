@@ -51,7 +51,6 @@ export default function InputNegation({
 			return;
 		}
 		onPublish(text);
-		setText("");
 		onClose();
 	}
 

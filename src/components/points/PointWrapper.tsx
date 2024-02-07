@@ -7,6 +7,7 @@ import publish from "../../lib/publish";
 import Comment from "./Comment";
 import { useSigner } from "@/contexts/SignerContext";
 import { Dispatch, SetStateAction } from "react";
+import Publishing from "./Publishing";
 
 export default function PointWrapper({
 	level,
@@ -52,36 +53,47 @@ export default function PointWrapper({
 							? `This point "${
 									parent?.endPoint ? parent?.endPoint.title : parent?.title
 							  }" isn't impactful because...`
-							: `An alternative to "${
+							: `A counterpoint to "${
 									parent?.endPoint ? parent?.endPoint.title : parent?.title
 							  }" is...`
 					}
 					setParentChildren={setParentChildren}
 					onPublish={async (text: string) => {
-						const type = point.negationType;
-						if (!type) return;
+						const negationType = point.negationType;
+						if (!negationType) return;
+						setParentChildren?.((element) => {
+							const lastInput = element[negationType]
+								.filter((child: Node) => child.type === "input")
+								.pop();
+							if (lastInput) {
+								lastInput.type = "publishing";
+								lastInput.title = text;
+							}
+							return { ...element };
+						});
 
 						if (point.parentId && signer)
 							await negate(text, point.parentId, signer);
 						else if (!point.parentId && signer) await publish(text, signer);
+
+						await refreshParentThread();
 						setParentChildren?.((element) => {
-							const filtered = {
-								...element,
-								[type]: element[type].filter(
-									(child: Node) => child.type !== "input",
-								),
-							};
-							return filtered;
+							for (const key in element) {
+								element[key as keyof typeof element] = element[
+									key as keyof typeof element
+								].filter((child: Node) => child.type !== "publishing");
+							}
+							return element;
 						});
-						refreshParentThread();
 					}}
 					onClose={() => {
-						const type = point.negationType;
-						if (type) {
+						const negationType = point.negationType;
+						if (negationType) {
 							setParentChildren?.((element) => {
+								console.log(element);
 								const filtered = {
 									...element,
-									[type]: element[type].filter(
+									[negationType]: element[negationType].filter(
 										(child: Node) => child.type !== "input",
 									),
 								};
@@ -91,6 +103,7 @@ export default function PointWrapper({
 					}}
 				/>
 			)}
+			{point.type === "publishing" && <Publishing pointBg={pointBg} />}
 			{point.type === "comment" && <Comment level={level} />}
 			{(point.type === "negation" || point.type === "root") && (
 				<Point

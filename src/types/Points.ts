@@ -11,8 +11,8 @@ export type Node = {
 	advocates?: { fid: number }[];
 	lovers?: { fid: number }[];
 	children?: Node[];
-	type: "root" | "input" | "negation" | "comment";
-	negationType?: "relevance" | "conviction" | "comment";
+	type: "root" | "input" | "negation" | "comment" | "publishing";
+	negationType?: "relevance" | "conviction";
 	// TODO: once we've switched to the real network, endPoint should be required
 	endPoint?: Node;
 	endPointUrl?: string;
