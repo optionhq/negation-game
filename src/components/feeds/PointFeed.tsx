@@ -5,14 +5,10 @@ import { Node } from "@/types/Points";
 import axios from "axios";
 import { Cast } from "neynar-next/server";
 import { useCallback, useEffect, useState } from "react";
-import { BiChevronLeft } from "react-icons/bi";
 import HistoricalPoints from "../points/HistoricalPoints";
 import PointWrapper from "../points/PointWrapper";
 
-export default function PointFeed({
-	fromPage,
-	className,
-}: { fromPage: "home" | "space"; className?: string }) {
+export default function PointFeed({ className }: { className?: string }) {
 	const [historicalPointIds, setHistoricalPointIds] = useState<
 		string[] | undefined
 	>([]);
@@ -40,21 +36,10 @@ export default function PointFeed({
 	return (
 		<div
 			className={cn(
-				"relative flex flex-col overflow-scroll gap-2 items-start p-4 justify-start h-full w-full bg-white",
+				"relative flex flex-col gap-2 items-start p-4 justify-start bg-white",
 				className,
 			)}
 		>
-			<div
-				onClick={() => {
-					setIds(null);
-				}}
-				className="flex flex-row py-2 mb-4 font-medium cursor-pointer hover:bg-slate-100 rounded-md text-gray-500 z-10"
-			>
-				<BiChevronLeft size={20} />
-				<p className="px-2">
-					{fromPage === "space" ? "Go back to conversation" : "Go to Home"}
-				</p>
-			</div>
 			{historicalPointIds && historicalPointIds?.length !== 0 && (
 				<HistoricalPoints ids={historicalPointIds} />
 			)}
