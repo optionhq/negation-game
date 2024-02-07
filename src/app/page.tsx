@@ -26,7 +26,7 @@ export default function Page() {
 			defaultValue="thread"
 			className="flex flex-col w-full h-full flex-grow gap-0 overflow-clip"
 		>
-			<div className="grid items-center grid-cols-2 bg-slate-50 z-10 shadow-sm p-2">
+			<div className="flex justify-between items-center bg-slate-50 z-10 shadow-sm p-2">
 				<div
 					onClick={() => {
 						setIds(null);
@@ -34,17 +34,23 @@ export default function Page() {
 					className="flex items-center justify-start font-medium cursor-pointer my-2 hover:bg-slate-100 rounded-md text-gray-500 z-10"
 				>
 					<BiChevronLeft size={20} />
-					<p className="px-2">Back to Home</p>
+					<p className="px-2">Home</p>
 				</div>
 				{!isAtLeastMd && (
-					<TabsList className="bg-slate-100 w-fit h-fit rounded-md shadow-inner justify-self-end px-6 gap-4 py-2  ">
-						<TabsTrigger value="thread" className="h-10 gap-2">
-							<PiRowsBold size={20} />
-							<h2 className="font-semibold">Thread</h2>
+					<TabsList className="bg-slate-100 w-fit h-fit rounded-md shadow-inner justify-self-end px-2 xs:px-6 gap-2 xs:gap-4 py-2  ">
+						<TabsTrigger
+							value="thread"
+							className="h-10 gap-2 text-sm xs:text-md"
+						>
+							<PiRowsBold />
+							<p className="font-semibold ">Thread</p>
 						</TabsTrigger>
-						<TabsTrigger value="graph" className="h-10 gap-2">
-							<PiGraphBold size={20} />
-							<h2 className="font-semibold">Graph</h2>
+						<TabsTrigger
+							value="graph"
+							className="h-10 gap-2 text-sm xs:text-md"
+						>
+							<PiGraphBold />
+							<p className="font-semibold">Graph</p>
 						</TabsTrigger>
 					</TabsList>
 				)}
