@@ -1,4 +1,5 @@
-import Header from "@/components/header/Header";
+import { Login } from "@/components";
+import HeaderNav from "@/components/header/HeaderNav";
 import MobileBottomHeader from "@/components/header/MobileBottomHeader";
 import { CytoscapeProvider } from "@/contexts/CytoscapeContext";
 import { SignerProvider } from "@/contexts/SignerContext";
@@ -33,11 +34,17 @@ export default function RootLayout({
 				<body className={cn("font-sans h-full", inter.variable)}>
 					<SignerProvider>
 						<div className="flex flex-col h-full min-h-screen">
-							<Header />
+							<header className="flex justify-between px-2 py-2 gap-6 bg-slate-50 border w-full sticky flex-col-reverse md:flex-row items-center top-0 z-50">
+								<HeaderNav className="hidden md:flex" />
+								<div className="flex-1 flex justify-end w-full">
+									<Login />
+								</div>
+							</header>
+
 							<div className="flex-grow overflow-clip">
 								<div className="w-full h-full overflow-scroll">{children}</div>
 							</div>
-							<MobileBottomHeader />
+							<MobileBottomHeader className="md:hidden" />
 						</div>
 					</SignerProvider>
 				</body>

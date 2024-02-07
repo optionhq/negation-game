@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IconType } from "react-icons";
 
-export default function HeaderElement({
+export default function HeaderNavItem({
 	name,
 	Icon,
 	path,
@@ -18,7 +18,7 @@ export default function HeaderElement({
 		<button type="button">
 			<Link
 				href={path}
-				className="flex flex-row items-center  sm:gap-2 px-2 sm:px-4 py-2 w-20 sm:w-28 md:w-40 hover:bg-black/5 justify-center rounded-md"
+				className="flex flex-row items-center  gap-0 lg:gap-2 px-2 sm:px-4 py-2 w-20 sm:w-28 lg:w-40 hover:bg-black/5 justify-center rounded-md"
 			>
 				<div className="relative p-1 sm:p-3">
 					<Icon color={currentPath ? "#000" : "#BBB"} size={16} />

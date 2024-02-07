@@ -5,7 +5,7 @@ import getNbNewNotifications from "@/lib/notifications/getNbNewNotifications";
 import { usePathname } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { MdNotifications } from "react-icons/md";
-import HeaderElement from "./HeaderElement";
+import HeaderNavItem from "./HeaderNavItem";
 
 export default function NotificationElement() {
 	const [nbNotifs, setNbNotifs] = useState(0);
@@ -22,7 +22,7 @@ export default function NotificationElement() {
 
 	return (
 		<div onClick={() => setNbNotifs(0)}>
-			<HeaderElement
+			<HeaderNavItem
 				Icon={MdNotifications}
 				name="Notifications"
 				path="/notifications"
