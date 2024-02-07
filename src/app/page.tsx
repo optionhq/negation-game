@@ -51,21 +51,21 @@ export default function Page() {
 			</div>
 			<TabsContent
 				value="thread"
-				className="data-[state=active]:flex flex-grow w-full overflow-cli m-0 transition-none"
+				className="data-[state=active]:flex flex-grow w-full overflow-clip m-0 transition-none"
 			>
-				<PointFeed className="h-full w-full overflow-scrol md:w-[450px] shadow-lg shrink-0" />
+				<PointFeed className="h-full w-full overflow-scroll md:w-[450px] shadow-lg shrink-0" />
 				{isAtLeastMd && (
 					<Graph
 						key={"graph"}
 						rootPointId={rootPointId}
 						focusedElementId={focusedElementId}
-						className="h-full"
+						className="h-full overflow-clip"
 					/>
 				)}
 			</TabsContent>
 			<TabsContent
 				value="graph"
-				className="data-[state=active]:flex flex-grow w-ful  overflow-clip m-0 transition-none"
+				className="data-[state=active]:flex flex-grow w-full overflow-clip m-0 transition-none"
 			>
 				{isAtLeastMd && (
 					<PointFeed className="h-full w-full overflow-scroll md:w-[450px] shadow-lg shrink-0" />
@@ -74,7 +74,7 @@ export default function Page() {
 					key={"graph"}
 					rootPointId={rootPointId}
 					focusedElementId={focusedElementId}
-					className="h-full"
+					className="h-full overflow-clip"
 				/>
 			</TabsContent>
 		</Tabs>
