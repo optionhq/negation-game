@@ -16,7 +16,7 @@ export default function RecastedPoint({ url }: { url: string }) {
 	}, [url]);
 
 	return (
-		<div className="m-2 p-2 border border-slate-300 rounded-md w-full max-h-36">
+		<div className="m-2 max-h-36 w-full rounded-md border border-slate-300 p-2">
 			{data?.title}
 		</div>
 	);

@@ -12,9 +12,9 @@ const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
 export const metadata: Metadata = {
 	metadataBase: new URL(
-		process.env.VERCEL_URL
-			? `https://${process.env.VERCEL_URL}`
-			: `http://localhost:${process.env.PORT || 3000}`,
+		process.env.VERCEL_URL ?
+			`https://${process.env.VERCEL_URL}`
+		:	`http://localhost:${process.env.PORT || 3000}`,
 	),
 	title: "Negation Game",
 	description: "The way extraterrestrials do governance.",
@@ -31,18 +31,18 @@ export default function RootLayout({
 	return (
 		<CytoscapeProvider>
 			<html lang="en" className="h-full">
-				<body className={cn("font-sans h-full", inter.variable)}>
+				<body className={cn("h-full font-sans", inter.variable)}>
 					<SignerProvider>
-						<div className="flex flex-col h-full min-h-screen">
-							<header className="flex justify-between px-2 py-2 gap-6 bg-slate-50 border w-full sticky flex-col-reverse md:flex-row items-center top-0 z-50">
+						<div className="flex h-full min-h-screen flex-col">
+							<header className="sticky top-0 z-50 flex w-full flex-col-reverse items-center justify-between gap-6 border bg-slate-50 px-2 py-2 md:flex-row">
 								<HeaderNav className="hidden md:flex" />
-								<div className="flex-1 flex justify-end w-full">
+								<div className="flex w-full flex-1 justify-end">
 									<Login />
 								</div>
 							</header>
 
 							<div className="flex-grow overflow-clip">
-								<div className="w-full h-full overflow-scroll">{children}</div>
+								<div className="h-full w-full overflow-scroll">{children}</div>
 							</div>
 							<MobileBottomHeader className="md:hidden" />
 						</div>

@@ -17,9 +17,9 @@ export const style: cytoscape.Stylesheet[] = [
 			height: "160px",
 			label: (node: NodeSingular) =>
 				`[${
-					Number.isInteger(node.data("consilience"))
-						? `${node.data("consilience")}/`
-						: ""
+					Number.isInteger(node.data("consilience")) ?
+						`${node.data("consilience")}/`
+					:	""
 				}${node.data("likes")}] ${breakLongWords(node.data("text")).replace(
 					/\n/g,
 					" ",
@@ -35,9 +35,9 @@ export const style: cytoscape.Stylesheet[] = [
 		selector: "node.negation",
 		style: {
 			visibility: (node: NodeSingular) =>
-				node.hasClass("hovered") || node.connectedEdges().length > 0
-					? "visible"
-					: "hidden",
+				node.hasClass("hovered") || node.connectedEdges().length > 0 ?
+					"visible"
+				:	"hidden",
 
 			"border-color": "#000",
 			"border-width": 2,
@@ -48,9 +48,9 @@ export const style: cytoscape.Stylesheet[] = [
 			width: 32,
 			height: 32,
 			label: (node: NodeSingular) =>
-				node.data("dissonance") !== undefined
-					? `${node.data("dissonance")}`
-					: "",
+				node.data("dissonance") !== undefined ?
+					`${node.data("dissonance")}`
+				:	"",
 		},
 	},
 	// {

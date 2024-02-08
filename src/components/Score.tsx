@@ -63,20 +63,20 @@ function NegateLikeButtons({
 
 	return (
 		<div>
-			<div className="group/points w-16 flex flex-col items-center">
+			<div className="group/points flex w-16 flex-col items-center">
 				<p
-					className={`group-hover/points:hidden h-6 ${
+					className={`h-6 group-hover/points:hidden ${
 						isLiked ? "font-bold" : ""
 					}`}
 				>
 					{score}
 				</p>
-				<div className="flex-row gap-1 transition-opacity hidden opacity-0 group-hover/points:flex group-hover/points:opacity-100 h-6">
+				<div className="hidden h-6 flex-row gap-1 opacity-0 transition-opacity group-hover/points:flex group-hover/points:opacity-100">
 					<span
 						className={
-							isLiked
-								? "text-green-500 text-xl"
-								: "hover:text-green-500 text-xl"
+							isLiked ?
+								"text-xl text-green-500"
+							:	"text-xl hover:text-green-500"
 						}
 						onMouseDown={(e) => {
 							e.stopPropagation();
@@ -87,7 +87,7 @@ function NegateLikeButtons({
 						<HiOutlineCheckCircle size={24} />
 					</span>
 					<span
-						className="hover:text-purple-600 text-xl"
+						className="text-xl hover:text-purple-600"
 						onMouseDown={(e) => {
 							e.stopPropagation();
 							e.preventDefault();
@@ -128,11 +128,13 @@ export default function Score({
 			}}
 		>
 			<ReactButtonWrapper>
-				<div className="flex flex-col items-center w-fit gap-[2px]">
+				<div className="flex w-fit flex-col items-center gap-[2px]">
 					<div className="flex flex-row items-center gap-1 text-sm font-thin">
-						{type === "relevance" ? <p>relevance</p> : <p>conviction</p>}
+						{type === "relevance" ?
+							<p>relevance</p>
+						:	<p>conviction</p>}
 					</div>
-					<hr className="w-full h-[1.5px] bg-slate-300" />
+					<hr className="h-[1.5px] w-full bg-slate-300" />
 					<NegateLikeButtons
 						id={id}
 						points={points}

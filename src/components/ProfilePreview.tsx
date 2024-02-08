@@ -3,7 +3,7 @@ import Image from "next/image";
 
 export default function ProfilePreview({ user }: { user: User }) {
 	return (
-		<div className="flex flex-row gap-2 mb-2">
+		<div className="mb-2 flex flex-row gap-2">
 			{user.pfp_url && (
 				<Image
 					src={user.pfp_url}

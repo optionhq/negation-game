@@ -11,7 +11,10 @@ import ReplyNotification from "./ReplyNotification";
 export default function NotificationWrapper({
 	notification,
 	previousNotif,
-}: { notification: Notification; previousNotif: string }) {
+}: {
+	notification: Notification;
+	previousNotif: string;
+}) {
 	const [isNew, setIsNew] = useState(
 		new Date(notification.most_recent_timestamp).getTime() >
 			new Date(previousNotif).getTime() || previousNotif === "",
@@ -40,7 +43,7 @@ export default function NotificationWrapper({
 	return (
 		<div
 			onClick={() => node && router.push(`/?ids=${node.id}${replyHistoric}`)}
-			className={`border p-4 w-full md:w-[500px] rounded-md hover:bg-slate-50 cursor-pointer ${
+			className={`w-full cursor-pointer rounded-md border p-4 hover:bg-slate-50 md:w-[500px] ${
 				isNew ? "bg-indigo-600/10" : ""
 			}`}
 		>

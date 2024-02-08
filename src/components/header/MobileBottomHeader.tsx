@@ -11,14 +11,16 @@ import HeaderNavItem from "./HeaderNavItem";
 
 export default function MobileBottomHeader({
 	className,
-}: { className?: string }) {
+}: {
+	className?: string;
+}) {
 	const { signer } = useSigner();
 	const pathName = usePathname();
 
 	return (
 		<ul
 			className={cn(
-				"flex flex-row gap-0 text-sm items-center w-full justify-center p-1 bg-slate-50 border sticky bottom-0",
+				"sticky bottom-0 flex w-full flex-row items-center justify-center gap-0 border bg-slate-50 p-1 text-sm",
 				className,
 			)}
 		>

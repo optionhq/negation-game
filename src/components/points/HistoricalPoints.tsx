@@ -10,7 +10,10 @@ import { Node } from "../../types/Points";
 export function HistoricalPoint({
 	id,
 	onClick,
-}: { id: string; onClick: () => void }) {
+}: {
+	id: string;
+	onClick: () => void;
+}) {
 	const [cast, setCast] = useState<Node | null>(null);
 
 	useEffect(() => {
@@ -25,17 +28,17 @@ export function HistoricalPoint({
 
 	return (
 		<div
-			className="relative flex cursor-pointer w-auto rounded-md hover:bg-gray-100 px-2 py-4 gap-2"
+			className="relative flex w-auto cursor-pointer gap-2 rounded-md px-2 py-4 hover:bg-gray-100"
 			onClick={onClick}
 		>
 			{!cast && <p>Loading ...</p>}
 			{cast && (
 				<>
-					<div className="w-[1px] h-1/2 bg-black absolute left-8 translate-y-full" />
-					<p className="text-gray-500 w-12 bg-slate-100 px-auto rounded-md text-center">
-						{cast.endPoint
-							? cast.endPoint.advocates?.length
-							: cast.advocates?.length}
+					<div className="absolute left-8 h-1/2 w-[1px] translate-y-full bg-black" />
+					<p className="px-auto w-12 rounded-md bg-slate-100 text-center text-gray-500">
+						{cast.endPoint ?
+							cast.endPoint.advocates?.length
+						:	cast.advocates?.length}
 					</p>
 					<p className="font-medium text-gray-900">
 						{cast.endPoint ? cast.endPoint.title : cast.title}
@@ -57,7 +60,7 @@ export default function HistoricalPoints({ ids }: { ids: string[] }) {
 	}
 
 	return (
-		<div className="flex space-y-0 flex-col-reverse w-full">
+		<div className="flex w-full flex-col-reverse space-y-0">
 			{ids.map((id, i) => (
 				<HistoricalPoint id={id} onClick={() => onClick(id)} key={id} />
 			))}

@@ -43,7 +43,7 @@ const Login: React.FC = () => {
 			{/* this extra stuff added as a hacky waitlist */}
 			{user && signer && "fid" in signer && playlist?.includes(signer.fid) && (
 				<div className="flex flex-row items-center gap-3">
-					<div className="h-12 w-12 relative">
+					<div className="relative h-12 w-12">
 						<Image
 							src={user.pfp_url || "/default-avatar.svg"}
 							alt="User profile picture"
@@ -53,7 +53,7 @@ const Login: React.FC = () => {
 					</div>
 					<div className="flex flex-col items-start">
 						<span className="">{user.display_name}</span>
-						<span className="text-sm text-center text-black/50">
+						<span className="text-center text-sm text-black/50">
 							{user.username}
 						</span>
 					</div>

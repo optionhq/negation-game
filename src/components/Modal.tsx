@@ -3,15 +3,18 @@ import { ReactNode } from "react";
 export default function Modal({
 	setSelected,
 	children,
-}: { setSelected: any; children: ReactNode }) {
+}: {
+	setSelected: any;
+	children: ReactNode;
+}) {
 	return (
 		<div
-			className="fixed w-screen h-screen top-0 left-0 z-50 bg-black/30 flex items-center justify-center"
+			className="fixed left-0 top-0 z-50 flex h-screen w-screen items-center justify-center bg-black/30"
 			style={{ zIndex: "300" }}
 			onClick={() => setSelected(false)}
 		>
 			<div
-				className="p-8 bg-white relative flex flex-col gap-2 items-end rounded-md w-[800px]"
+				className="relative flex w-[800px] flex-col items-end gap-2 rounded-md bg-white p-8"
 				onClick={(e) => e.stopPropagation()}
 			>
 				{children}

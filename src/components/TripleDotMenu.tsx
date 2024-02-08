@@ -41,7 +41,7 @@ const TripleDotMenu: React.FC = () => {
 				...
 			</button>
 			{isOpen && (
-				<div className="absolute right-0 w-48 bg-white border border-gray-200 divide-y divide-gray-100 rounded-md shadow-lg">
+				<div className="absolute right-0 w-48 divide-y divide-gray-100 rounded-md border border-gray-200 bg-white shadow-lg">
 					<button
 						type="button"
 						className="w-full px-4 py-2 text-left"
@@ -56,7 +56,7 @@ const TripleDotMenu: React.FC = () => {
 					<button
 						type="button"
 						className={`w-full px-4 py-2 text-left ${
-							!isAuthor ? "opacity-50 cursor-not-allowed" : ""
+							!isAuthor ? "cursor-not-allowed opacity-50" : ""
 						}`}
 						onClick={async (event) => {
 							event.stopPropagation();

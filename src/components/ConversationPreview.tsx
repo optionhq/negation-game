@@ -53,7 +53,7 @@ export default function ConversationPreview({ id }: { id: string }) {
 	if (!conversation) {
 		// The conversation data hasn't been loaded yet, so we render a loading message
 		return (
-			<div className="w-full flex items-center justify-center">
+			<div className="flex w-full items-center justify-center">
 				Loading conversation...
 			</div>
 		);
@@ -62,12 +62,12 @@ export default function ConversationPreview({ id }: { id: string }) {
 	return (
 		<Link
 			href={`/spaces/purple/${id}`}
-			className="relative cursor-pointer block bg-white shadow-md rounded-lg overflow-hidden border mx-2 sm:mx-4 md:mx-20 lg:mx-40 xl:mx-96 gap-2"
+			className="relative mx-2 block cursor-pointer gap-2 overflow-hidden rounded-lg border bg-white shadow-md sm:mx-4 md:mx-20 lg:mx-40 xl:mx-96"
 		>
-			<div className="bg-slate-100 px-6 py-3 flex flex-col gap-3">
+			<div className="flex flex-col gap-3 bg-slate-100 px-6 py-3">
 				<div className="flex justify-between">
 					<p>{new Date(conversation.timestamp).toDateString()}</p>
-					<div className="rounded-full bg-green-400 text-white font-medium px-3 py-1 text-xs">
+					<div className="rounded-full bg-green-400 px-3 py-1 text-xs font-medium text-white">
 						Active
 					</div>
 				</div>
@@ -75,7 +75,7 @@ export default function ConversationPreview({ id }: { id: string }) {
 				{/* <h2 className="text-xl font-bold">{conversation.reactions.likes.length}</h2> */}
 			</div>
 			{/* <p className="text-md mb-2 pt-3">Top options</p> */}
-			<div className="px-6 py-3 flex flex-col gap-4">
+			<div className="flex flex-col gap-4 px-6 py-3">
 				<h3 className="font-semibold">
 					{conversation.replies.count} responses
 				</h3>
@@ -90,7 +90,7 @@ export default function ConversationPreview({ id }: { id: string }) {
 							}}
 						>
 							<div
-								className={`border-gray-200 flex flex-row w-full py-4 gap-4 ${
+								className={`flex w-full flex-row gap-4 border-gray-200 py-4 ${
 									i !== 0 ? "border-t" : ""
 								}`}
 							>

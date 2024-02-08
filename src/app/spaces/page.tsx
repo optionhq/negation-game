@@ -14,8 +14,8 @@ const infos: { [key: string]: { description: string } } = {
 
 export default function Page() {
 	return (
-		<div className="flex-1 flex items-center gap-6 pb-6 sm:gap-12 sm:pb-12 relative  flex-col">
-			<div className="w-full top-0 left-0 right-0 bg-purple-900/80 text-white p-3 flex flex-row items-center justify-center">
+		<div className="relative flex flex-1 flex-col items-center gap-6 pb-6 sm:gap-12  sm:pb-12">
+			<div className="left-0 right-0 top-0 flex w-full flex-row items-center justify-center bg-purple-900/80 p-3 text-white">
 				<div>
 					Want to open a space in the negation game ? Ping Connor&nbsp;{" "}
 					<a
@@ -35,22 +35,22 @@ export default function Page() {
 						<button
 							type="button"
 							key={space}
-							className=" border rounded-md p-4 w-80 items-start shadow-lg hover:shadow-xl transition-shadow duration-200 ease-in-out"
+							className=" w-80 items-start rounded-md border p-4 shadow-lg transition-shadow duration-200 ease-in-out hover:shadow-xl"
 						>
 							<Link
 								href={`/spaces/${space}`}
-								className="flex flex-col gap-2 items-start"
+								className="flex flex-col items-start gap-2"
 							>
 								<div className="flex flex-row items-center gap-4">
 									<div
-										className="rounded-full w-10 h-10"
+										className="h-10 w-10 rounded-full"
 										style={{ backgroundColor: "#8A63D2" }}
 									/>
-									<h3 className="font-medium text-xl">
+									<h3 className="text-xl font-medium">
 										{space.charAt(0).toUpperCase() + space.slice(1)}
 									</h3>
 								</div>
-								<p className=" text-gray-500 text-left">
+								<p className=" text-left text-gray-500">
 									{infos[space]?.description}
 								</p>
 								<p className="text-gray-500">

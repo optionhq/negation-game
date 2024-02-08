@@ -23,7 +23,7 @@ export const negate = async (
 
 		const newCast: PostCastResponse = castResponse.data.cast;
 
-		const warpcastUrl = `https://warpcast.com/${newCast.author.username}/${newCast.hash.slice(0, 8).toString()}`
+		const warpcastUrl = `https://warpcast.com/${newCast.author.username}/${newCast.hash.slice(0, 8).toString()}`;
 
 		const embeds = [{ url: warpcastUrl }];
 		const negation = `${NEGATION_SYMBOL}\n${warpcastUrl}`;

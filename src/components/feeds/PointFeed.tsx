@@ -36,14 +36,14 @@ export default function PointFeed({ className }: { className?: string }) {
 	return (
 		<div
 			className={cn(
-				"relative flex flex-col gap-2 items-start p-4 justify-start bg-white",
+				"relative flex flex-col items-start justify-start gap-2 bg-white p-4",
 				className,
 			)}
 		>
 			{historicalPointIds && historicalPointIds?.length !== 0 && (
 				<HistoricalPoints ids={historicalPointIds} />
 			)}
-			{point ? (
+			{point ?
 				<PointWrapper
 					key={point.id}
 					level={0}
@@ -54,11 +54,10 @@ export default function PointFeed({ className }: { className?: string }) {
 					getParentAncestry={undefined}
 					refreshParentThread={init}
 				/>
-			) : (
-				<div className="flex h-full w-full items-center justify-center">
+			:	<div className="flex h-full w-full items-center justify-center">
 					<Loader />
 				</div>
-			)}
+			}
 		</div>
 	);
 }

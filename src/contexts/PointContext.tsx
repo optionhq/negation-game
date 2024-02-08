@@ -98,25 +98,27 @@ export function PointProvider({
 			| { relevance: boolean | undefined; conviction: boolean | undefined };
 		if (point.type !== "input") {
 			const likedveracity =
-				signer &&
-				"fid" in signer &&
-				point.advocates?.some((el: { fid: number }) => el.fid === signer.fid)
-					? signer &&
-					  "fid" in signer &&
-					  point.advocates?.some(
-							(el: { fid: number }) => el.fid === signer.fid,
-					  )
-					: undefined;
+				(
+					signer &&
+					"fid" in signer &&
+					point.advocates?.some((el: { fid: number }) => el.fid === signer.fid)
+				) ?
+					signer &&
+					"fid" in signer &&
+					point.advocates?.some((el: { fid: number }) => el.fid === signer.fid)
+				:	undefined;
 			const likedrelevance =
-				signer &&
-				"fid" in signer &&
-				point.advocates?.some((el: { fid: number }) => el.fid === signer.fid)
-					? signer &&
-					  "fid" in signer &&
-					  point.endPoint?.advocates?.some(
-							(el: { fid: number }) => el.fid === signer.fid,
-					  )
-					: undefined;
+				(
+					signer &&
+					"fid" in signer &&
+					point.advocates?.some((el: { fid: number }) => el.fid === signer.fid)
+				) ?
+					signer &&
+					"fid" in signer &&
+					point.endPoint?.advocates?.some(
+						(el: { fid: number }) => el.fid === signer.fid,
+					)
+				:	undefined;
 			if (point.type === "negation") {
 				_likes = {
 					relevance: point.points,
@@ -148,11 +150,12 @@ export function PointProvider({
 							(prev) =>
 								({
 									...prev,
-									[type]: prev
-										? (prev?.[type] ?? 0) > 0
-											? (prev[type] as number) - 1
-											: 0
-										: 0,
+									[type]:
+										prev ?
+											(prev?.[type] ?? 0) > 0 ?
+												(prev[type] as number) - 1
+											:	0
+										:	0,
 								}) as {
 									relevance: number | undefined;
 									conviction: number | undefined;
@@ -174,11 +177,12 @@ export function PointProvider({
 							(prev) =>
 								({
 									...prev,
-									[type]: prev
-										? (prev?.[type] ?? 0) > 0
-											? (prev[type] as number) + 1
-											: 0
-										: 0,
+									[type]:
+										prev ?
+											(prev?.[type] ?? 0) > 0 ?
+												(prev[type] as number) + 1
+											:	0
+										:	0,
 								}) as {
 									relevance: number | undefined;
 									conviction: number | undefined;
@@ -209,11 +213,12 @@ export function PointProvider({
 				const hasInput = newChildren[type]?.some(
 					(neg: Node) => neg.type === "input",
 				);
-				const parentId = point.endPoint
-					? type === "conviction"
-						? point.endPoint.id
-						: point.id
-					: point.id;
+				const parentId =
+					point.endPoint ?
+						type === "conviction" ?
+							point.endPoint.id
+						:	point.id
+					:	point.id;
 
 				// If there's no input element, add one
 				if (!hasInput)
@@ -267,9 +272,9 @@ export function PointProvider({
 				return 0;
 			});
 
-			return inputBox
-				? [[inputBox, ...sortedNegations], comments]
-				: [sortedNegations, comments];
+			return inputBox ?
+					[[inputBox, ...sortedNegations], comments]
+				:	[sortedNegations, comments];
 		},
 		[children],
 	);

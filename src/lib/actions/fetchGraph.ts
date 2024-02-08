@@ -120,13 +120,14 @@ ORDER BY c.created_at ASC;`,
 		}
 	}
 
-	const elements: CollectionReturnValue = pointId
-		? cytoscape
+	const elements: CollectionReturnValue =
+		pointId ?
+			cytoscape
 				.getElementById(pointId)
 				// @ts-expect-error
 				.component()
-		: // ? extendedClosedNeighborhood(pointId, cy.elements(), 2)
-		  cytoscape.elements();
+			// ? extendedClosedNeighborhood(pointId, cy.elements(), 2)
+		:	cytoscape.elements();
 
 	assignScores(elements);
 

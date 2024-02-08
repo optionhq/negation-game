@@ -18,14 +18,14 @@ export default function HeaderNavItem({
 		<button type="button">
 			<Link
 				href={path}
-				className="flex flex-row items-center  gap-0 lg:gap-2 px-2 sm:px-4 py-2 w-20 sm:w-28 lg:w-40 hover:bg-black/5 justify-center rounded-md"
+				className="flex w-20 flex-row  items-center justify-center gap-0 rounded-md px-2 py-2 hover:bg-black/5 sm:w-28 sm:px-4 lg:w-40 lg:gap-2"
 			>
 				<div className="relative p-1 sm:p-3">
 					<Icon color={currentPath ? "#000" : "#BBB"} size={16} />
 					{name === "Notifications" &&
 						nbNotifs !== undefined &&
 						nbNotifs > 0 && (
-							<div className=" bg-red-500 rounded-full h-5 w-5 absolute top-0 right-0 text-xs flex items-center justify-center text-white">
+							<div className=" absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
 								{nbNotifs}
 							</div>
 						)}

@@ -13,17 +13,19 @@ export default function AccordionArrow() {
 	return (
 		<div className="flex flex-col md:gap-2">
 			<div
-				className={`py-1 rounded-md ${
-					(point.replyCount && point.replyCount > 0) ||
-					(point.endPoint?.replyCount && point.endPoint.replyCount > 0)
-						? "opacity-100"
-						: "opacity-0 pointer-events-none"
+				className={`rounded-md py-1 ${
+					(
+						(point.replyCount && point.replyCount > 0) ||
+						(point.endPoint?.replyCount && point.endPoint.replyCount > 0)
+					) ?
+						"opacity-100"
+					:	"pointer-events-none opacity-0"
 				}`}
 				onClick={handleArrowClick}
 			>
-				<div className="p-1 rounded-lg hover:bg-gray-200">
+				<div className="rounded-lg p-1 hover:bg-gray-200">
 					<div
-						className={`transition transform ${
+						className={`transform transition ${
 							detailsOpened ? "rotate-90" : ""
 						}`}
 					>

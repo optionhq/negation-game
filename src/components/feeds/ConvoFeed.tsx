@@ -20,9 +20,9 @@ export default function ConvoFeed({ conversation }: { conversation: string }) {
 			}
 		}
 		points.sort((a, b) =>
-			b.advocates?.length && a.advocates?.length
-				? b.advocates.length - a.advocates.length
-				: 0,
+			b.advocates?.length && a.advocates?.length ?
+				b.advocates.length - a.advocates.length
+			:	0,
 		);
 		return points;
 	}
@@ -48,11 +48,11 @@ export default function ConvoFeed({ conversation }: { conversation: string }) {
 	}, [conversation, fetchItems]);
 
 	return (
-		<div className="flex flex-col items-center gap-4 centered-element py-4">
-			<h2 className="text-lg md:text-xl font-medium text-center p-6 border w-full bg-white sticky top-6 z-30 shadow-sm bg-gradient-to-tr from-purple-50 to-blue-50 ">
+		<div className="centered-element flex flex-col items-center gap-4 py-4">
+			<h2 className="sticky top-6 z-30 w-full border bg-white bg-gradient-to-tr from-purple-50 to-blue-50 p-6 text-center text-lg font-medium shadow-sm md:text-xl ">
 				{topic}
 			</h2>
-			<div className="flex flex-col gap-1 w-auto">
+			<div className="flex w-auto flex-col gap-1">
 				{points?.map((e: Node, i: number) => (
 					<PointWrapper
 						key={e.id}

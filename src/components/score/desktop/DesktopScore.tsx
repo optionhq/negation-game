@@ -25,17 +25,17 @@ export default function DesktopScore({
 			}}
 		>
 			<ReactButtonWrapper>
-				<div className="flex flex-col items-center w-fit gap-[2px]">
+				<div className="flex w-fit flex-col items-center gap-[2px]">
 					<p className="text-sm font-thin">
 						{type[0].toUpperCase() + type.slice(1)}
 					</p>
-					<hr className="w-full h-[1.5px] bg-slate-300" />
-					<div className="group/points h-6 w-16 flex items-center justify-center">
+					<hr className="h-[1.5px] w-full bg-slate-300" />
+					<div className="group/points flex h-6 w-16 items-center justify-center">
 						<div
-							className={`group-hover/points:hidden gap-1 flex flex-row items-center`}
+							className={`flex flex-row items-center gap-1 group-hover/points:hidden`}
 						>
 							<span
-								className={liked?.[type] ? " text-green-500 font-bold" : ""}
+								className={liked?.[type] ? " font-bold text-green-500" : ""}
 							>
 								{likes[type]}
 							</span>

@@ -4,9 +4,11 @@ import { SPACES } from "@/config";
 
 export default function Page({
 	params: { space },
-}: { params: { space: string } }) {
+}: {
+	params: { space: string };
+}) {
 	return (
-		<div className="flex flex-col gap-2 h-full items-center  my-12">
+		<div className="my-12 flex h-full flex-col items-center  gap-2">
 			{SPACES[space]?.map((id: string) => (
 				<ConversationPreview key={id} id={id} />
 			))}

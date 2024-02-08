@@ -9,8 +9,9 @@ export const addNegation = (
 	includeAuxEdges = false,
 ) => {
 	const type = negatedNode.hasClass("point") ? "counterpoint" : "objection";
-	const auxEdges: ElementDefinition[] = includeAuxEdges
-		? [
+	const auxEdges: ElementDefinition[] =
+		includeAuxEdges ?
+			[
 				{
 					group: "edges",
 					data: {
@@ -31,8 +32,8 @@ export const addNegation = (
 					},
 					classes: "aux",
 				},
-		  ]
-		: [];
+			]
+		:	[];
 
 	const elements = cytoscape.add([
 		{

@@ -68,9 +68,9 @@ export default function Point({
 
 		// Prepend the missing ancestors to the path
 		const missingAncestors =
-			commonAncestorIndex > 0
-				? ancestry.slice(0, commonAncestorIndex).join(",")
-				: ancestry.join(",");
+			commonAncestorIndex > 0 ?
+				ancestry.slice(0, commonAncestorIndex).join(",")
+			:	ancestry.join(",");
 		const route = current ? `${missingAncestors},${current}` : missingAncestors;
 
 		setIds(route);
@@ -92,19 +92,17 @@ export default function Point({
 	return (
 		<details
 			open={detailsOpened}
-			className="flex flex-col gap-1 w-full"
+			className="flex w-full flex-col gap-1"
 			onClick={handleClick}
 		>
 			<summary
 				className={cn(
-					level % 2
-						? isHovered
-							? "bg-indigo-50"
-							: "bg-indigo-25"
-						: isHovered
-						  ? "bg-gray-100"
-						  : "bg-slate-50",
-					"claim relative border cursor-pointer",
+					level % 2 ?
+						isHovered ? "bg-indigo-50"
+						:	"bg-indigo-25"
+					: isHovered ? "bg-gray-100"
+					: "bg-slate-50",
+					"claim relative cursor-pointer border",
 				)}
 				onMouseOver={() => {
 					setHoveredPointId(currentPointId);
@@ -112,7 +110,7 @@ export default function Point({
 				onMouseOut={() => setHoveredPointId(undefined)}
 			>
 				<AccordionArrow />
-				<div className="flex flex-col gap-3 items-start justify-center w-full">
+				<div className="flex w-full flex-col items-start justify-center gap-3">
 					<NegationText />
 					<Score />
 				</div>

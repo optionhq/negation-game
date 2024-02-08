@@ -21,14 +21,14 @@ export default function MobileScore({
 			}}
 		>
 			<ReactButtonWrapper>
-				<div className="flex flex-col items-center w-fit gap-[2px]">
+				<div className="flex w-fit flex-col items-center gap-[2px]">
 					<div className="flex flex-row items-center gap-1">
 						<span>{likes[type]}</span>
 						<p className="text-sm font-thin">
 							{type[0].toUpperCase() + type.slice(1)}
 						</p>
 					</div>
-					<hr className="w-full h-[1.5px] bg-slate-300" />
+					<hr className="h-[1.5px] w-full bg-slate-300" />
 					<NegateLikeButtons type={type} />
 				</div>
 			</ReactButtonWrapper>

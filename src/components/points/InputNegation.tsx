@@ -61,7 +61,7 @@ export default function InputNegation({
 	return (
 		<div
 			className={cn(
-				"w-full flex flex-col relative gap-3 font-medium cursor-pointer list-none px-5 py-3 rounded-md order-first border",
+				"relative order-first flex w-full cursor-pointer list-none flex-col gap-3 rounded-md border px-5 py-3 font-medium",
 				pointBg,
 				className,
 			)}
@@ -70,11 +70,11 @@ export default function InputNegation({
 			<textarea
 				ref={textareaRef}
 				placeholder={placeHolder}
-				className="w-full h-36 caret-purple-900 border-1"
+				className="border-1 h-36 w-full caret-purple-900"
 				value={text}
 				onChange={(e) => setText(e.target.value)}
 			/>
-			<div className="w-full flex justify-between">
+			<div className="flex w-full justify-between">
 				<p className="text-sm text-black/60">
 					<span
 						className={`${

@@ -11,13 +11,13 @@ export default function NegateLikeButtons({
 	return (
 		<div className="flex flex-row gap-2">
 			<button
-				className={liked?.[type] ? "text-green-500 text-xl" : "text-xl"}
+				className={liked?.[type] ? "text-xl text-green-500" : "text-xl"}
 				onMouseDown={(e) => handleLike(e, type)}
 			>
 				<HiOutlineCheckCircle size={30} />
 			</button>
 			<button
-				className="hover:text-purple-600 text-xl"
+				className="text-xl hover:text-purple-600"
 				onMouseDown={(e) => handleNegate(e, type)}
 			>
 				<HiOutlineXCircle size={30} />

@@ -13,6 +13,7 @@ pnpm dev
 ```
 
 You'll have to fill out the content of .env.local with your values:
+
 ```bash
 NODE_ENV=development
 

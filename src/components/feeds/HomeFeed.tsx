@@ -27,7 +27,11 @@ const fetchPinnedCasts = async () => {
 async function fetchFeed({
 	limit,
 	cursor,
-}: { limit: number; existingPoints?: Node[]; cursor?: string }) {
+}: {
+	limit: number;
+	existingPoints?: Node[];
+	cursor?: string;
+}) {
 	const points: Node[] = [];
 
 	const url = `/api/feed/${encodeURIComponent(
@@ -110,15 +114,15 @@ export default function HomeFeed() {
 
 	return (
 		<div className="flex flex-col items-center gap-4 py-4">
-			<div className="relative flex flex-row rounded-md p-3 bg-slate-50 border w-fit">
+			<div className="relative flex w-fit flex-row rounded-md border bg-slate-50 p-3">
 				<div
-					className={`absolute w-40 bg-black/5 top-1 bottom-1 left-3 ${
+					className={`absolute bottom-1 left-3 top-1 w-40 bg-black/5 ${
 						selectedFeed === "pinned" ? "" : "translate-x-full"
-					} transition-all rounded-md`}
+					} rounded-md transition-all`}
 				/>
 				<button
 					type="button"
-					className="flex flex-row gap-2 items-center justify-center w-40 z-40"
+					className="z-40 flex w-40 flex-row items-center justify-center gap-2"
 					onClick={() => setSelectedFeed("pinned")}
 				>
 					<AiOutlinePushpin size={20} />
@@ -126,7 +130,7 @@ export default function HomeFeed() {
 				</button>
 				<button
 					type="button"
-					className="flex flex-row gap-2 items-center w-40 justify-center z-40"
+					className="z-40 flex w-40 flex-row items-center justify-center gap-2"
 					onClick={() => setSelectedFeed("all")}
 				>
 					<GoListUnordered size={20} />
@@ -134,32 +138,33 @@ export default function HomeFeed() {
 				</button>
 			</div>
 
-			<div className="flex flex-col gap-1 centered-element">
-				{selectedFeed === "all"
-					? points?.map((e: Node, i: number) => (
-							<PointWrapper
-								key={e.id}
-								level={0}
-								point={e}
-								parent={undefined}
-								setHistoricalItems={() => {}}
-								setParentChildren={() => {}}
-								getParentAncestry={undefined}
-								refreshParentThread={refreshCasts}
-							/>
-					  ))
-					: pinnedPoints?.map((e: Node, i: number) => (
-							<PointWrapper
-								key={e.id}
-								level={0}
-								point={e}
-								parent={undefined}
-								setHistoricalItems={() => {}}
-								setParentChildren={() => {}}
-								getParentAncestry={undefined}
-								refreshParentThread={setPinnedCasts}
-							/>
-					  ))}
+			<div className="centered-element flex flex-col gap-1">
+				{selectedFeed === "all" ?
+					points?.map((e: Node, i: number) => (
+						<PointWrapper
+							key={e.id}
+							level={0}
+							point={e}
+							parent={undefined}
+							setHistoricalItems={() => {}}
+							setParentChildren={() => {}}
+							getParentAncestry={undefined}
+							refreshParentThread={refreshCasts}
+						/>
+					))
+				:	pinnedPoints?.map((e: Node, i: number) => (
+						<PointWrapper
+							key={e.id}
+							level={0}
+							point={e}
+							parent={undefined}
+							setHistoricalItems={() => {}}
+							setParentChildren={() => {}}
+							getParentAncestry={undefined}
+							refreshParentThread={setPinnedCasts}
+						/>
+					))
+				}
 			</div>
 			<div className="loading h-10" ref={loader} />
 

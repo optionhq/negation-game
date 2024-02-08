@@ -1,95 +1,93 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
- 
+
 @layer base {
-  :root {
-    --foreground-rgb: 0, 0, 0;
-    --background-start-rgb: 214, 219, 220;
-    --background-end-rgb: 255, 255, 255;
+	:root {
+		--foreground-rgb: 0, 0, 0;
+		--background-start-rgb: 214, 219, 220;
+		--background-end-rgb: 255, 255, 255;
 
-    /* shadcn light theme  */
-    --background: 0 0% 100%;
-    --foreground: 224 71.4% 4.1%;
-    --card: 0 0% 100%;
-    --card-foreground: 224 71.4% 4.1%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 224 71.4% 4.1%;
-    --primary: 262.1 83.3% 57.8%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 220 13% 91%;
-    --input: 220 13% 91%;
-    --ring: 262.1 83.3% 57.8%;
-    --radius: 0.5rem;
-  }
- 
+		/* shadcn light theme  */
+		--background: 0 0% 100%;
+		--foreground: 224 71.4% 4.1%;
+		--card: 0 0% 100%;
+		--card-foreground: 224 71.4% 4.1%;
+		--popover: 0 0% 100%;
+		--popover-foreground: 224 71.4% 4.1%;
+		--primary: 262.1 83.3% 57.8%;
+		--primary-foreground: 210 20% 98%;
+		--secondary: 220 14.3% 95.9%;
+		--secondary-foreground: 220.9 39.3% 11%;
+		--muted: 220 14.3% 95.9%;
+		--muted-foreground: 220 8.9% 46.1%;
+		--accent: 220 14.3% 95.9%;
+		--accent-foreground: 220.9 39.3% 11%;
+		--destructive: 0 84.2% 60.2%;
+		--destructive-foreground: 210 20% 98%;
+		--border: 220 13% 91%;
+		--input: 220 13% 91%;
+		--ring: 262.1 83.3% 57.8%;
+		--radius: 0.5rem;
+	}
 
-  .dark {
-    /* shadcn dark theme  */
-    --background: 224 71.4% 4.1%;
-    --foreground: 210 20% 98%;
-    --card: 224 71.4% 4.1%;
-    --card-foreground: 210 20% 98%;
-    --popover: 224 71.4% 4.1%;
-    --popover-foreground: 210 20% 98%;
-    --primary: 263.4 70% 50.4%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 215 27.9% 16.9%;
-    --secondary-foreground: 210 20% 98%;
-    --muted: 215 27.9% 16.9%;
-    --muted-foreground: 217.9 10.6% 64.9%;
-    --accent: 215 27.9% 16.9%;
-    --accent-foreground: 210 20% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 215 27.9% 16.9%;
-    --input: 215 27.9% 16.9%;
-    --ring: 263.4 70% 50.4%;
-  }
-  
-  body {
-    color: rgb(var(--foreground-rgb));
-    background-color: rgb(var(--background-end-rgb));
-  }
-  
-  textarea {
-    @apply bg-white text-gray-900 border text-sm rounded-lg focus:ring-inset focus:border-0 block w-full p-4 py-3 resize-none;
-  }
-  
-  p {
-    @apply text-ellipsis;
-    }
-  
-    summary::-webkit-details-marker {
-      display: none;
-    }
-  }
+	.dark {
+		/* shadcn dark theme  */
+		--background: 224 71.4% 4.1%;
+		--foreground: 210 20% 98%;
+		--card: 224 71.4% 4.1%;
+		--card-foreground: 210 20% 98%;
+		--popover: 224 71.4% 4.1%;
+		--popover-foreground: 210 20% 98%;
+		--primary: 263.4 70% 50.4%;
+		--primary-foreground: 210 20% 98%;
+		--secondary: 215 27.9% 16.9%;
+		--secondary-foreground: 210 20% 98%;
+		--muted: 215 27.9% 16.9%;
+		--muted-foreground: 217.9 10.6% 64.9%;
+		--accent: 215 27.9% 16.9%;
+		--accent-foreground: 210 20% 98%;
+		--destructive: 0 62.8% 30.6%;
+		--destructive-foreground: 210 20% 98%;
+		--border: 215 27.9% 16.9%;
+		--input: 215 27.9% 16.9%;
+		--ring: 263.4 70% 50.4%;
+	}
 
-  @layer components {
-    .claim {
-      @apply relative flex flex-row items-start gap-1 lg:gap-3 font-medium list-none px-2 sm:px-3 md:px-5 py-2 sm:py-3 md:py-3 rounded-md z-0 min-w-[16rem] ;
-    }
-  
-    .button {
-      @apply bg-purple-900 px-3 py-2 text-white rounded-md cursor-pointer flex flex-row gap-2 items-center hover:bg-purple-800 disabled:bg-slate-500 disabled:cursor-default;
-    }
-    
-    .secondary-button {
-      @apply border text-black/80 px-3 py-2 rounded-md flex items-center justify-center hover:border-black/20 bg-slate-100/80 hover:bg-white hover:text-black;
-    }
-  }
-  
-  @layer utilities {
-    .centered-element {
-      @apply mx-3 sm:mx-4 md:mx-8 lg:mx-24 xl:mx-40;
-    
-    }
-  }
+	body {
+		color: rgb(var(--foreground-rgb));
+		background-color: rgb(var(--background-end-rgb));
+	}
+
+	textarea {
+		@apply block w-full resize-none rounded-lg border bg-white p-4 py-3 text-sm text-gray-900 focus:border-0 focus:ring-inset;
+	}
+
+	p {
+		@apply text-ellipsis;
+	}
+
+	summary::-webkit-details-marker {
+		display: none;
+	}
+}
+
+@layer components {
+	.claim {
+		@apply relative z-0 flex min-w-[16rem] list-none flex-row items-start gap-1 rounded-md px-2 py-2 font-medium sm:px-3 sm:py-3 md:px-5 md:py-3 lg:gap-3;
+	}
+
+	.button {
+		@apply flex cursor-pointer flex-row items-center gap-2 rounded-md bg-purple-900 px-3 py-2 text-white hover:bg-purple-800 disabled:cursor-default disabled:bg-slate-500;
+	}
+
+	.secondary-button {
+		@apply flex items-center justify-center rounded-md border bg-slate-100/80 px-3 py-2 text-black/80 hover:border-black/20 hover:bg-white hover:text-black;
+	}
+}
+
+@layer utilities {
+	.centered-element {
+		@apply mx-3 sm:mx-4 md:mx-8 lg:mx-24 xl:mx-40;
+	}
+}

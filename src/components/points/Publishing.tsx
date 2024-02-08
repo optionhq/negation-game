@@ -15,13 +15,13 @@ export default function Publishing({
 		<div
 			className={cn(
 				pointBg,
-				"w-full flex flex-col relative gap-3 font-medium cursor-pointer list-none pl-14 pr-5 py-3 rounded-md order-first border",
+				"relative order-first flex w-full cursor-pointer list-none flex-col gap-3 rounded-md border py-3 pl-14 pr-5 font-medium",
 				className,
 			)}
 			onClick={(e) => e.stopPropagation()}
 		>
 			<p className="w-full">{point.title}</p>
-			<div className="w-full flex justify-end">
+			<div className="flex w-full justify-end">
 				<p className="text-xs italic">Publishing</p>
 			</div>
 		</div>

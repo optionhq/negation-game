@@ -3,7 +3,9 @@ import Image from "next/image";
 
 export default function MentionNotification({
 	notification,
-}: { notification: Notification }) {
+}: {
+	notification: Notification;
+}) {
 	return (
 		<div>
 			<div className="flex flex-row items-center gap-2">
@@ -16,7 +18,7 @@ export default function MentionNotification({
 				/>
 				<p className="font-bold">{notification.cast?.author.display_name}</p>
 			</div>
-			<div className="table table-fixed w-full overflow-hidden">
+			<div className="table w-full table-fixed overflow-hidden">
 				<p>{notification.cast?.text}</p>
 			</div>
 		</div>

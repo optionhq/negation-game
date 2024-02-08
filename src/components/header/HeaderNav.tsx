@@ -18,7 +18,7 @@ export default function HeaderNav({ className }: { className?: string }) {
 	return (
 		<ul
 			className={cn(
-				"flex flex-row gap-1 text-sm lg:text-base lg:gap-4",
+				"flex flex-row gap-1 text-sm lg:gap-4 lg:text-base",
 				className,
 			)}
 		>

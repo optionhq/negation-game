@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 function LikersTooltip({ reactions }: { reactions: Reaction[] }) {
 	return (
 		<span
-			className="absolute flex flex-col top-0 bg-slate-50 border rounded-md p-2 px-4 w-44 left-0 gap-2"
+			className="absolute left-0 top-0 flex w-44 flex-col gap-2 rounded-md border bg-slate-50 p-2 px-4"
 			style={{ transform: "translateY(-100%)" }}
 		>
 			{reactions.slice(1).map((reaction: Reaction) => (
@@ -29,7 +29,9 @@ function LikersTooltip({ reactions }: { reactions: Reaction[] }) {
 
 export default function LikeNotification({
 	notification,
-}: { notification: Notification }) {
+}: {
+	notification: Notification;
+}) {
 	const [node, setNode] = useState<Node>();
 	const [isLinkingPoint, setIsLinkingPoint] = useState<boolean>(false);
 	const [showTooltip, setShowTooltip] = useState(false);
@@ -76,7 +78,7 @@ export default function LikeNotification({
 								onPointerEnter={() => setShowTooltip(true)}
 								onPointerLeave={() => setShowTooltip(false)}
 							>
-								<span className="font-semibold hover:underline w-fit">
+								<span className="w-fit font-semibold hover:underline">
 									{likersLen - 1} other{likersLen > 2 ? "s" : ""}
 								</span>
 								{showTooltip && (
@@ -91,15 +93,15 @@ export default function LikeNotification({
 						{isLinkingPoint ? "important" : "accurate"}.
 					</span>
 				</p>
-				<div className="table table-fixed w-full overflow-hidden">
-					{node &&
-					((isLinkingPoint && node.endPoint?.title) || !isLinkingPoint) ? (
-						<p className=" text-black/50 text-sm ">
+				<div className="table w-full table-fixed overflow-hidden">
+					{(
+						node &&
+						((isLinkingPoint && node.endPoint?.title) || !isLinkingPoint)
+					) ?
+						<p className=" text-sm text-black/50 ">
 							{isLinkingPoint ? node.endPoint?.title : node.title}
 						</p>
-					) : (
-						<p className="text-black/50 text-sm">Deleted point.</p>
-					)}
+					:	<p className="text-sm text-black/50">Deleted point.</p>}
 				</div>
 			</div>
 		</div>

@@ -34,9 +34,9 @@ export default function PointWrapper({
 }) {
 	const { signer } = useSigner();
 	const pointBg = `${
-		level % 2
-			? " bg-indigo-25 hover:bg-indigo-50"
-			: " bg-slate-50 hover:bg-gray-100"
+		level % 2 ?
+			" bg-indigo-25 hover:bg-indigo-50"
+		:	" bg-slate-50 hover:bg-gray-100"
 	}`;
 
 	return (
@@ -49,13 +49,13 @@ export default function PointWrapper({
 				<InputNegation
 					pointBg={pointBg}
 					placeHolder={
-						point.negationType === "relevance"
-							? `This point "${
-									parent?.endPoint ? parent?.endPoint.title : parent?.title
-							  }" isn't impactful because...`
-							: `A counterpoint to "${
-									parent?.endPoint ? parent?.endPoint.title : parent?.title
-							  }" is...`
+						point.negationType === "relevance" ?
+							`This point "${
+								parent?.endPoint ? parent?.endPoint.title : parent?.title
+							}" isn't impactful because...`
+						:	`A counterpoint to "${
+								parent?.endPoint ? parent?.endPoint.title : parent?.title
+							}" is...`
 					}
 					setParentChildren={setParentChildren}
 					onPublish={async (text: string) => {

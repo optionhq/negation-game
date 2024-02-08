@@ -24,30 +24,30 @@ export default function Page() {
 	return (
 		<Tabs
 			defaultValue="thread"
-			className="flex flex-col w-full h-full flex-grow gap-0 overflow-clip"
+			className="flex h-full w-full flex-grow flex-col gap-0 overflow-clip"
 		>
-			<div className="flex justify-between items-center bg-slate-50 z-10 shadow-sm p-2">
+			<div className="z-10 flex items-center justify-between bg-slate-50 p-2 shadow-sm">
 				<div
 					onClick={() => {
 						setIds(null);
 					}}
-					className="flex items-center justify-start font-medium cursor-pointer my-2 hover:bg-slate-100 rounded-md text-gray-500 z-10"
+					className="z-10 my-2 flex cursor-pointer items-center justify-start rounded-md font-medium text-gray-500 hover:bg-slate-100"
 				>
 					<BiChevronLeft size={20} />
 					<p className="px-2">Home</p>
 				</div>
 				{!isAtLeastMd && (
-					<TabsList className="bg-slate-100 w-fit h-fit rounded-md shadow-inner justify-self-end px-2 xs:px-6 gap-2 xs:gap-4 py-2  ">
+					<TabsList className="h-fit w-fit gap-2 justify-self-end rounded-md bg-slate-100 px-2 py-2 shadow-inner xs:gap-4 xs:px-6  ">
 						<TabsTrigger
 							value="thread"
-							className="h-10 gap-2 text-sm xs:text-md"
+							className="xs:text-md h-10 gap-2 text-sm"
 						>
 							<PiRowsBold />
 							<p className="font-semibold ">Thread</p>
 						</TabsTrigger>
 						<TabsTrigger
 							value="graph"
-							className="h-10 gap-2 text-sm xs:text-md"
+							className="xs:text-md h-10 gap-2 text-sm"
 						>
 							<PiGraphBold />
 							<p className="font-semibold">Graph</p>
@@ -57,9 +57,9 @@ export default function Page() {
 			</div>
 			<TabsContent
 				value="thread"
-				className="data-[state=active]:flex flex-grow w-full overflow-clip m-0 transition-none"
+				className="m-0 w-full flex-grow overflow-clip transition-none data-[state=active]:flex"
 			>
-				<PointFeed className="h-full w-full overflow-scroll md:w-[450px] shadow-lg shrink-0" />
+				<PointFeed className="h-full w-full shrink-0 overflow-scroll shadow-lg md:w-[450px]" />
 				{isAtLeastMd && (
 					<Graph
 						key={"graph"}
@@ -71,10 +71,10 @@ export default function Page() {
 			</TabsContent>
 			<TabsContent
 				value="graph"
-				className="data-[state=active]:flex flex-grow w-full overflow-clip m-0 transition-none"
+				className="m-0 w-full flex-grow overflow-clip transition-none data-[state=active]:flex"
 			>
 				{isAtLeastMd && (
-					<PointFeed className="h-full w-full overflow-scroll md:w-[450px] shadow-lg shrink-0" />
+					<PointFeed className="h-full w-full shrink-0 overflow-scroll shadow-lg md:w-[450px]" />
 				)}
 				<Graph
 					key={"graph"}

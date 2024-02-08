@@ -1,11 +1,15 @@
-import { usePointContext } from "../../contexts/PointContext"
+import { usePointContext } from "../../contexts/PointContext";
 
 export default function LoadingNegations() {
-    const { childrenLoading } = usePointContext()
+	const { childrenLoading } = usePointContext();
 
-    return (
-        <>
-            {childrenLoading && <div className="border w-full p-4 flex items-center justify-center">Loading...</div>}
-        </>
-    )
+	return (
+		<>
+			{childrenLoading && (
+				<div className="flex w-full items-center justify-center border p-4">
+					Loading...
+				</div>
+			)}
+		</>
+	);
 }

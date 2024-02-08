@@ -29,7 +29,7 @@ export default function CastButton({
 			{signer && (
 				<div>
 					<button
-						className="fixed bottom-16 z-50 sm:bottom-5 right-5 button"
+						className="button fixed bottom-16 right-5 z-50 sm:bottom-5"
 						onClick={() => setCastModal(true)}
 					>
 						<BiSolidPencil size={18} />

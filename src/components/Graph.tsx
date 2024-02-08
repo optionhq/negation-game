@@ -111,8 +111,8 @@ export const Graph: FC<GraphProps> = ({
 		>
 			{isLoading && <Loader />}
 			{!isLoading && (
-				<div className="relative w-full h-full">
-					<div ref={cyContainer} className="w-full h-full" />
+				<div className="relative h-full w-full">
+					<div ref={cyContainer} className="h-full w-full" />
 					<GraphMenu handleNegate={handleNegate} />
 					{isPointBeingMade && (
 						<InputNegation
@@ -124,7 +124,7 @@ export const Graph: FC<GraphProps> = ({
 					)}
 					{!pointBeingMade && cytoscape && (
 						<button
-							className="absolute bottom-2 right-2 button"
+							className="button absolute bottom-2 right-2"
 							onClick={handleMakePoint}
 						>
 							<BiSolidPencil size={18} />
@@ -189,7 +189,10 @@ const updateLayout = (
 const useTrackSelectedElement = ({
 	cytoscape,
 	enabled,
-}: { cytoscape: Core | null; enabled: boolean }) => {
+}: {
+	cytoscape: Core | null;
+	enabled: boolean;
+}) => {
 	const setSelectedElement = useSetAtom(selectedElementAtom);
 
 	useEffect(() => {
@@ -223,7 +226,10 @@ const useTrackSelectedElement = ({
 const useTrackHoveredElement = ({
 	cytoscape,
 	enabled,
-}: { cytoscape: Core | null; enabled: boolean }) => {
+}: {
+	cytoscape: Core | null;
+	enabled: boolean;
+}) => {
 	const [hoveredPointId, setHoveredPointId] = useAtom(hoveredPointIdAtom);
 
 	useEffect(() => {
@@ -390,7 +396,10 @@ const useHandleNegate = ({
 const useNegationNodesAutoReposition = ({
 	cytoscape,
 	enabled,
-}: { cytoscape: Core | null; enabled: boolean }) => {
+}: {
+	cytoscape: Core | null;
+	enabled: boolean;
+}) => {
 	useEffect(() => {
 		if (!cytoscape || !enabled) return;
 
@@ -429,7 +438,10 @@ const useNegationNodesAutoReposition = ({
 const useHandleIncomingElements = ({
 	cytoscape,
 	elements,
-}: { cytoscape: Core | null; elements?: ElementDefinition[] }) => {
+}: {
+	cytoscape: Core | null;
+	elements?: ElementDefinition[];
+}) => {
 	useUpdateEffect(() => {
 		if (!cytoscape) return;
 		cytoscape.startBatch();
@@ -443,7 +455,10 @@ const useHandleIncomingElements = ({
 const useHandleElementFocus = ({
 	cytoscape,
 	focusedElementId,
-}: { cytoscape: Core | null; focusedElementId?: string }) => {
+}: {
+	cytoscape: Core | null;
+	focusedElementId?: string;
+}) => {
 	useEffect(() => {
 		if (!cytoscape || !focusedElementId) return;
 
@@ -476,7 +491,10 @@ const useHandleElementFocus = ({
 const useDisplayMenuOnSelectedElement = ({
 	cytoscape,
 	enabled,
-}: { cytoscape: Core | null; enabled: boolean }) => {
+}: {
+	cytoscape: Core | null;
+	enabled: boolean;
+}) => {
 	const selectedElement = useAtomValue(selectedElementAtom);
 	const [menuIsOpen, setMenuIsOpen] = useState(selectedElement !== null);
 
@@ -621,23 +639,26 @@ const useCytoscape = ({
 const useToogleInteractiveOnZoom = ({
 	cytoscape,
 	enabled,
-}: { cytoscape: Core | null; enabled: boolean }) => {
+}: {
+	cytoscape: Core | null;
+	enabled: boolean;
+}) => {
 	useEffect(() => {
 		if (!cytoscape || !enabled) return;
 		const handleZoom = () => {
 			const currentZoomLevel = cytoscape.zoom();
 
-			currentZoomLevel > GRAPH_INTERACTIVE_MIN_ZOOM
-				? cytoscape
-						.nodes()
-						.grabify()
-						// @ts-expect-error
-						.unpanify()
-				: cytoscape
-						.nodes()
-						.ungrabify()
-						// @ts-expect-error
-						.panify();
+			currentZoomLevel > GRAPH_INTERACTIVE_MIN_ZOOM ?
+				cytoscape
+					.nodes()
+					.grabify()
+					// @ts-expect-error
+					.unpanify()
+			:	cytoscape
+					.nodes()
+					.ungrabify()
+					// @ts-expect-error
+					.panify();
 		};
 		cytoscape.on("zoom", handleZoom);
 		handleZoom();
@@ -651,7 +672,10 @@ const useToogleInteractiveOnZoom = ({
 const useHandleMakePoint = ({
 	cytoscape,
 	enabled,
-}: { cytoscape: Core | null; enabled: boolean }) => {
+}: {
+	cytoscape: Core | null;
+	enabled: boolean;
+}) => {
 	const [pointBeingMade, setPointBeingMade] = useAtom(pointBeingMadeAtom);
 	const isPointBeingMade = !!pointBeingMade;
 	const user = useSignedInUser();
