@@ -27,7 +27,7 @@ export const GraphMenu: FC<GraphMenuProps> = ({ handleNegate }) => {
 							className="w-full py-2 text-center hover:text-purple-800"
 							href={`https://warpcast.com/${selectedElement.data(
 								"fname",
-							)}/0x${selectedElement.data("hash")}`}
+							)}/${selectedElement.data("hash")}`}
 							target="_blank"
 						>
 							Open in Warpcast
