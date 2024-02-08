@@ -59,15 +59,17 @@ export const Graph: FC<GraphProps> = ({
 	className,
 	...props
 }) => {
-	const { data: elements, isLoading } = useSWR(["graph", rootPointId], () =>
+	const { data: elements } = useSWR(["graph", rootPointId], () =>
 		fetchGraph(rootPointId),
 	);
+
+	console.log(elements);
 
 	const cyContainer = useRef<HTMLDivElement>(null);
 	const { cytoscape, edgeHandles } = useCytoscape({
 		style,
 		initialElements: elements,
-		focusedElementId,
+		enabled: !!elements,
 		containerRef: cyContainer,
 	});
 	const [pointBeingMade] = useAtom(pointBeingMadeAtom);
@@ -109,8 +111,8 @@ export const Graph: FC<GraphProps> = ({
 			)}
 			{...props}
 		>
-			{isLoading && <Loader />}
-			{!isLoading && (
+			{elements === undefined && <Loader />}
+			{elements !== undefined && (
 				<div className="relative h-full w-full">
 					<div ref={cyContainer} className="h-full w-full" />
 					<GraphMenu handleNegate={handleNegate} />
@@ -554,14 +556,14 @@ const useDisplayMenuOnSelectedElement = ({
 };
 
 const useCytoscape = ({
-	focusedElementId,
 	initialElements,
 	style,
 	containerRef,
+	enabled,
 }: {
+	enabled: boolean;
 	initialElements?: ElementDefinition[];
 	style?: Stylesheet[];
-	focusedElementId?: string;
 	containerRef: React.MutableRefObject<HTMLDivElement | null>;
 }) => {
 	useAssertCytoscapeExtensionsLoaded();
@@ -628,7 +630,7 @@ const useCytoscape = ({
 			edgeHandles.destroy();
 			cytoscape.destroy();
 		};
-	}, [containerRef]);
+	}, [containerRef, enabled]);
 
 	return {
 		cytoscape: cytoscape,
