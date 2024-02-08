@@ -63,8 +63,6 @@ export const Graph: FC<GraphProps> = ({
 		fetchGraph(rootPointId),
 	);
 
-	console.log(elements);
-
 	const cyContainer = useRef<HTMLDivElement>(null);
 	const { cytoscape, edgeHandles } = useCytoscape({
 		style,
