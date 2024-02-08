@@ -25,7 +25,7 @@ import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
 import { cn } from "@/lib/utils";
 import cytoscape from "cytoscape";
 import { EdgeHandlesInstance } from "cytoscape-edgehandles";
-import { useAtom, useAtomValue, useSetAtom } from "jotai";
+import { useAtom } from "jotai";
 import {
 	FC,
 	HTMLAttributes,
@@ -42,7 +42,6 @@ import {
 	useUpdateEffect,
 } from "usehooks-ts";
 import { GraphMenu } from "./Graph.Menu";
-import { pointBeingMadeAtom, selectedElementAtom } from "./Graph.state";
 import { style } from "./Graph.style";
 import { Loader } from "./Loader";
 import InputNegation from "./points/InputNegation";
@@ -74,10 +73,12 @@ export const Graph: FC<GraphProps> = ({
 		enabled: !!elements,
 		containerRef: cyContainer,
 	});
-	const [pointBeingMade] = useAtom(pointBeingMadeAtom);
 
 	useToogleInteractiveOnZoom({ cytoscape, enabled: true });
-	useTrackSelectedElement({ cytoscape, enabled: true });
+	const { selectedElement, setSelectedElement } = useTrackSelectedElement({
+		cytoscape,
+		enabled: true,
+	});
 	useTrackHoveredElement({ cytoscape, enabled: true });
 	// useHandleIncomingElements({ cytoscape, elements });
 	useNegationNodesAutoReposition({
@@ -86,6 +87,8 @@ export const Graph: FC<GraphProps> = ({
 	});
 	useHandleElementFocus({ cytoscape, focusedElementId });
 	const { isNegating, handleNegate } = useHandleNegate({
+		selectedElement,
+		setSelectedElement,
 		cytoscape,
 		edgeHandles,
 		enabled: true,
@@ -94,11 +97,13 @@ export const Graph: FC<GraphProps> = ({
 	const {
 		handleMakePoint,
 		isPointBeingMade,
+		pointBeingMade,
 		handleMakePointMadeOrDismissed,
 		handleMakePointSubmitted,
 	} = useHandleMakePoint({ cytoscape, enabled: true });
 
 	useDisplayMenuOnSelectedElement({
+		selectedElement,
 		cytoscape,
 		enabled: !isNegating,
 	});
@@ -117,7 +122,10 @@ export const Graph: FC<GraphProps> = ({
 			{elements !== undefined && (
 				<div className="relative h-full w-full">
 					<div ref={cyContainer} className="h-full w-full" />
-					<GraphMenu handleNegate={handleNegate} />
+					<GraphMenu
+						handleNegate={handleNegate}
+						selectedElement={selectedElement}
+					/>
 					{isPointBeingMade && (
 						<InputNegation
 							className="absolute bottom-0 w-full p-4"
@@ -197,7 +205,9 @@ const useTrackSelectedElement = ({
 	cytoscape: Core | null;
 	enabled: boolean;
 }) => {
-	const setSelectedElement = useSetAtom(selectedElementAtom);
+	const [selectedElement, setSelectedElement] = useState<NodeSingular | null>(
+		null,
+	);
 
 	useEffect(() => {
 		if (!cytoscape || !enabled) return;
@@ -225,6 +235,8 @@ const useTrackSelectedElement = ({
 			cytoscape.off("tap", handleTap);
 		};
 	}, [cytoscape, enabled, setSelectedElement]);
+
+	return { selectedElement, setSelectedElement };
 };
 
 const useTrackHoveredElement = ({
@@ -307,14 +319,17 @@ const useHandleNegate = ({
 	cytoscape,
 	edgeHandles,
 	enabled,
+	selectedElement,
+	setSelectedElement,
 }: {
+	selectedElement: NodeSingular | null;
+	setSelectedElement: (node: NodeSingular | null) => void;
 	cytoscape: Core | null;
 	edgeHandles: EdgeHandlesInstance | null;
 	enabled: boolean;
 }) => {
 	const signerUuid = useSigner().signer?.signer_uuid;
 	const user = useSignedInUser();
-	const [selectedElement, setSelectedElement] = useAtom(selectedElementAtom);
 	const [isNegating, setIsNegating] = useState(false);
 
 	useEffect(() => {
@@ -495,11 +510,12 @@ const useHandleElementFocus = ({
 const useDisplayMenuOnSelectedElement = ({
 	cytoscape,
 	enabled,
+	selectedElement,
 }: {
+	selectedElement: NodeSingular | null;
 	cytoscape: Core | null;
 	enabled: boolean;
 }) => {
-	const selectedElement = useAtomValue(selectedElementAtom);
 	const [menuIsOpen, setMenuIsOpen] = useState(selectedElement !== null);
 
 	useEffect(() => {
@@ -680,7 +696,9 @@ const useHandleMakePoint = ({
 	cytoscape: Core | null;
 	enabled: boolean;
 }) => {
-	const [pointBeingMade, setPointBeingMade] = useAtom(pointBeingMadeAtom);
+	const [pointBeingMade, setPointBeingMade] = useState<NodeSingular | null>(
+		null,
+	);
 	const isPointBeingMade = !!pointBeingMade;
 	const user = useSignedInUser();
 	const signer = useSigner().signer;
@@ -746,6 +764,7 @@ const useHandleMakePoint = ({
 
 	return {
 		handleMakePoint,
+		pointBeingMade,
 		isPointBeingMade,
 		handleMakePointMadeOrDismissed,
 		handleMakePointSubmitted,

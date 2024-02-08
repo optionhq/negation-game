@@ -1,13 +1,15 @@
-import { useAtomValue } from "jotai";
+import { NodeSingular } from "cytoscape";
 import { FC } from "react";
-import { selectedElementAtom } from "./Graph.state";
 
 export interface GraphMenuProps {
 	handleNegate: () => void;
+	selectedElement: NodeSingular | null;
 }
 
-export const GraphMenu: FC<GraphMenuProps> = ({ handleNegate }) => {
-	const selectedElement = useAtomValue(selectedElementAtom);
+export const GraphMenu: FC<GraphMenuProps> = ({
+	handleNegate,
+	selectedElement,
+}) => {
 	return (
 		<div
 			id="graph-menu"
