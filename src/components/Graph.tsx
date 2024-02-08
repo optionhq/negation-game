@@ -59,8 +59,12 @@ export const Graph: FC<GraphProps> = ({
 	className,
 	...props
 }) => {
-	const { data: elements } = useSWR(["graph", rootPointId], () =>
-		fetchGraph(rootPointId),
+	const { data: elements } = useSWR(
+		["graph", rootPointId],
+		() => fetchGraph(rootPointId),
+		{
+			errorRetryInterval: 1000,
+		},
 	);
 
 	const cyContainer = useRef<HTMLDivElement>(null);
