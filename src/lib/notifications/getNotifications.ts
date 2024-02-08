@@ -13,7 +13,7 @@ export default async function getNotifications(
 	try {
 		// localStorage.removeItem("old_most_recent_notification")
 		// localStorage.removeItem("most_recent_notification")
-		const url = `/api/notifications/${"https%3A%2F%2Fnegationgame.com"}?user=${
+		const url = `/api/notifications/${encodeURIComponent(DEFAULT_CHANNELID)}?user=${
 			//@ts-ignore
 			signer?.fid
 		}&limit=${amount ?? 25}${cursor ? `&cursor=${cursor}` : ""}`;
