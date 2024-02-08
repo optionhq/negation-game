@@ -5,6 +5,7 @@ import { Node } from "@/types/Points";
 import axios from "axios";
 import { Cast } from "neynar-next/server";
 import { useCallback, useEffect, useState } from "react";
+import { Loader } from "../Loader";
 import HistoricalPoints from "../points/HistoricalPoints";
 import PointWrapper from "../points/PointWrapper";
 
@@ -32,7 +33,6 @@ export default function PointFeed({ className }: { className?: string }) {
 		init();
 	}, [init]);
 
-	if (!point) return;
 	return (
 		<div
 			className={cn(
@@ -43,16 +43,22 @@ export default function PointFeed({ className }: { className?: string }) {
 			{historicalPointIds && historicalPointIds?.length !== 0 && (
 				<HistoricalPoints ids={historicalPointIds} />
 			)}
-			<PointWrapper
-				key={point.id}
-				level={0}
-				point={point}
-				parent={undefined}
-				setHistoricalItems={setHistoricalPointIds}
-				setParentChildren={() => {}}
-				getParentAncestry={undefined}
-				refreshParentThread={init}
-			/>
+			{point ? (
+				<PointWrapper
+					key={point.id}
+					level={0}
+					point={point}
+					parent={undefined}
+					setHistoricalItems={setHistoricalPointIds}
+					setParentChildren={() => {}}
+					getParentAncestry={undefined}
+					refreshParentThread={init}
+				/>
+			) : (
+				<div className="flex h-full w-full items-center justify-center">
+					<Loader />
+				</div>
+			)}
 		</div>
 	);
 }

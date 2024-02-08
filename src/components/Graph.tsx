@@ -34,7 +34,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import { BiLoaderAlt, BiSolidPencil } from "react-icons/bi";
+import { BiSolidPencil } from "react-icons/bi";
 import useSWR from "swr";
 import {
 	useDebounceCallback,
@@ -44,6 +44,7 @@ import {
 import { GraphMenu } from "./Graph.Menu";
 import { pointBeingMadeAtom, selectedElementAtom } from "./Graph.state";
 import { style } from "./Graph.style";
+import { Loader } from "./Loader";
 import InputNegation from "./points/InputNegation";
 import { hoveredPointIdAtom } from "./points/Point";
 
@@ -61,23 +62,25 @@ export const Graph: FC<GraphProps> = ({
 	const { data: elements, isLoading } = useSWR(["graph", rootPointId], () =>
 		fetchGraph(rootPointId),
 	);
+
 	const cyContainer = useRef<HTMLDivElement>(null);
 	const { cytoscape, edgeHandles } = useCytoscape({
 		style,
+		initialElements: elements,
+		focusedElementId,
 		containerRef: cyContainer,
-		enabled: !isLoading,
 	});
 	const [pointBeingMade] = useAtom(pointBeingMadeAtom);
 
 	useToogleInteractiveOnZoom({ cytoscape, enabled: true });
 	useTrackSelectedElement({ cytoscape, enabled: true });
 	useTrackHoveredElement({ cytoscape, enabled: true });
-	useHandleIncomingElements({ cytoscape, elements });
+	// useHandleIncomingElements({ cytoscape, elements });
 	useNegationNodesAutoReposition({
 		cytoscape,
-		enabled: !isLoading,
+		enabled: !!cytoscape,
 	});
-	useHandleElementFocus({ cytoscape, focusedElementId, enabled: true });
+	useHandleElementFocus({ cytoscape, focusedElementId });
 	const { isNegating, handleNegate } = useHandleNegate({
 		cytoscape,
 		edgeHandles,
@@ -106,9 +109,7 @@ export const Graph: FC<GraphProps> = ({
 			)}
 			{...props}
 		>
-			{isLoading && (
-				<BiLoaderAlt size={128} className="animate-spin text-purple-200" />
-			)}
+			{isLoading && <Loader />}
 			{!isLoading && (
 				<div className="relative w-full h-full">
 					<div ref={cyContainer} className="w-full h-full" />
@@ -180,7 +181,6 @@ const updateLayout = (
 			// @ts-expect-error
 			animate: true,
 			animationDuration: 1000,
-
 			...options,
 		})
 		.run();
@@ -435,7 +435,7 @@ const useHandleIncomingElements = ({
 		cytoscape.startBatch();
 		cytoscape.elements().remove();
 		elements && cytoscape.add(elements);
-		updateLayout(cytoscape);
+		// updateLayout(cytoscape);
 		cytoscape.endBatch();
 	}, [cytoscape, elements]);
 };
@@ -443,10 +443,9 @@ const useHandleIncomingElements = ({
 const useHandleElementFocus = ({
 	cytoscape,
 	focusedElementId,
-	enabled,
-}: { cytoscape: Core | null; focusedElementId?: string; enabled: boolean }) => {
+}: { cytoscape: Core | null; focusedElementId?: string }) => {
 	useEffect(() => {
-		if (!cytoscape || !focusedElementId || !enabled) return;
+		if (!cytoscape || !focusedElementId) return;
 
 		const selectedPoint =
 			cytoscape.getElementById(`negation-${focusedElementId}`)?.source() ??
@@ -463,14 +462,15 @@ const useHandleElementFocus = ({
 				eles: selectedPoint,
 			},
 			zoom: 0.5,
-			duration: 500,
+			duration: 1000,
 			easing: "ease-in-out-cubic",
+			queue: true,
 		});
 
 		return () => {
 			selectedPoint.removeClass("focused");
 		};
-	}, [cytoscape, focusedElementId, enabled]);
+	}, [cytoscape, focusedElementId]);
 };
 
 const useDisplayMenuOnSelectedElement = ({
@@ -507,7 +507,6 @@ const useDisplayMenuOnSelectedElement = ({
 						options: {
 							padding: 12,
 							mainAxis: true,
-							altAxis: true,
 							boundary: cytoscape.container(),
 						},
 					},
@@ -537,13 +536,15 @@ const useDisplayMenuOnSelectedElement = ({
 };
 
 const useCytoscape = ({
+	focusedElementId,
+	initialElements,
 	style,
 	containerRef,
-	enabled,
 }: {
+	initialElements?: ElementDefinition[];
 	style?: Stylesheet[];
+	focusedElementId?: string;
 	containerRef: React.MutableRefObject<HTMLDivElement | null>;
-	enabled: boolean;
 }) => {
 	useAssertCytoscapeExtensionsLoaded();
 	const [cytoscape, setCytoscape] = useState<Core | null>(null);
@@ -552,9 +553,11 @@ const useCytoscape = ({
 	);
 
 	useEffect(() => {
-		if (!containerRef.current || !enabled) return;
+		if (!containerRef.current) return;
+
 		const cytoscape = Cytoscape({
 			style,
+			elements: initialElements,
 			container: containerRef.current,
 			autounselectify: true,
 			userPanningEnabled: true,
@@ -569,6 +572,7 @@ const useCytoscape = ({
 					return getNegationPositionFromNode(node);
 				},
 				fit: true,
+				padding: 30,
 				animate: false,
 			},
 		});
@@ -606,7 +610,7 @@ const useCytoscape = ({
 			edgeHandles.destroy();
 			cytoscape.destroy();
 		};
-	}, [enabled, containerRef, style]);
+	}, [containerRef]);
 
 	return {
 		cytoscape: cytoscape,
