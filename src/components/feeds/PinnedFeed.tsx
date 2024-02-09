@@ -33,7 +33,7 @@ export default function PinnedFeed() {
 	if (!pinnedPoints) return <LoadingPane />;
 
 	return (
-		<div className="flex flex-col items-center gap-4 py-4">
+		<div className="relative flex flex-col items-center gap-4 py-4">
 			<div className="centered-element flex flex-col gap-1">
 				{pinnedPoints?.map((e: Node, i: number) => (
 					<PointWrapper
@@ -51,7 +51,7 @@ export default function PinnedFeed() {
 				))}
 			</div>
 
-			<CastButton refreshThread={async () => {}} />
+			<CastButton className="sticky bottom-4 z-50 mx-5 self-end shadow-md" refreshThread={async () => {}} />
 		</div>
 	);
 }

@@ -60,7 +60,7 @@ export default function AllPointsFeed() {
 	if (!pointPages) return <LoadingPane />;
 
 	return (
-		<div className="flex flex-col items-center gap-4 py-4">
+		<div className="relative flex flex-col items-center gap-4 py-4">
 			<div className="centered-element flex flex-col gap-1">
 				{pointPages
 					?.flatMap((page) => page?.points ?? [])
@@ -81,7 +81,10 @@ export default function AllPointsFeed() {
 			</div>
 			<div className="loading h-10" ref={loaderRef} />
 
-			<CastButton refreshThread={async () => {}} />
+			<CastButton
+				className="sticky bottom-4 z-50 mx-5 self-end shadow-md"
+				refreshThread={async () => {}}
+			/>
 		</div>
 	);
 }
