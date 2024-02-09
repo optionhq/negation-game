@@ -29,7 +29,7 @@ export default function Page() {
 			<div className="z-10 flex items-center justify-between bg-slate-50 p-2 shadow-sm">
 				<div
 					onClick={() => {
-						setIds(null);
+						setIds("");
 					}}
 					className="z-10 my-2 flex cursor-pointer items-center justify-start rounded-md font-medium text-gray-500 hover:bg-slate-100"
 				>

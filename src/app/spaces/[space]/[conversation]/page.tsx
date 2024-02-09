@@ -16,7 +16,7 @@ export default function Page({
 		<div className="flex h-full w-full flex-grow flex-col gap-0 overflow-clip">
 			<div
 				onClick={() => {
-					setIds(null);
+					setIds("");
 				}}
 				className="z-10 my-2 flex cursor-pointer items-center justify-start rounded-md font-medium text-gray-500 hover:bg-slate-100"
 			>
