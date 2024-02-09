@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { IconType } from "react-icons";
 
-export default function HeaderNavItem({
+export default function NavItem({
 	name,
 	Icon,
 	path,

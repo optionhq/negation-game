@@ -7,13 +7,9 @@ import { BiSolidGroup } from "react-icons/bi";
 import { HiHome } from "react-icons/hi";
 import { MdNotifications } from "react-icons/md";
 import { PiGraphBold } from "react-icons/pi";
-import HeaderNavItem from "./HeaderNavItem";
+import NavItem from "./NavItem";
 
-export default function MobileBottomHeader({
-	className,
-}: {
-	className?: string;
-}) {
+export default function MobileNav({ className }: { className?: string }) {
 	const { signer } = useSigner();
 	const pathName = usePathname();
 
@@ -24,26 +20,26 @@ export default function MobileBottomHeader({
 				className,
 			)}
 		>
-			<HeaderNavItem
+			<NavItem
 				Icon={HiHome}
 				name="Home"
 				path="/"
 				currentPath={pathName === "/"}
 			/>
-			<HeaderNavItem
+			<NavItem
 				Icon={BiSolidGroup}
 				name="Spaces"
 				path="/spaces"
 				currentPath={pathName === "/spaces"}
 			/>
-			<HeaderNavItem
+			<NavItem
 				Icon={PiGraphBold}
 				name="Graph"
 				path="/graph"
 				currentPath={pathName === "/graph"}
 			/>
 			{signer && (
-				<HeaderNavItem
+				<NavItem
 					Icon={MdNotifications}
 					name="Notifications"
 					path="/notifications"

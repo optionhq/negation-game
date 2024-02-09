@@ -78,7 +78,7 @@
 	}
 
 	.button {
-		@apply flex cursor-pointer flex-row items-center gap-2 rounded-md bg-purple-900 px-3 py-2 text-white hover:bg-purple-800 disabled:cursor-default disabled:bg-slate-500;
+		@apply flex cursor-pointer flex-row items-center gap-2 rounded-md bg-violet-700 px-3 py-2 text-white hover:bg-violet-600 disabled:cursor-default disabled:bg-slate-500;
 	}
 
 	.secondary-button {
