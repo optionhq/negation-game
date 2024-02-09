@@ -25,7 +25,7 @@ export default function NavItem({
 					{name === "Notifications" &&
 						nbNotifs !== undefined &&
 						nbNotifs > 0 && (
-							<div className=" absolute right-0 top-0 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+							<div className=" absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white sm:right-0 sm:top-0">
 								{nbNotifs}
 							</div>
 						)}
