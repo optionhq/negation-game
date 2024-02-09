@@ -37,17 +37,17 @@ export default function Page() {
 					<p className="px-2">Home</p>
 				</div>
 				{!isAtLeastMd && (
-					<TabsList className="h-fit w-fit gap-2 justify-self-end rounded-md bg-slate-100 px-2 py-2 shadow-inner xs:gap-4 xs:px-6  ">
+					<TabsList className="grid h-fit grid-cols-2 justify-self-end shadow-inner xs:gap-4   ">
 						<TabsTrigger
 							value="thread"
-							className="xs:text-md h-10 gap-2 text-sm"
+							className="h-10 gap-2 text-sm xs:text-lg"
 						>
 							<PiRowsBold />
 							<p className="font-semibold ">Thread</p>
 						</TabsTrigger>
 						<TabsTrigger
 							value="graph"
-							className="xs:text-md h-10 gap-2 text-sm"
+							className="h-10 gap-2 text-sm xs:text-lg"
 						>
 							<PiGraphBold />
 							<p className="font-semibold">Graph</p>
