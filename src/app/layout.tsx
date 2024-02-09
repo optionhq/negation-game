@@ -6,6 +6,7 @@ import "@/globals.css";
 import { cn } from "@/lib/utils";
 import { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Link from "next/link";
 import { IoArrowRedo } from "react-icons/io5";
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" });
 
@@ -34,13 +35,16 @@ export default function RootLayout({
 					<SignerProvider>
 						<div className="flex h-full min-h-screen flex-col">
 							<header className="md: sticky top-0 z-50 grid w-full grid-cols-2 items-center justify-center gap-6 border bg-slate-50 px-4 py-2 md:grid-cols-[auto_1fr_auto]">
-								<div className="flex flex-col text-xl font-black leading-[0.85] text-violet-700">
+								<Link
+									href={"/"}
+									className="flex w-fit select-none flex-col text-xl font-black leading-[0.85] text-violet-700"
+								>
 									<p>Negation</p>
 									<div className="flex items-center gap-0">
 										<p>Game </p>
 										<IoArrowRedo className="rotate-180" />
 									</div>
-								</div>
+								</Link>
 								<Navigation className="hidden gap-1 text-sm md:flex lg:gap-4 lg:text-base" />
 								<div className="flex w-full flex-1 justify-end">
 									<Login />
