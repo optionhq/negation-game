@@ -12,7 +12,7 @@ export default function HomeFeed() {
 			defaultValue="pinned-points"
 			className="relative flex h-full w-full flex-grow flex-col items-center gap-0 overflow-clip"
 		>
-			<div className="z-10 flex w-full items-center justify-center bg-slate-50 p-2 shadow-md">
+			<div className="z-10 flex w-full items-center justify-center bg-slate-50 p-2 shadow-sm">
 				<TabsList className="grid h-fit grid-cols-2  shadow-inner">
 					<TabsTrigger value="pinned-points" className="gap-2">
 						<AiOutlinePushpin size={20} />
