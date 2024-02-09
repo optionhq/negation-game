@@ -1,6 +1,5 @@
 import { Login } from "@/components";
-import HeaderNav from "@/components/header/HeaderNav";
-import MobileNav from "@/components/header/MobileNav";
+import Navigation from "@/components/header/Navigation";
 import { CytoscapeProvider } from "@/contexts/CytoscapeContext";
 import { SignerProvider } from "@/contexts/SignerContext";
 import "@/globals.css";
@@ -42,7 +41,7 @@ export default function RootLayout({
 										<IoArrowRedo className="rotate-180" />
 									</div>
 								</div>
-								<HeaderNav className="hidden md:flex" />
+								<Navigation className="hidden gap-1 text-sm md:flex lg:gap-4 lg:text-base" />
 								<div className="flex w-full flex-1 justify-end">
 									<Login />
 								</div>
@@ -51,7 +50,7 @@ export default function RootLayout({
 							<div className="flex-grow overflow-clip">
 								<div className="h-full w-full overflow-scroll">{children}</div>
 							</div>
-							<MobileNav className="md:hidden" />
+							<Navigation className=" w-full gap-0 border bg-slate-50 p-1 text-sm md:hidden" />
 						</div>
 					</SignerProvider>
 				</body>

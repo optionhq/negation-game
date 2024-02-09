@@ -5,18 +5,21 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { BiSolidGroup } from "react-icons/bi";
 import { HiHome } from "react-icons/hi";
-import { MdNotifications } from "react-icons/md";
 import { PiGraphBold } from "react-icons/pi";
 import NavItem from "./NavItem";
+import NotificationElement from "./NotificationElement";
+("./NotificationElement");
+("./NotificationElement");
 
-export default function MobileNav({ className }: { className?: string }) {
-	const { signer } = useSigner();
+export default function Navigation({ className }: { className?: string }) {
 	const pathName = usePathname();
+	const { signer } = useSigner();
 
 	return (
 		<ul
+			role="navigation"
 			className={cn(
-				"sticky bottom-0 flex w-full flex-row items-center justify-center gap-0 border bg-slate-50 p-1 text-sm",
+				"flex flex-row justify-center",
 				className,
 			)}
 		>
@@ -30,22 +33,15 @@ export default function MobileNav({ className }: { className?: string }) {
 				Icon={BiSolidGroup}
 				name="Spaces"
 				path="/spaces"
-				currentPath={pathName === "/spaces"}
+				currentPath={pathName?.split("/")[1] === "spaces"}
 			/>
 			<NavItem
 				Icon={PiGraphBold}
 				name="Graph"
 				path="/graph"
-				currentPath={pathName === "/graph"}
+				currentPath={pathName?.split("/")[1] === "graph"}
 			/>
-			{signer && (
-				<NavItem
-					Icon={MdNotifications}
-					name="Notifications"
-					path="/notifications"
-					currentPath={pathName === "/notifications"}
-				/>
-			)}
+			{signer && <NotificationElement />}
 		</ul>
 	);
 }
