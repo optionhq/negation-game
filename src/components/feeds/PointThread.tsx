@@ -9,7 +9,7 @@ import { Loader } from "../Loader";
 import HistoricalPoints from "../points/HistoricalPoints";
 import PointWrapper from "../points/PointWrapper";
 
-export default function PointFeed({ className }: { className?: string }) {
+export default function PointThread({ className }: { className?: string }) {
 	const [historicalPointIds, setHistoricalPointIds] = useState<
 		string[] | undefined
 	>([]);

@@ -2,7 +2,7 @@
 
 import { Graph } from "@/components/Graph";
 import HomeFeed from "@/components/feeds/HomeFeed";
-import PointFeed from "@/components/feeds/PointFeed";
+import PointThread from "@/components/feeds/PointThread";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useIsAtLeast } from "@/lib/hooks/useIsAtLeast";
 import { usePointIds } from "@/lib/hooks/usePointIds";
@@ -59,7 +59,7 @@ export default function Page() {
 				value="thread"
 				className="m-0 w-full flex-grow overflow-clip transition-none data-[state=active]:flex"
 			>
-				<PointFeed className="h-full w-full shrink-0 overflow-scroll shadow-lg md:w-[450px]" />
+				<PointThread className="h-full w-full shrink-0 overflow-scroll shadow-lg md:w-[450px]" />
 				{isAtLeastMd && (
 					<Graph
 						key={"graph"}
@@ -74,7 +74,7 @@ export default function Page() {
 				className="m-0 w-full flex-grow overflow-clip transition-none data-[state=active]:flex"
 			>
 				{isAtLeastMd && (
-					<PointFeed className="h-full w-full shrink-0 overflow-scroll shadow-lg md:w-[450px]" />
+					<PointThread className="h-full w-full shrink-0 overflow-scroll shadow-lg md:w-[450px]" />
 				)}
 				<Graph
 					key={"graph"}

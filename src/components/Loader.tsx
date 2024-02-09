@@ -9,6 +9,6 @@ export interface LoaderProps {
 export const Loader: FC<LoaderProps> = ({ className }) => (
 	<BiLoaderAlt
 		size={128}
-		className={cn("animate-spin text-purple-200", className)}
+		className={cn("animate-spin text-violet-200", className)}
 	/>
 );

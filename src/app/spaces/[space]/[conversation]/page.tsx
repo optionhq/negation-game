@@ -1,6 +1,6 @@
 "use client";
 import ConvoFeed from "@/components/feeds/ConvoFeed";
-import PointFeed from "@/components/feeds/PointFeed";
+import PointThread from "@/components/feeds/PointThread";
 import { usePointIds } from "@/lib/hooks/usePointIds";
 import { BiChevronLeft } from "react-icons/bi";
 
@@ -23,7 +23,7 @@ export default function Page({
 				<BiChevronLeft size={20} />
 				<p className="px-2">Back to convo</p>
 			</div>
-			<PointFeed />;
+			<PointThread />;
 		</div>
 	);
 }
