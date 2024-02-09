@@ -16,11 +16,11 @@ export default function HomeFeed() {
 				<TabsList className="grid h-fit grid-cols-2  shadow-inner">
 					<TabsTrigger value="pinned-points" className="gap-2">
 						<AiOutlinePushpin size={20} />
-						<h2 className="text-lg font-semibold">Pinned points</h2>
+						<h2 className="font-semibold xs:text-lg">Pinned points</h2>
 					</TabsTrigger>
 					<TabsTrigger value="all-points" className="gap-2">
 						<GoListUnordered size={20} />
-						<h2 className="text-lg font-semibold">All points</h2>
+						<h2 className="font-semibold xs:text-lg">All points</h2>
 					</TabsTrigger>
 				</TabsList>
 			</div>
