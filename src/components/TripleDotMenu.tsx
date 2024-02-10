@@ -48,27 +48,28 @@ const TripleDotMenu: FC<TripleDotMenuProps> = ({ portalTarget }) => {
 								Open in Warpcast
 							</a>
 						</Button>
-						<Button
-							className="rounded-none"
-							variant="tertiary"
-							disabled={!isAuthor}
-							onClick={async (event) => {
-								event.stopPropagation();
-								if (signer && isAuthor) {
-									try {
-										await axios.delete(`/api/cast/${point.id}/delete`, {
-											data: { signerUuid: signer.signer_uuid },
-										});
-										refreshParentThread();
-										setOpen(false);
-									} catch (error) {
-										console.error("Failed to delete cast:", error);
+						{isAuthor && (
+							<Button
+								className="rounded-none"
+								variant="tertiary"
+								onClick={async (event) => {
+									event.stopPropagation();
+									if (signer && isAuthor) {
+										try {
+											await axios.delete(`/api/cast/${point.id}/delete`, {
+												data: { signerUuid: signer.signer_uuid },
+											});
+											refreshParentThread();
+											setOpen(false);
+										} catch (error) {
+											console.error("Failed to delete cast:", error);
+										}
 									}
-								}
-							}}
-						>
-							Delete
-						</Button>
+								}}
+							>
+								Delete
+							</Button>
+						)}
 					</div>
 				</PopoverContent>
 			</PopoverPortal>
