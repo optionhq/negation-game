@@ -1,7 +1,7 @@
 import { usePointIds } from "@/lib/hooks/usePointIds";
 import { cn } from "@/lib/utils";
 import { atom, useAtom } from "jotai";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 import { usePointContext } from "../../contexts/PointContext";
 import { Node } from "../../types/Points";
 import AccordionArrow from "../AccordionArrow";
@@ -89,11 +89,14 @@ export default function Point({
 		}
 	}, [ids, point, unfurlDropdown]);
 
+	const selfRef = useRef<HTMLDetailsElement>(null);
+
 	return (
 		<details
 			open={detailsOpened}
 			className="flex w-full flex-col gap-1"
 			onClick={handleClick}
+			ref={selfRef}
 		>
 			<summary
 				className={cn(
@@ -114,7 +117,9 @@ export default function Point({
 					<NegationText />
 					<Score />
 				</div>
-				<TripleDotMenu />
+				<TripleDotMenu
+					portalTarget={selfRef?.current?.parentElement ?? undefined}
+				/>
 			</summary>
 			<CommentsThread level={level} />
 			<ChildrenThread

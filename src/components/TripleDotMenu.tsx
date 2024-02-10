@@ -1,83 +1,78 @@
-import axios from "axios";
-import React, { useEffect, useMemo, useRef, useState } from "react";
-import makeWarpcastUrl from "../lib/makeWarpcastUrl";
-import { usePointContext } from "../contexts/PointContext";
 import { useSigner } from "@/contexts/SignerContext";
+import axios from "axios";
+import { FC, useMemo, useState } from "react";
+import { BsThreeDots } from "react-icons/bs";
+import { usePointContext } from "../contexts/PointContext";
+import makeWarpcastUrl from "../lib/makeWarpcastUrl";
+import { Button } from "./ui/button";
+import {
+	Popover,
+	PopoverArrow,
+	PopoverContent,
+	PopoverPortal,
+	PopoverTrigger,
+} from "./ui/popover";
 
-const TripleDotMenu: React.FC = () => {
+export interface TripleDotMenuProps {
+	portalTarget?: HTMLElement;
+}
+
+const TripleDotMenu: FC<TripleDotMenuProps> = ({ portalTarget }) => {
 	const { signer } = useSigner();
 	const [isOpen, setOpen] = useState(false);
-	const menuRef = useRef<HTMLDivElement>(null);
 	const { point, refreshParentThread } = usePointContext();
+	const warpcastUrl = useMemo(() => makeWarpcastUrl(point), [point]);
 
 	const isAuthor = useMemo(
 		() => signer && "fid" in signer && point.author?.fid === signer.fid,
 		[signer, point],
 	);
 
-	useEffect(() => {
-		const handleClickOutside = (event: MouseEvent) => {
-			if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-				setOpen(false);
-			}
-		};
-
-		document.addEventListener("mousedown", handleClickOutside);
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside);
-		};
-	}, []);
-
 	return (
-		<div className="relative" ref={menuRef}>
-			<button
-				type="button"
-				onClick={(e) => {
-					e.stopPropagation();
-					setOpen((prevState) => !prevState);
-				}}
-				className=""
-			>
-				...
-			</button>
-			{isOpen && (
-				<div className="absolute right-0 w-48 divide-y divide-gray-100 rounded-md border border-gray-200 bg-white shadow-lg">
-					<button
-						type="button"
-						className="w-full px-4 py-2 text-left"
-						onClick={(event) => {
-							event.stopPropagation();
-							const warpcastUrl = makeWarpcastUrl(point);
-							window.open(warpcastUrl, "_blank");
-						}}
-					>
-						Open in Warpcast
-					</button>
-					<button
-						type="button"
-						className={`w-full px-4 py-2 text-left ${
-							!isAuthor ? "cursor-not-allowed opacity-50" : ""
-						}`}
-						onClick={async (event) => {
-							event.stopPropagation();
-							if (signer && isAuthor) {
-								try {
-									await axios.delete(`/api/cast/${point.id}/delete`, {
-										data: { signerUuid: signer.signer_uuid },
-									});
-									refreshParentThread();
-									setOpen(false);
-								} catch (error) {
-									console.error("Failed to delete cast:", error);
+		<Popover open={isOpen} onOpenChange={setOpen}>
+			<PopoverTrigger asChild onClick={(e) => e.stopPropagation()}>
+				<Button variant={"ghost"} className="h-fit p-2">
+					<BsThreeDots />
+				</Button>
+			</PopoverTrigger>
+			<PopoverPortal container={portalTarget}>
+				<PopoverContent
+					align="end"
+					className="w-fit p-1"
+					onClick={(e) => e.stopPropagation()}
+				>
+					<PopoverArrow />
+					<div className="flex w-fit flex-col divide-y">
+						<Button variant="tertiary" asChild className="rounded-none">
+							<a href={warpcastUrl} target="_blank">
+								Open in Warpcast
+							</a>
+						</Button>
+						<Button
+							className="rounded-none"
+							variant="tertiary"
+							disabled={!isAuthor}
+							onClick={async (event) => {
+								event.stopPropagation();
+								if (signer && isAuthor) {
+									try {
+										await axios.delete(`/api/cast/${point.id}/delete`, {
+											data: { signerUuid: signer.signer_uuid },
+										});
+										refreshParentThread();
+										setOpen(false);
+									} catch (error) {
+										console.error("Failed to delete cast:", error);
+									}
 								}
-							}
-						}}
-					>
-						Delete
-					</button>
-				</div>
-			)}
-		</div>
+							}}
+						>
+							Delete
+						</Button>
+					</div>
+				</PopoverContent>
+			</PopoverPortal>
+		</Popover>
 	);
 };
 
