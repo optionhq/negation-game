@@ -1,12 +1,12 @@
-import { Node } from "../../types/Points";
-import { PointProvider } from "../../contexts/PointContext";
-import InputNegation from "./InputNegation";
-import Point from "./Point";
-import { negate } from "../../lib/negate";
-import publish from "../../lib/publish";
-import Comment from "./Comment";
 import { useSigner } from "@/contexts/SignerContext";
 import { Dispatch, SetStateAction } from "react";
+import { PointProvider } from "../../contexts/PointContext";
+import { negate } from "../../lib/negate";
+import publish from "../../lib/publish";
+import { Node } from "../../types/Points";
+import Comment from "./Comment";
+import InputPoint from "./InputPoint";
+import Point from "./Point";
 import Publishing from "./Publishing";
 
 export default function PointWrapper({
@@ -46,7 +46,7 @@ export default function PointWrapper({
 			refreshParentThread={refreshParentThread}
 		>
 			{point.type === "input" && (
-				<InputNegation
+				<InputPoint
 					pointBg={pointBg}
 					placeHolder={
 						point.negationType === "relevance" ?

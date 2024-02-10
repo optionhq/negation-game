@@ -44,7 +44,7 @@ import {
 import { GraphMenu } from "./Graph.Menu";
 import { style } from "./Graph.style";
 import { Loader } from "./Loader";
-import InputNegation from "./points/InputNegation";
+import InputPoint from "./points/InputPoint";
 import { hoveredPointIdAtom } from "./points/Point";
 
 interface GraphProps extends HTMLAttributes<HTMLDivElement> {
@@ -127,7 +127,7 @@ export const Graph: FC<GraphProps> = ({
 						selectedElement={selectedElement}
 					/>
 					{isPointBeingMade && (
-						<InputNegation
+						<InputPoint
 							className="absolute bottom-0 w-full p-4"
 							placeHolder="Make your point..."
 							onClose={handleMakePointMadeOrDismissed}

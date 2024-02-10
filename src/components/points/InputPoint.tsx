@@ -5,7 +5,7 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 const MAX_CHAR_PER_CAST = 320;
 
-export default function InputNegation({
+export default function InputPoint({
 	pointBg = "bg-white ",
 	placeHolder,
 	onPublish,
@@ -28,22 +28,6 @@ export default function InputNegation({
 	const [text, setText] = useState("");
 	const textareaRef = useRef<HTMLTextAreaElement>(null);
 	const { signer } = useSigner();
-
-	useEffect(() => {
-		const listener = (event: KeyboardEvent) => {
-			if (
-				(event.ctrlKey || event.metaKey) &&
-				(event.key === "Enter" || event.key === "Return")
-			) {
-				// Click the publish button
-				text && onPublish(text);
-			}
-		};
-		document.addEventListener("keydown", listener);
-		return () => {
-			document.removeEventListener("keydown", listener);
-		};
-	}, [text, onPublish]);
 
 	async function handlePublish() {
 		if (!signer) {
@@ -73,6 +57,14 @@ export default function InputNegation({
 				className="border-1 h-36 w-full caret-purple-900"
 				value={text}
 				onChange={(e) => setText(e.target.value)}
+				onKeyDown={(e) => {
+					if (!text || !(e.metaKey || e.ctrlKey)) return;
+
+					if (e.key === "Enter") {
+						e.preventDefault();
+						text && handlePublish();
+					}
+				}}
 			/>
 			<div className="flex w-full justify-between">
 				<p className="text-sm text-black/60">

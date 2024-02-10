@@ -1,11 +1,11 @@
 "use client";
 import { useSigner } from "@/contexts/SignerContext";
+import { cn } from "@/lib/utils";
 import { useState } from "react";
 import { BiSolidPencil } from "react-icons/bi";
 import publish from "../lib/publish";
 import Modal from "./Modal";
-import InputNegation from "./points/InputNegation";
-import { cn } from "@/lib/utils";
+import InputPoint from "./points/InputPoint";
 
 export default function CastButton({
 	conversation,
@@ -32,7 +32,7 @@ export default function CastButton({
 			</button>
 			{castModal && (
 				<Modal setSelected={setCastModal}>
-					<InputNegation
+					<InputPoint
 						placeHolder="Make a cast..."
 						onPublish={async (text: string) => {
 							const resp = await publish(text, signer, conversation);
