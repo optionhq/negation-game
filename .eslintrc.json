@@ -1,3 +1,16 @@
 {
-	"extends": "next/core-web-vitals"
+	"extends": "next/core-web-vitals",
+	"rules": {
+		"no-restricted-imports": [
+			"warn",
+			{
+				"paths": [
+					{
+						"name": "joi",
+						"message": "Please use 'zod' instead, which is type-safe."
+					}
+				]
+			}
+		]
+	}
 }
