@@ -7,7 +7,7 @@ import { Node } from "@/types/Points";
 import axios from "axios";
 import useSWRInfinite from "swr/infinite";
 import { useIntersectionObserver, useUpdateEffect } from "usehooks-ts";
-import CastButton from "../CastButton";
+import MakePointButton from "../MakePointButton";
 import PointWrapper from "../points/PointWrapper";
 
 async function fetchFeed({
@@ -33,6 +33,8 @@ async function fetchFeed({
 	return { points, cursor: feed.data.next?.cursor };
 }
 
+export const ALL_POINTS_KEY = "allPoints";
+
 export default function AllPointsFeed() {
 	const {
 		data: pointPages,
@@ -42,7 +44,9 @@ export default function AllPointsFeed() {
 		(_, previousPageData) => {
 			return ["allPoints", previousPageData?.cursor];
 		},
-		([, cursor]) => fetchFeed({ limit: 25, cursor }),
+		([, cursor]) => {
+			return fetchFeed({ limit: 25, cursor });
+		},
 	);
 
 	const { ref: loaderRef, isIntersecting } = useIntersectionObserver({
@@ -81,9 +85,11 @@ export default function AllPointsFeed() {
 			</div>
 			<div className="loading h-10" ref={loaderRef} />
 
-			<CastButton
-				className="sticky bottom-4 z-50 mx-5 self-end shadow-md"
-				refreshThread={async () => {}}
+			<MakePointButton
+				classNames={{ button: "sticky bottom-4 z-50 mx-5 self-end shadow-md" }}
+				refreshThread={async () => {
+					await refreshCasts();
+				}}
 			/>
 		</div>
 	);

@@ -1,5 +1,6 @@
 import { Login } from "@/components";
 import Navigation from "@/components/header/Navigation";
+import { Toaster } from "@/components/ui/sonner";
 import { CytoscapeProvider } from "@/contexts/CytoscapeContext";
 import { SignerProvider } from "@/contexts/SignerContext";
 import "@/globals.css";
@@ -56,6 +57,11 @@ export default function RootLayout({
 							</div>
 							<Navigation className=" w-full gap-0 border bg-slate-50 p-1 text-sm md:hidden" />
 						</div>
+						<Toaster
+							position="bottom-right"
+							theme="light"
+							className="!bottom-32"
+						/>
 					</SignerProvider>
 				</body>
 			</html>

@@ -5,6 +5,9 @@ import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 
 const MAX_CHAR_PER_CAST = 320;
 
+/**
+ * @deprecated Use PointForm instead
+ */
 export default function InputPoint({
 	pointBg = "bg-white ",
 	placeHolder,
