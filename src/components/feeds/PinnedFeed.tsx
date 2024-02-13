@@ -42,7 +42,6 @@ export default function PinnedFeed() {
 						level={0}
 						point={e}
 						parent={undefined}
-						setHistoricalItems={() => {}}
 						setParentChildren={() => {}}
 						getParentAncestry={undefined}
 						refreshParentThread={async () => {

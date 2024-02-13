@@ -1,7 +1,9 @@
 import { useSigner } from "@/contexts/SignerContext";
+import { usePointIds } from "@/lib/hooks/usePointIds";
 import axios from "axios";
 import { FC, useMemo, useState } from "react";
 import { BsThreeDots } from "react-icons/bs";
+import { mutate } from "swr";
 import { usePointContext } from "../contexts/PointContext";
 import makeWarpcastUrl from "../lib/makeWarpcastUrl";
 import { Button } from "./ui/button";
@@ -22,6 +24,7 @@ const TripleDotMenu: FC<TripleDotMenuProps> = ({ portalTarget }) => {
 	const [isOpen, setOpen] = useState(false);
 	const { point, refreshParentThread } = usePointContext();
 	const warpcastUrl = useMemo(() => makeWarpcastUrl(point), [point]);
+	const { rootPointId } = usePointIds();
 
 	const isAuthor = useMemo(
 		() => signer && "fid" in signer && point.author?.fid === signer.fid,
@@ -60,6 +63,7 @@ const TripleDotMenu: FC<TripleDotMenuProps> = ({ portalTarget }) => {
 												data: { signerUuid: signer.signer_uuid },
 											});
 											refreshParentThread();
+											mutate(["graph", rootPointId]);
 											setOpen(false);
 										} catch (error) {
 											console.error("Failed to delete cast:", error);

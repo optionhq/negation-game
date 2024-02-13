@@ -17,14 +17,10 @@ export const hoveredPointIdAtom = atom<string | undefined>(undefined);
 export default function Point({
 	level,
 	parent,
-	setHistoricalItems,
 	getParentAncestry,
 }: {
 	level: number;
 	parent: Node | undefined;
-	setHistoricalItems: React.Dispatch<
-		React.SetStateAction<string[] | undefined>
-	>;
 	getParentAncestry: undefined | (() => string | undefined);
 }) {
 	const { point, detailsOpened, unfurlDropdown } = usePointContext();
@@ -125,13 +121,11 @@ export default function Point({
 			<ChildrenThread
 				type="relevance"
 				level={level}
-				setHistoricalItems={setHistoricalItems}
 				getParentAncestry={getAncestry}
 			/>
 			<ChildrenThread
 				type="conviction"
 				level={level}
-				setHistoricalItems={setHistoricalItems}
 				getParentAncestry={getAncestry}
 			/>
 			<LoadingNegations />

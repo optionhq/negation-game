@@ -74,7 +74,6 @@ export default function AllPointsFeed() {
 							level={0}
 							point={e}
 							parent={undefined}
-							setHistoricalItems={() => {}}
 							setParentChildren={() => {}}
 							getParentAncestry={undefined}
 							refreshParentThread={async () => {

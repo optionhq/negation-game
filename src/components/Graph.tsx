@@ -9,6 +9,7 @@ import Cytoscape, {
 	EventObjectNode,
 	LayoutOptions,
 	NodeSingular,
+	Position,
 	Stylesheet,
 } from "cytoscape";
 
@@ -22,6 +23,7 @@ import { addNegation } from "@/lib/cytoscape/addNegation";
 import { addPointNode } from "@/lib/cytoscape/addPointNode";
 import { assignDissonance } from "@/lib/cytoscape/algo/assignDissonance";
 import { useSignedInUser } from "@/lib/farcaster/useSignedInUser";
+import { usePointIds } from "@/lib/hooks/usePointIds";
 import { cn } from "@/lib/utils";
 import cytoscape from "cytoscape";
 import { EdgeHandlesInstance } from "cytoscape-edgehandles";
@@ -35,7 +37,7 @@ import {
 	useState,
 } from "react";
 import { BiSolidPencil } from "react-icons/bi";
-import useSWR from "swr";
+import useSWR, { mutate } from "swr";
 import {
 	useDebounceCallback,
 	useResizeObserver,
@@ -80,7 +82,7 @@ export const Graph: FC<GraphProps> = ({
 		enabled: true,
 	});
 	useTrackHoveredElement({ cytoscape, enabled: true });
-	// useHandleIncomingElements({ cytoscape, elements });
+	useHandleIncomingElements({ cytoscape, elements });
 	useNegationNodesAutoReposition({
 		cytoscape,
 		enabled: !!cytoscape,
@@ -331,6 +333,7 @@ const useHandleNegate = ({
 	const signerUuid = useSigner().signer?.signer_uuid;
 	const user = useSignedInUser();
 	const [isNegating, setIsNegating] = useState(false);
+	const { focusedElementId } = usePointIds();
 
 	useEffect(() => {
 		if (!cytoscape || !edgeHandles || !enabled) return;
@@ -389,6 +392,8 @@ const useHandleNegate = ({
 			}
 
 			provisionalEdge.remove();
+
+			mutate(["point", focusedElementId]);
 		};
 
 		cytoscape.on("ehcomplete", handleNewEdge);
@@ -396,7 +401,15 @@ const useHandleNegate = ({
 		return () => {
 			cytoscape.off("ehcomplete", handleNewEdge);
 		};
-	}, [cytoscape, enabled, signerUuid, user, setSelectedElement, edgeHandles]);
+	}, [
+		cytoscape,
+		enabled,
+		signerUuid,
+		user,
+		setSelectedElement,
+		edgeHandles,
+		focusedElementId,
+	]);
 
 	const handleNegate = useCallback(() => {
 		if (!selectedElement || !edgeHandles || !enabled) return;
@@ -463,9 +476,22 @@ const useHandleIncomingElements = ({
 }) => {
 	useUpdateEffect(() => {
 		if (!cytoscape) return;
+		const oldPositions = cytoscape
+			.nodes()
+			.reduce(
+				(positions, node) => ({ ...positions, [node.id()]: node.position() }),
+				{} as Record<string, Position>,
+			);
 		cytoscape.startBatch();
+
 		cytoscape.elements().remove();
-		elements && cytoscape.add(elements);
+		elements &&
+			cytoscape.add(
+				elements.map((element) => ({
+					...element,
+					position: oldPositions[element.data.id!] ?? element.position,
+				})),
+			);
 		// updateLayout(cytoscape);
 		cytoscape.endBatch();
 	}, [cytoscape, elements]);

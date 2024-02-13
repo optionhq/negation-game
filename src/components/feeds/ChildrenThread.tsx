@@ -110,14 +110,10 @@ function RelevanceThreadHeader({
 export default function ChildrenThread({
 	type,
 	level,
-	setHistoricalItems,
 	getParentAncestry,
 }: {
 	type: "conviction" | "relevance";
 	level: number;
-	setHistoricalItems: React.Dispatch<
-		React.SetStateAction<string[] | undefined>
-	>;
 	getParentAncestry: undefined | (() => string | undefined);
 }) {
 	const { point, children, setChildren, detailsOpened, refreshChildren } =
@@ -157,7 +153,6 @@ export default function ChildrenThread({
 										level={level + 1}
 										point={el}
 										parent={point}
-										setHistoricalItems={setHistoricalItems}
 										setParentChildren={setChildren}
 										refreshParentThread={refreshChildren}
 										getParentAncestry={getParentAncestry}

@@ -1,5 +1,7 @@
 import { useSigner } from "@/contexts/SignerContext";
+import { usePointIds } from "@/lib/hooks/usePointIds";
 import { Dispatch, SetStateAction } from "react";
+import { mutate } from "swr";
 import { PointProvider } from "../../contexts/PointContext";
 import { negate } from "../../lib/negate";
 import publish from "../../lib/publish";
@@ -14,7 +16,6 @@ export default function PointWrapper({
 	point,
 	parent = undefined,
 	setParentChildren,
-	setHistoricalItems,
 	getParentAncestry,
 	refreshParentThread,
 }: {
@@ -28,7 +29,6 @@ export default function PointWrapper({
 			comment: Node[];
 		}>
 	>;
-	setHistoricalItems: Dispatch<SetStateAction<string[] | undefined>>;
 	getParentAncestry: undefined | (() => string | undefined);
 	refreshParentThread: () => Promise<void>;
 }) {
@@ -38,6 +38,7 @@ export default function PointWrapper({
 			" bg-indigo-25 hover:bg-indigo-50"
 		:	" bg-slate-50 hover:bg-gray-100"
 	}`;
+	const { rootPointId } = usePointIds();
 
 	return (
 		<PointProvider
@@ -77,6 +78,8 @@ export default function PointWrapper({
 						else if (!point.parentId && signer) await publish(text, signer);
 
 						await refreshParentThread();
+						mutate(["graph", rootPointId]);
+
 						setParentChildren?.((element) => {
 							for (const key in element) {
 								element[key as keyof typeof element] = element[
@@ -110,7 +113,6 @@ export default function PointWrapper({
 					level={level}
 					parent={parent}
 					getParentAncestry={getParentAncestry}
-					setHistoricalItems={setHistoricalItems}
 				/>
 			)}
 		</PointProvider>
