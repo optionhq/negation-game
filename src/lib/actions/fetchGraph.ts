@@ -12,7 +12,8 @@ import Cytoscape, {
 } from "cytoscape";
 // @ts-expect-error
 import eulerExtension from "cytoscape-euler";
-import { neynarDb } from "../clients/neynarDb";
+import { sql } from "kysely";
+import { queryFarcasterDb } from "../clients/neynarDb";
 import { addNegation } from "../cytoscape/addNegation";
 import { addPointNode } from "../cytoscape/addPointNode";
 import { assignScores } from "../cytoscape/algo/assignScores";
@@ -35,35 +36,56 @@ const findCast = (
 export const fetchGraph = async (
 	pointId?: string,
 ): Promise<ElementDefinition[]> => {
-	const allNegationGameCasts = (await neynarDb(
+	const playlistedFids = process.env.NEXT_PUBLIC_PLAYLIST?.split(",") || [];
+
+	const allNegationGameCasts = await queryFarcasterDb(
 		async (client) =>
 			await client
-				.query(
-					`
-  SELECT
-    -- c.created_at,
-    p.fname,
-    CONCAT('0x',encode(c.hash, 'hex')) AS hash,
-    c.text,
-    (CASE WHEN (c.parent_hash IS NULL) THEN NULL ELSE CONCAT('0x',encode(c.parent_hash, 'hex')) END) AS "parentHash",
-    -- c.embeds,
-    COUNT(r.target_hash)::int AS likes
-FROM
-    casts c
-LEFT JOIN
-    reactions r ON r.deleted_at IS NULL AND c.hash = r.target_hash AND c.fid = r.target_fid AND r.reaction_type = 1 AND r.fid IN (${process.env.NEXT_PUBLIC_PLAYLIST})
-LEFT JOIN
-    profile_with_addresses p on c.fid = p.fid
-WHERE
-    c.fid IN (${process.env.NEXT_PUBLIC_PLAYLIST}) AND
-    (c.parent_url = '${DEFAULT_CHANNELID}' OR c.root_parent_url = '${DEFAULT_CHANNELID}') AND
-    c.deleted_at IS NULL
-GROUP BY
-    p.fname, c.created_at, c.fid, c.hash, c.text, c.embeds, c.parent_hash, c.embeds
-ORDER BY c.created_at ASC;`,
+				.selectFrom("casts as c")
+				.leftJoin("reactions as r", (join) =>
+					join
+						.onRef("c.hash", "=", "r.target_hash")
+						.onRef("c.fid", "=", "r.target_fid")
+						.on("r.deleted_at", "is", null)
+						.on("r.reaction_type", "=", 1)
+						.on("r.fid", "in", playlistedFids),
 				)
-				.then((res) => res.rows),
-	)) as Cast[];
+				.leftJoin("profile_with_addresses as p", (join) =>
+					join.onRef("c.fid", "=", "p.fid"),
+				)
+				.select([
+					"p.fname",
+					"c.text",
+					sql<`0x${string}`>`CONCAT('0x',encode(c.hash, 'hex'))`.as("hash"),
+					sql<
+						`0x${string}` | null
+					>`(CASE WHEN (c.parent_hash IS NULL) THEN NULL ELSE CONCAT('0x',encode(c.parent_hash, 'hex')) END)`.as(
+						"parentHash",
+					),
+					sql<number>`COUNT(r.target_hash)::int`.as("likes"),
+				])
+				.where("c.fid", "in", playlistedFids)
+				.where("c.deleted_at", "is", null)
+				.where((e) =>
+					e.or([
+						e("c.parent_url", "=", DEFAULT_CHANNELID),
+						e("c.root_parent_url", "=", DEFAULT_CHANNELID),
+					]),
+				)
+				.$narrowType<{ fname: string }>()
+				.groupBy([
+					"p.fname",
+					"c.created_at",
+					"c.fid",
+					"c.hash",
+					"c.text",
+					"c.embeds",
+					"c.parent_hash",
+					"c.embeds",
+				])
+				.orderBy("c.created_at", "asc")
+				.execute(),
+	);
 
 	const cytoscape = Cytoscape({ headless: true });
 

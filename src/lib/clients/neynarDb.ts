@@ -1,7 +1,9 @@
-import { Client } from "pg";
+import { Kysely, PostgresDialect } from "kysely";
+import { Pool } from "pg";
+import { DB } from "./neynarDb.d";
 
-export const neynarDb = async <T>(
-	callback: (client: Client) => Promise<T>,
+export const queryFarcasterDb = async <T>(
+	callback: (farcasterDb: Kysely<DB>) => Promise<T>,
 ): Promise<T> => {
 	if (!process.env.NEYNAR_DB_NAME) {
 		throw new Error("NEYNAR_DB_NAME not set");
@@ -19,19 +21,24 @@ export const neynarDb = async <T>(
 		throw new Error("NEYNAR_DB_PORT not set");
 	}
 
-	const client = new Client({
-		database: process.env.NEYNAR_DB_NAME,
-		user: process.env.NEYNAR_DB_USER,
-		password: process.env.NEYNAR_DB_PASSWORD,
-		host: process.env.NEYNAR_DB_HOST,
-		port: parseInt(process.env.NEYNAR_DB_PORT),
+	const dialect = new PostgresDialect({
+		pool: new Pool({
+			database: process.env.NEYNAR_DB_NAME,
+			user: process.env.NEYNAR_DB_USER,
+			password: process.env.NEYNAR_DB_PASSWORD,
+			host: process.env.NEYNAR_DB_HOST,
+			port: parseInt(process.env.NEYNAR_DB_PORT),
+			max: 1,
+		}),
 	});
 
-	await client.connect();
+	const farcasterDb = new Kysely<DB>({
+		dialect,
+	});
 
-	const result = await callback(client);
+	const results = await callback(farcasterDb);
 
-	await client.end();
+	farcasterDb.destroy();
 
-	return result;
+	return results;
 };
