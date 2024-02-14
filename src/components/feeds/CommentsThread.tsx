@@ -1,8 +1,8 @@
-import { usePointContext } from "../../contexts/PointContext";
 import { useState } from "react";
 import { GoComment } from "react-icons/go";
-import PointWrapper from "../points/PointWrapper";
+import { usePointContext } from "../../contexts/PointContext";
 import { Node } from "../../types/Points";
+import PointWrapper from "../points/PointWrapper";
 
 function CommentThreadHeader({
 	isrelevanceVisible,
@@ -63,7 +63,6 @@ export default function CommentsThread({ level }: { level: number }) {
 										level={level + 1}
 										point={el}
 										parent={point}
-										setHistoricalItems={() => {}}
 										setParentChildren={setChildren}
 										refreshParentThread={refreshChildren}
 										getParentAncestry={() => ""}

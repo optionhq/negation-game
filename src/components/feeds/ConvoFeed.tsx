@@ -59,7 +59,6 @@ export default function ConvoFeed({ conversation }: { conversation: string }) {
 						level={0}
 						point={e}
 						parent={undefined}
-						setHistoricalItems={() => {}}
 						setParentChildren={() => {}}
 						getParentAncestry={undefined}
 						refreshParentThread={fetchItems}

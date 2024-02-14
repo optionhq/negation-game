@@ -36,7 +36,6 @@ export default function Comment({ level }: { level: number }) {
 						key={i}
 						level={level}
 						point={el}
-						setHistoricalItems={() => {}}
 						getParentAncestry={() => ""}
 						refreshParentThread={() => Promise.resolve()}
 					/>
