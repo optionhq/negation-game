@@ -1,13 +1,14 @@
 // src/components/ConversationPreview.tsx
 "use client";
-import React, { useEffect, useState } from "react";
+import { useSigner } from "@/contexts/SignerContext";
 import axios from "axios";
 import Link from "next/link";
-import Score from "./score/Score";
+import { Cast } from "neynar-next/server";
+import { useEffect, useState } from "react";
 import { PointProvider } from "../contexts/PointContext";
 import { getMaybeNegation } from "../lib/useCasts";
-import { Cast, Node } from "../types/Points";
-import { useSigner } from "@/contexts/SignerContext";
+import { Node } from "../types/Points";
+import Score from "./score/Score";
 
 export default function ConversationPreview({ id }: { id: string }) {
 	const [conversation, setConversation] = useState<Cast | null>(null);
