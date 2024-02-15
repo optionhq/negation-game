@@ -21,7 +21,7 @@ export default function AllPointsFeed() {
 			if (previousPageData && previousPageData.length === 0) return null;
 			return ["allPoints", pageNumber];
 		},
-		([, pageNumber]) => fetchAllPoints({ pageNumber, pageSize: 25 }),
+		([, pageNumber]) => fetchAllPoints({ pageNumber, pageSize: 10 }),
 		{ revalidateFirstPage: false },
 	);
 
