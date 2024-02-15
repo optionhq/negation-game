@@ -32,24 +32,21 @@ export const fetchAllPoints = async ({
 			.leftJoin("profile_with_addresses as p", (join) =>
 				join.onRef("c.fid", "=", "p.fid"),
 			)
-			.leftJoin(
-				(e) =>
-					e
-						.selectFrom("casts as reply_cast")
-						.select(({ fn, val, ref }) => [
-							"reply_cast.parent_hash",
-							sql<number | null>`COUNT(reply_cast.hash)::int`.as(
-								"replies_count",
-							),
-						])
-
-						.groupBy("reply_cast.parent_hash")
-						// .where("reply_cast.parent_hash", "is not", null)
-						.as("reply"),
-				(j) => j.onRef("c.hash", "=", "reply.parent_hash"),
-			)
+			// .leftJoin(
+			// 	(e) =>
+			// 		e
+			// 			.selectFrom("casts")
+			// 			.select([
+			// 				"parent_hash",
+			// 				sql<number | null>`COUNT(hash)::int`.as("replies_count"),
+			// 			])
+			// 			.where("deleted_at", "is", null)
+			// 			.groupBy("parent_hash")
+			// 			.as("reply"),
+			// 	(j) => j.onRef("c.hash", "=", "reply.parent_hash"),
+			// )
 			.select([
-				"replies_count",
+				// "replies_count",
 				"p.fname",
 				"c.created_at",
 				"c.fid",
@@ -93,7 +90,7 @@ export const fetchAllPoints = async ({
 				"p.display_name",
 				"p.avatar_url",
 				"c.text",
-				"replies_count",
+				// "replies_count",
 			])
 			.limit(pageSize)
 			.offset(pageNumber * pageSize)
@@ -113,7 +110,7 @@ export const fetchAllPoints = async ({
 				type: "root",
 				advocates: cast.likers.map((fid) => ({ fid })),
 				points: cast.likers.length,
-				replyCount: cast.replies_count ?? 0,
+				// replyCount: cast.replies_count ?? 0,
 			}),
 		);
 	});
