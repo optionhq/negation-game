@@ -14,7 +14,7 @@ const infos: { [key: string]: { description: string } } = {
 
 export default function Page() {
 	return (
-		<div className="relative flex flex-1 flex-col items-center gap-6 pb-6 sm:gap-12  sm:pb-12">
+		<div className="relative flex flex-1 flex-col items-center gap-6 overflow-scroll pb-6  sm:gap-12 sm:pb-12">
 			<div className="left-0 right-0 top-0 flex w-full flex-row items-center justify-center bg-purple-900/80 p-3 text-white">
 				<div>
 					Want to open a space in the negation game ? Ping Connor&nbsp;{" "}
