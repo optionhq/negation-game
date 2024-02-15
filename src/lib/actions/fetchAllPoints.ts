@@ -62,7 +62,7 @@ export const fetchAllPoints = async ({
 				>`(CASE WHEN (c.parent_hash IS NULL) THEN NULL ELSE CONCAT('0x',encode(c.parent_hash, 'hex')) END)`.as(
 					"parent_id",
 				),
-				sql<number[]>`array_remove(array_agg(r.fid), null)`.as("likers"),
+				sql<number[]>`array_remove(array_agg(r.fid::int), null)`.as("likers"),
 			])
 			.where((e) =>
 				e.and([
