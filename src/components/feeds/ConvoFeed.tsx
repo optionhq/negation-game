@@ -1,10 +1,17 @@
 import { getMaybeNegation } from "@/lib/useCasts";
+import { cn } from "@/lib/utils";
 import { Node } from "@/types/Points";
 import axios from "axios";
 import { useCallback, useEffect, useRef, useState } from "react";
 import PointWrapper from "../points/PointWrapper";
 
-export default function ConvoFeed({ conversation }: { conversation: string }) {
+export default function ConvoFeed({
+	conversation,
+	className,
+}: {
+	conversation: string;
+	className?: string;
+}) {
 	const [topic, setTopic] = useState("");
 	const isFetching = useRef(false);
 	const [points, setPoints] = useState<Node[]>([]);
@@ -48,7 +55,12 @@ export default function ConvoFeed({ conversation }: { conversation: string }) {
 	}, [conversation, fetchItems]);
 
 	return (
-		<div className="centered-element flex flex-col items-center gap-4 py-4">
+		<div
+			className={cn(
+				"centered-element flex flex-col items-center gap-4 py-4",
+				className,
+			)}
+		>
 			<h2 className="sticky top-6 z-30 w-full border bg-white bg-gradient-to-tr from-purple-50 to-blue-50 p-6 text-center text-lg font-medium shadow-sm md:text-xl ">
 				{topic}
 			</h2>

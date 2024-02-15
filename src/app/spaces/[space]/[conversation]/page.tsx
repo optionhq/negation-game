@@ -10,10 +10,16 @@ export default function Page({
 	params: { conversation: string };
 }) {
 	const { ids, setIds } = usePointIds();
-	if (!ids) return <ConvoFeed conversation={conversation} />;
+	if (!ids)
+		return (
+			<ConvoFeed
+				conversation={conversation}
+				className="h-full overflow-scroll"
+			/>
+		);
 
 	return (
-		<div className="flex h-full w-full flex-grow flex-col gap-0 overflow-clip">
+		<div className="flex h-full w-full flex-grow flex-col gap-0 overflow-scroll">
 			<div
 				onClick={() => {
 					setIds("");
@@ -23,7 +29,7 @@ export default function Page({
 				<BiChevronLeft size={20} />
 				<p className="px-2">Back to convo</p>
 			</div>
-			<PointThread />;
+			<PointThread />
 		</div>
 	);
 }

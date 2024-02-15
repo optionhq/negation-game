@@ -31,10 +31,10 @@ export default function RootLayout({
 }) {
 	return (
 		<CytoscapeProvider>
-			<html lang="en" className="h-full">
-				<body className={cn("h-full font-sans", inter.variable)}>
+			<html lang="en" className="h-full overscroll-contain">
+				<body className={cn("h-full  font-sans", inter.variable)}>
 					<SignerProvider>
-						<div className="flex h-full min-h-screen flex-col">
+						<div className="flex h-full min-h-screen flex-col ">
 							<header className="md: sticky top-0 z-50 grid w-full grid-cols-2 items-center justify-center gap-6 border bg-slate-50 px-4 py-2 md:grid-cols-[auto_1fr_auto]">
 								<Link
 									href={"/"}
@@ -52,9 +52,7 @@ export default function RootLayout({
 								</div>
 							</header>
 
-							<div className="flex-grow overflow-clip">
-								<div className="h-full w-full overflow-scroll">{children}</div>
-							</div>
+							<div className="min-h-0 flex-grow overflow-clip">{children}</div>
 							<Navigation className=" w-full gap-0 border bg-slate-50 p-1 text-sm md:hidden" />
 						</div>
 						<Toaster

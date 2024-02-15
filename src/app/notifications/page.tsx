@@ -65,7 +65,7 @@ export default function Notifications() {
 	}, [signer, handleObserver]);
 
 	return (
-		<div className="mx-4 flex flex-1 justify-center py-6 sm:py-12 md:mx-12 ">
+		<div className="mx-4 flex h-full flex-1 justify-center overflow-scroll py-6 sm:py-12 md:mx-12 ">
 			<div className="flex flex-col items-center gap-2">
 				{notifications.map((notif, i) => (
 					<NotificationWrapper
