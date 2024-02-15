@@ -1,5 +1,5 @@
 import { Embed } from "@/types/Embed";
-import { Cast } from "neynar-next/server";
+import { Cast } from "@/types/Points";
 
 // these are the only URLs that can used to fetch a cast
 export const okUrls = [

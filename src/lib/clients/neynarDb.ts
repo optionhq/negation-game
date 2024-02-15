@@ -28,7 +28,8 @@ export const queryFarcasterDb = async <T>(
 			password: process.env.NEYNAR_DB_PASSWORD,
 			host: process.env.NEYNAR_DB_HOST,
 			port: parseInt(process.env.NEYNAR_DB_PORT),
-			max: 1,
+			max: 5,
+			allowExitOnIdle: true,
 		}),
 	});
 
@@ -38,7 +39,7 @@ export const queryFarcasterDb = async <T>(
 
 	const results = await callback(farcasterDb);
 
-	farcasterDb.destroy();
+	await farcasterDb.destroy();
 
 	return results;
 };

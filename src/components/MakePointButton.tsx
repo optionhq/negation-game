@@ -1,4 +1,5 @@
 "use client";
+import { ROOT_CAST_ID } from "@/config";
 import { useSigner } from "@/contexts/SignerContext";
 import { usePointIds } from "@/lib/hooks/usePointIds";
 import { cn } from "@/lib/utils";
@@ -49,7 +50,7 @@ export default function MakePointButton({
 							description: content,
 						});
 
-						publish(content, signer, conversation)
+						publish(content, signer, conversation || ROOT_CAST_ID)
 							.then((response) => {
 								const castHash = response?.data.cast.hash;
 								if (!castHash) {

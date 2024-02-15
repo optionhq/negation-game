@@ -1,8 +1,7 @@
-import { Cast } from "neynar-next/server";
-import { Node } from "../types/Points";
-import { extractEndPointUrl } from "./useEndPoints";
 import axios from "axios";
+import { Cast, Node } from "../types/Points";
 import isNegation from "./isNegation";
+import { extractEndPointUrl } from "./useEndPoints";
 
 export async function getMaybeNegation(cast: Cast): Promise<Node> {
 	const maybeNegation = castToNegation(cast);
@@ -21,6 +20,21 @@ export async function getMaybeNegation(cast: Cast): Promise<Node> {
 	return maybeNegation;
 }
 
+export async function fetchNegationTargets(node: Node): Promise<Node> {
+	if (node.endPointUrl) {
+		const res = await axios.get(
+			`/api/cast?type=url&identifier=${node.endPointUrl}`,
+		);
+		res.status === 200 || console.error("Failed to fetch cast", res);
+		if (!res.data) return node;
+		const endPoint: Node = castToPoint(res.data);
+		node.endPoint = endPoint;
+		if (isNegation(node)) node.type = "negation";
+	}
+
+	return node;
+}
+
 export function castToNegation(cast: Cast): Node {
 	const endPointUrl = extractEndPointUrl(cast);
 	return {
@@ -30,7 +44,6 @@ export function castToNegation(cast: Cast): Node {
 		parentId: cast.parent_hash as string,
 		points: cast.reactions?.likes?.length,
 		advocates: cast.reactions?.likes,
-		lovers: cast.reactions?.recasts,
 		replyCount: cast.replies?.count,
 		children: [],
 		endPointUrl: endPointUrl || undefined,
@@ -46,7 +59,6 @@ export function castToPoint(cast: Cast): Node {
 		parentId: cast.parent_hash || undefined,
 		replyCount: cast.replies?.count,
 		advocates: cast.reactions?.likes,
-		lovers: cast.reactions?.recasts,
 		points: cast.reactions?.likes?.length,
 		children: [],
 		type: "root",

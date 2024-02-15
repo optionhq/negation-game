@@ -2,9 +2,8 @@
 
 import LoadingPane from "@/app/loading";
 import { getMaybeNegation } from "@/lib/useCasts";
-import { Node } from "@/types/Points";
+import { Cast, Node } from "@/types/Points";
 import axios from "axios";
-import { Cast } from "neynar-next/server";
 import useSWR, { mutate } from "swr";
 import { unstable_serialize } from "swr/infinite";
 import MakePointButton from "../MakePointButton";

@@ -1,4 +1,4 @@
-export interface Cast {
+export interface GameCast {
 	fname: string;
 	hash: string;
 	text: string;

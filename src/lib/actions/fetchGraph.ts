@@ -1,9 +1,9 @@
 "use server";
 
-import { DEFAULT_CHANNELID } from "@/config";
+import { DEFAULT_CHANNELID, ROOT_CAST_ID } from "@/config";
 import { extractTruncatedHash } from "@/lib/extractTruncatedHash";
 import { isValidNegation } from "@/lib/isValidNegation";
-import { Cast } from "@/types/Cast";
+import { GameCast } from "@/types/Cast";
 import Cytoscape, {
 	CollectionReturnValue,
 	EdgeSingular,
@@ -22,7 +22,7 @@ Cytoscape.use(eulerExtension);
 
 const findCast = (
 	truncatedHash: string,
-	casts: Cast[],
+	casts: GameCast[],
 	searchToIndex: number,
 ) => {
 	for (let i = 0; i < searchToIndex; i++) {
@@ -68,8 +68,12 @@ export const fetchGraph = async (
 				.where("c.deleted_at", "is", null)
 				.where((e) =>
 					e.or([
-						e("c.parent_url", "=", DEFAULT_CHANNELID),
 						e("c.root_parent_url", "=", DEFAULT_CHANNELID),
+						e(
+							sql<string>`CONCAT('0x',encode(c.root_parent_hash, 'hex'))`,
+							"=",
+							ROOT_CAST_ID,
+						),
 					]),
 				)
 				.$narrowType<{ fname: string }>()
@@ -91,7 +95,7 @@ export const fetchGraph = async (
 
 	for (let i = 0; i < allNegationGameCasts.length; i++) {
 		const negatedNodeHash = allNegationGameCasts[i].parentHash;
-		if (negatedNodeHash === null) {
+		if (negatedNodeHash === null || negatedNodeHash === ROOT_CAST_ID) {
 			// console.log("adding point node", allNegationGameCasts[i]);
 			addPointNode(cytoscape, allNegationGameCasts[i]);
 

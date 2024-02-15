@@ -2,10 +2,9 @@
 
 import { usePointIds } from "@/lib/hooks/usePointIds";
 import axios from "axios";
-import { Cast } from "neynar-next/server";
 import { useEffect, useState } from "react";
 import { getMaybeNegation } from "../../lib/useCasts";
-import { Node } from "../../types/Points";
+import { Cast, Node } from "../../types/Points";
 
 export function HistoricalPoint({
 	id,

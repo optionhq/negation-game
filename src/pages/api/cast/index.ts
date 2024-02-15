@@ -1,8 +1,8 @@
 import neynarClient from "../../../lib/neynar";
-import { Cast } from "neynar-next/server";
 import { NextApiResponse } from "next";
 import { NextApiRequest } from "next";
 import Joi from "joi";
+import { Cast } from "@/types/Points";
 
 const getSchema = Joi.object({
 	type: Joi.string().valid("url", "hash").required(),

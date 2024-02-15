@@ -1,9 +1,9 @@
-import { Cast } from "@/types/Cast";
+import { GameCast } from "@/types/Cast";
 import { Core, ElementDefinition } from "cytoscape";
 
 export const addPointNode = (
 	cytoscape: Core,
-	cast: Cast,
+	cast: GameCast,
 	params?: Partial<Omit<ElementDefinition, "data" | "group">>,
 ) => {
 	cytoscape.add({

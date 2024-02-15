@@ -1,4 +1,21 @@
-import { User } from "neynar-next/server";
+import { Cast as NeynarCast } from "neynar-next/server";
+
+export interface User
+	extends Pick<
+		NeynarCast["author"],
+		"fid" | "username" | "display_name" | "pfp_url"
+	> {}
+
+export interface Reactions extends Pick<NeynarCast["reactions"], "likes"> {}
+
+export interface Cast
+	extends Pick<
+		NeynarCast,
+		"text" | "hash" | "parent_hash" | "replies" | "embeds"
+	> {
+	author: User;
+	reactions: Reactions;
+}
 
 export type Node = {
 	title: string;
@@ -9,7 +26,6 @@ export type Node = {
 	points?: number;
 	replyCount?: number;
 	advocates?: { fid: number }[];
-	lovers?: { fid: number }[];
 	children?: Node[];
 	type: "root" | "input" | "negation" | "comment" | "publishing";
 	negationType?: "relevance" | "conviction";

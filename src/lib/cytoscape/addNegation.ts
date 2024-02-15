@@ -1,9 +1,9 @@
-import { Cast } from "@/types/Cast";
+import { GameCast } from "@/types/Cast";
 import { Core, ElementDefinition, NodeSingular } from "cytoscape";
 
 export const addNegation = (
 	cytoscape: Core,
-	negationCast: Omit<Cast, "text">,
+	negationCast: Omit<GameCast, "text">,
 	negatingPoint: NodeSingular,
 	negatedNode: NodeSingular,
 	includeAuxEdges = false,
