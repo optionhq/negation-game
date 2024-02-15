@@ -1,6 +1,6 @@
-import { NextApiResponse, NextApiRequest } from "next";
-import neynarClient from "../../../../../lib/neynar";
 import Joi from "joi";
+import { NextApiRequest, NextApiResponse } from "next";
+import neynarClient from "../../../../../lib/neynar";
 
 const schema = Joi.object({
 	signerUuid: Joi.string().required(),
@@ -13,7 +13,7 @@ export async function POST(request: NextApiRequest, response: NextApiResponse) {
 	const hash = request.query.hash as string;
 	await neynarClient.likeCast(value.signerUuid, hash as `0x${string}`);
 
-	return response.status(201).json({});
+	return response.status(204).end();
 }
 
 export async function DELETE(
@@ -26,7 +26,7 @@ export async function DELETE(
 	const hash = request.query.hash as string;
 	await neynarClient.unlikeCast(value.signerUuid, hash as `0x${string}`);
 
-	return response.status(204).json({});
+	return response.status(204).end();
 }
 
 export default async function handler(
