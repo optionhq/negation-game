@@ -14,12 +14,17 @@ export default function PointThread({ className }: { className?: string }) {
 
 	const { data: point, mutate: invalidate } = useSWR(
 		["point", focusedElementId],
-		async () =>
-			await getMaybeNegation(
+		async () => {
+			let resp = await getMaybeNegation(
 				await axios
 					.get(`/api/cast?type=hash&identifier=${focusedElementId}`)
-					.then((res) => res.data as Cast),
-			),
+					.then(async (res) => {
+						return res.data as Cast;
+					}),
+			);
+			if (resp.parentId && resp.type !== "negation") resp.type = "comment";
+			return resp;
+		},
 	);
 
 	return (
