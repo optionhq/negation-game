@@ -5,7 +5,6 @@ import { cn } from "@/lib/utils";
 import { usePathname } from "next/navigation";
 import { BiSolidGroup } from "react-icons/bi";
 import { HiHome } from "react-icons/hi";
-import { PiGraphBold } from "react-icons/pi";
 import NavItem from "./NavItem";
 import NotificationElement from "./NotificationElement";
 ("./NotificationElement");
@@ -18,10 +17,7 @@ export default function Navigation({ className }: { className?: string }) {
 	return (
 		<ul
 			role="navigation"
-			className={cn(
-				"flex flex-row justify-center",
-				className,
-			)}
+			className={cn("flex flex-row justify-center", className)}
 		>
 			<NavItem
 				Icon={HiHome}
@@ -34,12 +30,6 @@ export default function Navigation({ className }: { className?: string }) {
 				name="Spaces"
 				path="/spaces"
 				currentPath={pathName?.split("/")[1] === "spaces"}
-			/>
-			<NavItem
-				Icon={PiGraphBold}
-				name="Graph"
-				path="/graph"
-				currentPath={pathName?.split("/")[1] === "graph"}
 			/>
 			{signer && <NotificationElement />}
 		</ul>
