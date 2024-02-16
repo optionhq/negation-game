@@ -64,16 +64,28 @@ export const fetchGraph = async (
 					),
 					sql<number>`COUNT(r.target_hash)::int`.as("likes"),
 				])
-				.where("c.fid", "in", playlistedFids)
-				.where("c.deleted_at", "is", null)
 				.where((e) =>
-					e.or([
-						e("c.root_parent_url", "=", DEFAULT_CHANNELID),
+					e.and([
 						e(
-							sql<string>`CONCAT('0x',encode(c.root_parent_hash, 'hex'))`,
-							"=",
-							ROOT_CAST_ID,
+							"c.fid",
+							"in",
+							sql<string>`(${sql.raw(process.env.NEXT_PUBLIC_PLAYLIST ?? "")})`,
 						),
+						e("c.deleted_at", "is", null),
+						e(
+							"c.hash",
+							"!=",
+							sql<Buffer>`'\\x${sql.raw(`${ROOT_CAST_ID.slice(2)}`)}'::bytea`,
+						),
+						e.or([
+							e("c.parent_url", "=", DEFAULT_CHANNELID),
+
+							e(
+								"c.parent_hash",
+								"=",
+								sql<Buffer>`'\\x${sql.raw(`${ROOT_CAST_ID.slice(2)}`)}'::bytea`,
+							),
+						]),
 					]),
 				)
 				.$narrowType<{ fname: string }>()

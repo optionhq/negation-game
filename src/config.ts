@@ -1,7 +1,7 @@
 export const DEFAULT_CHANNELID = "https://negationgame.com";
 
-//https://warpcast.com/point/0x1dfb6fe0
-export const ROOT_CAST_ID = "0x1dfb6fe08956d68fb18a3c72145585027bf89b81";
+//https://warpcast.com/negationgame/0xbddf1e693575f35ee913b7f8eb3b1c272a21a573
+export const ROOT_CAST_ID = "0xbddf1e693575f35ee913b7f8eb3b1c272a21a573";
 
 export const NEGATION_SYMBOL = "nah";
 

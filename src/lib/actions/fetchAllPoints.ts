@@ -12,8 +12,6 @@ export const fetchAllPoints = async ({
 	pageNumber: number;
 	pageSize: number;
 }) => {
-	const rootCastHash = ROOT_CAST_ID.slice(2);
-
 	return await queryFarcasterDb(async (client) => {
 		const queryBuilder = client
 			.selectFrom("casts as c")
@@ -69,12 +67,18 @@ export const fetchAllPoints = async ({
 						sql<string>`(${sql.raw(process.env.NEXT_PUBLIC_PLAYLIST ?? "")})`,
 					),
 					e("c.deleted_at", "is", null),
+					e(
+						"c.hash",
+						"!=",
+						sql<Buffer>`'\\x${sql.raw(`${ROOT_CAST_ID.slice(2)}`)}'::bytea`,
+					),
 					e.or([
 						e("c.parent_url", "=", DEFAULT_CHANNELID),
+
 						e(
 							"c.parent_hash",
 							"=",
-							sql<Buffer>`'\\x${sql.raw(`${rootCastHash}`)}'::bytea`,
+							sql<Buffer>`'\\x${sql.raw(`${ROOT_CAST_ID.slice(2)}`)}'::bytea`,
 						),
 					]),
 				]),
