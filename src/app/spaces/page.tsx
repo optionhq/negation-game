@@ -35,11 +35,11 @@ export default function Page() {
 						<button
 							type="button"
 							key={space}
-							className=" w-80 items-start rounded-md border p-4 shadow-lg transition-shadow duration-200 ease-in-out hover:shadow-xl"
+							className="flex w-80 flex-col items-start rounded-md border p-4 shadow-lg transition-shadow duration-200 ease-in-out hover:shadow-xl"
 						>
 							<Link
 								href={`/spaces/${space}`}
-								className="flex flex-col items-start gap-2"
+								className="flex h-full flex-col items-start gap-2"
 							>
 								<div className="flex flex-row items-center gap-4">
 									<div
@@ -50,7 +50,7 @@ export default function Page() {
 										{space.charAt(0).toUpperCase() + space.slice(1)}
 									</h3>
 								</div>
-								<p className=" text-left text-gray-500">
+								<p className=" flex-1 text-left text-gray-500">
 									{infos[space]?.description}
 								</p>
 								<p className="text-gray-500">
