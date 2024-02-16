@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { Node } from "../../types/Points";
+import Text from "../Text";
 
 export default function RecastedPoint({ url }: { url: string }) {
 	const [data, setData] = useState<Node>();
@@ -17,7 +18,7 @@ export default function RecastedPoint({ url }: { url: string }) {
 
 	return (
 		<div className="m-2 max-h-36 w-full rounded-md border border-slate-300 p-2">
-			{data?.title}
+			<Text text={data?.title} />
 		</div>
 	);
 }
