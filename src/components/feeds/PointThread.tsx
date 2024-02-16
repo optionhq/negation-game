@@ -8,6 +8,7 @@ import useSWR from "swr";
 import { Loader } from "../Loader";
 import HistoricalPoints from "../points/HistoricalPoints";
 import PointWrapper from "../points/PointWrapper";
+import { ROOT_CAST_ID } from "@/config";
 
 export default function PointThread({ className }: { className?: string }) {
 	const { focusedElementId, historicalPointIds } = usePointIds();
@@ -25,7 +26,7 @@ export default function PointThread({ className }: { className?: string }) {
 			if (
 				resp.parentId &&
 				resp.type !== "negation" &&
-				resp.parentId != "0x1dfb6fe08956d68fb18a3c72145585027bf89b81"
+				resp.parentId != ROOT_CAST_ID
 			)
 				resp.type = "comment";
 			return resp;
