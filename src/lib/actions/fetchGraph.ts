@@ -77,15 +77,7 @@ export const fetchGraph = async (
 							"!=",
 							sql<Buffer>`'\\x${sql.raw(`${ROOT_CAST_ID.slice(2)}`)}'::bytea`,
 						),
-						e.or([
-							e("c.parent_url", "=", DEFAULT_CHANNELID),
-
-							e(
-								"c.parent_hash",
-								"=",
-								sql<Buffer>`'\\x${sql.raw(`${ROOT_CAST_ID.slice(2)}`)}'::bytea`,
-							),
-						]),
+						e("c.root_parent_url", "=", DEFAULT_CHANNELID),
 					]),
 				)
 				.$narrowType<{ fname: string }>()
