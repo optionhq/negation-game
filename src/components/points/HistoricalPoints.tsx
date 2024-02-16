@@ -14,17 +14,26 @@ export function HistoricalPoint({
 	onClick: () => void;
 }) {
 	const [cast, setCast] = useState<Node | null>(null);
-
+	const [deleted, setDeleted] = useState(false);
 	useEffect(() => {
 		const fetchCast = async () => {
 			const res = await axios.get(`/api/cast?type=hash&identifier=${id}`);
-			const cast: Cast = res.data;
-			const maybeNegation = await getMaybeNegation(cast);
-			setCast(maybeNegation);
+			if (res) {
+				console.log(res);
+				if (res.data === "") {
+					setDeleted(true);
+					return;
+				}
+				const cast: Cast = res.data;
+				const maybeNegation = await getMaybeNegation(cast);
+				setCast(maybeNegation);
+			}
 		};
 		fetchCast();
 	}, [id]);
 
+	if (deleted)
+		return <div className="italic text-gray-700">Deleted point.</div>;
 	return (
 		<div
 			className="relative flex w-auto cursor-pointer gap-2 rounded-md px-2 py-4 hover:bg-gray-100"
