@@ -42,7 +42,7 @@ export default function RootLayout({
 				<body className={cn("h-[100dvh]  font-sans", inter.variable)}>
 					<SignerProvider>
 						<div className="flex h-[100dvh] min-h-[100dvh] flex-col ">
-							<header className="md: sticky top-0 z-50 grid w-full grid-cols-2 items-center justify-center gap-6 border bg-slate-50 px-4 py-2 md:grid-cols-[auto_1fr_auto]">
+							<header className=" sticky top-0 z-50 grid w-full grid-cols-2 items-center justify-center gap-3 border bg-slate-50 px-4 py-2 md:grid-cols-[1fr_3fr_1fr] ">
 								<Link
 									href={"/"}
 									className="flex w-fit select-none flex-col text-xl font-black leading-[0.85] text-violet-700"
@@ -53,14 +53,14 @@ export default function RootLayout({
 										<IoArrowRedo className="rotate-180" />
 									</div>
 								</Link>
-								<Navigation className="hidden gap-1 text-sm md:flex lg:gap-4 lg:text-base" />
-								<div className="flex w-full flex-1 justify-end">
+								<Navigation className="text-md hidden justify-center gap-16 md:flex" />
+								<div className="flex w-fit justify-self-end">
 									<Login />
 								</div>
 							</header>
 
 							<div className="min-h-0 flex-grow overflow-clip">{children}</div>
-							<Navigation className=" w-full gap-0 border bg-slate-50 p-1 text-sm md:hidden" />
+							<Navigation className="text-md w-full justify-evenly border bg-slate-50 p-1 md:hidden" />
 						</div>
 						<Toaster
 							position="bottom-right"
