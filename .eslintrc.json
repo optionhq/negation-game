@@ -8,6 +8,10 @@
 					{
 						"name": "joi",
 						"message": "Please use 'zod' instead, which is type-safe."
+					},
+					{
+						"name": "axios",
+						"message": "Please use the native fetch API instead."
 					}
 				]
 			}
