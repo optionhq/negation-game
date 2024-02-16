@@ -22,7 +22,12 @@ export default function PointThread({ className }: { className?: string }) {
 						return res.data as Cast;
 					}),
 			);
-			if (resp.parentId && resp.type !== "negation") resp.type = "comment";
+			if (
+				resp.parentId &&
+				resp.type !== "negation" &&
+				resp.parentId != "0x1dfb6fe08956d68fb18a3c72145585027bf89b81"
+			)
+				resp.type = "comment";
 			return resp;
 		},
 	);
