@@ -11,9 +11,7 @@ export default function NegationText() {
 	return (
 		<>
 			{point.endPoint && isNegation(point) && (
-				<div className="table w-full">
-					<Text text={point.endPoint.title} />
-				</div>
+				<Text text={point.endPoint.title} />
 			)}
 			{!point.endPoint && (
 				<div className=" table w-full table-fixed">
