@@ -44,13 +44,15 @@ export const style: cytoscape.Stylesheet[] = [
 			"background-color": (node: NodeSingular) =>
 				node.data("dissonance") !== undefined ? "#06d" : "#fa0",
 			"text-valign": "center",
-			color: "#fff",
+			color: (node: NodeSingular) =>
+				node.data("dissonance") !== undefined ? "#fff" : "#000",
+
 			width: 32,
 			height: 32,
 			label: (node: NodeSingular) =>
 				node.data("dissonance") !== undefined ?
 					`${node.data("dissonance")}`
-				:	"",
+				:	`${node.data("likes")}`,
 		},
 	},
 	// {

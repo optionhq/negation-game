@@ -159,7 +159,7 @@ export const fetchGraph = async (
 			// ? extendedClosedNeighborhood(pointId, cy.elements(), 2)
 		:	cytoscape.elements();
 
-	assignScores(elements);
+	// assignScores(elements);
 
 	elements.layout({ name: "grid" }).run();
 
