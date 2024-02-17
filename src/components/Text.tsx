@@ -1,7 +1,4 @@
 export default function Text({ text }: { text: string | undefined }) {
-	// Regular expression to detect URLs
-	// const urlRegex = /((https?:\/\/)|(www\.)[^\s])+/g;
-	// const urlRegex = /(https?:\/\/[^\s]+)/g;
 	if (!text) return <></>;
 
 	const urlRegex =
@@ -19,16 +16,18 @@ export default function Text({ text }: { text: string | undefined }) {
 					href={part}
 					target="_blank"
 					rel="noopener noreferrer"
-					className=" text-blue-600 underline "
+					className=" w-full break-all text-blue-600 underline"
 				>
 					{part}
 				</a>
 			);
-		} else {
-			// Otherwise, return plain text
-			return <span key={index}>{part}</span>;
 		}
+		return (
+			<span key={index} className=" break-words">
+				{part}
+			</span>
+		);
 	});
 
-	return <p className="table-cell text-ellipsis">{content}</p>;
+	return <p className=" w-full">{content}</p>;
 }
