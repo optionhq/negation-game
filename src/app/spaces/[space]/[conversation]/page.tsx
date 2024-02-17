@@ -5,15 +5,16 @@ import { usePointIds } from "@/lib/hooks/usePointIds";
 import { BiChevronLeft } from "react-icons/bi";
 
 export default function Page({
-	params: { conversation },
+	params: { conversation, space },
 }: {
-	params: { conversation: string };
+	params: { conversation: string; space: string };
 }) {
 	const { ids, setIds } = usePointIds();
 	if (!ids)
 		return (
 			<ConvoFeed
 				conversation={conversation}
+				space={space}
 				className="h-full overflow-scroll"
 			/>
 		);

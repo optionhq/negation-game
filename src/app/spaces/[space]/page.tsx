@@ -8,7 +8,7 @@ export default function Page({
 	params: { space: string };
 }) {
 	return (
-		<div className="flex h-full flex-col items-center gap-2 overflow-scroll py-12">
+		<div className="flex h-full flex-col items-center gap-2 overflow-scroll py-4 md:py-12">
 			{SPACES[space]?.map((id: string) => (
 				<ConversationPreview key={id} id={id} />
 			))}
