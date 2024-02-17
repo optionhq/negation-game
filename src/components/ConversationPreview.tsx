@@ -62,7 +62,7 @@ export default function ConversationPreview({ id }: { id: string }) {
 	return (
 		<Link
 			href={`/spaces/purple/${id}`}
-			className="relative mx-2 block cursor-pointer gap-2 overflow-hidden rounded-lg border bg-white shadow-md sm:mx-4 md:mx-20 lg:mx-40 xl:mx-96"
+			className="relative mx-2 block max-w-4xl cursor-pointer gap-2 rounded-lg border bg-white shadow-md sm:mx-4 md:mx-20 "
 		>
 			<div className="flex flex-col gap-3 bg-slate-100 px-6 py-3">
 				<div className="flex justify-between">
