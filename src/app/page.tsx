@@ -9,10 +9,6 @@ import { usePointIds } from "@/lib/hooks/usePointIds";
 import { BiChevronLeft } from "react-icons/bi";
 import { PiGraphBold, PiRowsBold } from "react-icons/pi";
 
-interface PointParams {
-	id: string;
-}
-
 export default function Page() {
 	const { ids, setIds, rootPointId, focusedElementId } = usePointIds();
 	const isAtLeastMd = useIsAtLeast("md");
@@ -57,7 +53,7 @@ export default function Page() {
 			</div>
 			<TabsContent
 				value="thread"
-				className="m-0 w-full flex-grow overflow-clip transition-none data-[state=active]:flex"
+				className="m-0 w-full flex-grow overflow-auto transition-none data-[state=active]:flex"
 			>
 				<PointThread className="h-full w-full shrink-0 overflow-scroll shadow-lg md:w-[450px]" />
 				{isAtLeastMd && (
