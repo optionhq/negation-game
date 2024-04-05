@@ -15,10 +15,14 @@ const fetchPinnedCasts = async () => {
 
 	if (pinnedHashes) {
 		for (const hash of pinnedHashes) {
-			const cast = await axios.get(
-				`/api/cast?type=hash&identifier=${hash.trim()}`,
-			);
-			fetchedPinnedCasts.push(await getMaybeNegation(cast.data as Cast));
+			const cast = (await axios
+				.get(`/api/cast?type=hash&identifier=${hash.trim()}`)
+				.then((res) => {
+					const cast = res.data;
+					delete cast.replies;
+					return cast;
+				})) as Cast;
+			fetchedPinnedCasts.push(await getMaybeNegation(cast));
 		}
 	}
 	return fetchedPinnedCasts;
