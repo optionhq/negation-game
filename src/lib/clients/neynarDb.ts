@@ -30,6 +30,7 @@ export const queryFarcasterDb = async <T>(
 			port: parseInt(process.env.NEYNAR_DB_PORT),
 			max: 5,
 			allowExitOnIdle: true,
+			ssl: { rejectUnauthorized: false },
 		}),
 	});
 
